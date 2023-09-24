@@ -51,6 +51,26 @@ public class Manager {
         }
     }
 
+    public void enable(Config conf) {
+        conf.func.onEnable();
+        conf.func.onChanged(true);
+        conf.enabled = true;
+    }
+
+    public void disable(Config conf) {
+        conf.func.onDisable();
+        conf.func.onChanged(false);
+        conf.enabled = false;
+    }
+
+    public void toggle(Config conf) {
+        if (conf.enabled) {
+            disable(conf);
+        } else {
+            enable(conf);
+        }
+    }
+
     public void buildClickHUD() {
         control.buildClickHUD(controlGroup);
     }

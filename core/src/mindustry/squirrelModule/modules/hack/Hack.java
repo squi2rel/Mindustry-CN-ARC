@@ -6,12 +6,14 @@ import arc.func.Cons;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.scene.Element;
 import arc.scene.event.ChangeListener;
 import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
+import arc.util.Log;
 import arc.util.Time;
 import arc.util.Timer;
 import arc.util.Tmp;
@@ -36,6 +38,8 @@ import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeItems;
 
+import java.util.Objects;
+
 import static arc.Core.settings;
 import static mindustry.Vars.*;
 
@@ -50,7 +54,8 @@ public class Hack {
     public static boolean weaponImmeTurn, forceControl, holdFill, autoFill, allowBlue;
     public static int holdFillInterval, holdFillMinItem, autoFillInterval, autoFillMaxCount;
     public static long lastFillTime, lastAutoFillTime;
-    public static ObjectMap<Block, Item[]> fillIndexer = new ObjectMap<>();
+    public static final ObjectMap<Block, Item[]> fillIndexer = new ObjectMap<>();
+    private static final ObjectMap<Config, KeyCode> keyMap = new ObjectMap<>();
 
     public static void init() {
         if (!settings.getBool("squirrel"))
@@ -94,6 +99,8 @@ public class Hack {
         initFill();
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
+
+        initKeys();
     }
 
     public static HackFunc changed(Cons<Boolean> func) {
@@ -309,5 +316,61 @@ public class Hack {
 
     interface StrInt<T> {
         String get(T p);
+    }
+
+    public static void updateInput() {
+        keyMap.each((c, k) -> {
+            if (Core.input.keyTap(k)) {
+                ui.infoControl.manager.toggle(c);
+            }
+        });
+    }
+
+    public static boolean resolveMessage(String msg) {
+        if (!msg.startsWith(".")) return false;
+        String[] args = msg.substring(1).split(" ");
+        try {
+            switch (args[0]) {
+                case "help" -> ui.chatfrag.addMessage("帮助\n.bind <func> <key> -绑定一个功能到指定键位");
+                case "bind" -> {
+                    boolean[] found = {false};
+                    ui.infoControl.manager.flatList.each((s, c) -> {
+                        if (Objects.equals(s, args[1]) || Objects.equals(args[1], c.displayName)) {
+                            found[0] = true;
+                            if (Objects.equals(args[2], "off") || Objects.equals(args[2], "none") || Objects.equals(args[2], "null")) {
+                                keyMap.remove(c);
+                                ui.chatfrag.addMessage("[green]已解除 " + c.displayName + " 的键位绑定");
+                                return;
+                            }
+                            KeyCode key;
+                            try {
+                                key = KeyCode.valueOf(args[2]);
+                            } catch (Exception e) {
+                                ui.chatfrag.addMessage("[scarlet]键位 " + args[2] + " 未找到!");
+                                return;
+                            }
+                            settings.put("key-" + c.internalName, key.name());
+                            keyMap.put(c, key);
+                            ui.chatfrag.addMessage("[green]已将 " + c.displayName + " 绑定到键位 " + key);
+                        }
+                    });
+                    if (!found[0]) ui.chatfrag.addMessage("[scarlet]功能 " + args[1] + " 未找到!");
+                }
+                default -> ui.chatfrag.addMessage("[scarlet]无效的指令 输入.help查看帮助 以..开头会变成普通消息");
+            }
+        } catch (Exception e) {
+            Log.err(e);
+            ui.chatfrag.addMessage("[scarlet]参数错误");
+        }
+        return true;
+    }
+
+    private static void initKeys() {
+        ui.infoControl.manager.flatList.each((s, c) -> {
+            String kn = settings.getString("key-" + c.internalName, null);
+            if (kn == null) return;
+            KeyCode k = KeyCode.valueOf(kn);
+            keyMap.put(c, k);
+        });
     }
 }
