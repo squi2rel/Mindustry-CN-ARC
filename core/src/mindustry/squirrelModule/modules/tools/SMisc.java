@@ -9,6 +9,7 @@ import arc.math.geom.Vec2;
 import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.scene.ui.layout.Table;
+import arc.util.Strings;
 import arc.util.Tmp;
 import arc.util.serialization.Base64Coder;
 import mindustry.arcModule.ui.window.Window;
@@ -28,13 +29,9 @@ public class SMisc {
 
     public static String color(String str, float step, float rot) {
         StringBuilder sb = new StringBuilder();
+        str = Strings.stripColors(str);
         for (int i = 0, l = str.length(); i < l; i++) {
             rot = (rot + step) % PI20;
-            if (str.charAt(i) == '[') {
-                sb.append("[#").append(color(rot).toString(), 0, 6).append("]").append("[[");
-                i++;
-                continue;
-            }
             sb.append("[#").append(color(rot).toString(), 0, 6).append("]").append(str.charAt(i));
             if (str.charAt(i) == '[') sb.append('[');
         }

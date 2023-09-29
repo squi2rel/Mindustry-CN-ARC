@@ -13,7 +13,7 @@ import mindustry.ui.Styles;
 public class Manager {
     public WidgetGroup controlGroup = new WidgetGroup();
     ControlTable control;
-    ObjectMap<String, Seq<Config>> list = new ObjectMap<>();
+    public ObjectMap<String, Seq<Config>> list = new ObjectMap<>();
     public ObjectMap<String, Config> flatList = new ObjectMap<>();
 
     public Manager(Group root) {

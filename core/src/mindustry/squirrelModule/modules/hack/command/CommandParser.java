@@ -10,11 +10,13 @@ import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Time;
 import mindustry.squirrelModule.modules.hack.Hack;
+import mindustry.squirrelModule.modules.tools.SMisc;
 import mindustry.ui.dialogs.BaseDialog;
 
 import java.util.Arrays;
 import java.util.Objects;
 
+import static mindustry.Vars.getThemeColor;
 import static mindustry.Vars.ui;
 import static mindustry.squirrelModule.modules.hack.Hack.keyMap;
 
@@ -76,7 +78,7 @@ public class CommandParser {
                     Command c = cmd.get(keys[i]);
                     sb.append("\n").append(keys[i]).append(" ").append(c.args).append(" -").append(c.desc);
                 }
-                ui.chatfrag.addMessage(sb.toString());
+                ui.chatfrag.addMessage(SMisc.color(sb.toString(), 3, ui.infoControl.getColor()));
             }
         });
         registerCmd(new Command("bind", "绑定功能到指定键位", "<func>", "<key>") {
@@ -111,39 +113,45 @@ public class CommandParser {
             @Override
             public void get(String[] args) {
                 BaseDialog b = new BaseDialog("键位绑定");
-                b.cont.table(t1 -> t1.pane(t2 -> ui.infoControl.manager.flatList.each((s, c) -> t2.table(t3 -> {
-                    t3.table(t4 -> t4.add(c.displayName)).growX();
-                    t3.table(t4 -> t4.label(() -> {
-                        KeyCode name = keyMap.get(c);
-                        return name == null ? "无" : name.value;
-                    })).growX();
-                    t3.table(t4 -> t4.button("重新绑定", () -> {
-                        BaseDialog bind = new BaseDialog("绑定");
-                        bind.addListener(new InputListener() {
-                            @Override
-                            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                                bind.hide();
-                                if(Core.app.isAndroid()) return false;
-                                keyMap.put(c, button);
-                                return false;
-                            }
-
-                            @Override
-                            public boolean keyDown(InputEvent event, KeyCode keycode){
-                                bind.hide();
-                                if (keycode == KeyCode.escape) {
-                                    keyMap.remove(c);
+                b.cont.table(t1 -> t1.pane(t2 -> ui.infoControl.manager.list.each((t, seq) -> {
+                    t2.table(t3 -> {
+                        t3.table(t4 -> t4.add(t).color(getThemeColor())).row();
+                        t3.image().height(4).growX().pad(2).color(getThemeColor());
+                    }).growX().row();
+                    seq.each(c -> t2.table(t3 -> {
+                        t3.table(t4 -> t4.label(() -> SMisc.packColor(ui.infoControl.getColor()) + c.displayName)).growX();
+                        t3.table(t4 -> t4.label(() -> {
+                            KeyCode name = keyMap.get(c);
+                            return name == null ? "无" : name.value;
+                        })).growX();
+                        t3.table(t4 -> t4.button("重新绑定", () -> {
+                            BaseDialog bind = new BaseDialog("绑定");
+                            bind.addListener(new InputListener() {
+                                @Override
+                                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                                    bind.hide();
+                                    if(Core.app.isAndroid()) return false;
+                                    keyMap.put(c, button);
                                     return false;
                                 }
-                                keyMap.put(c, keycode);
-                                return false;
-                            }
-                        });
-                        bind.cont.add("请按一个键...");
-                        bind.show();
-                        Time.runTask(1f, () -> b.getScene().setScrollFocus(bind));
-                    }).growX()).growX();
-                }).growX().row())).grow()).grow();
+
+                                @Override
+                                public boolean keyDown(InputEvent event, KeyCode keycode){
+                                    bind.hide();
+                                    if (keycode == KeyCode.escape) {
+                                        keyMap.remove(c);
+                                        return false;
+                                    }
+                                    keyMap.put(c, keycode);
+                                    return false;
+                                }
+                            });
+                            bind.cont.add("请按一个键...");
+                            bind.show();
+                            Time.runTask(1f, () -> b.getScene().setScrollFocus(bind));
+                        }).growX()).growX();
+                    }).growX().row());
+                })).grow()).grow();
                 b.addCloseButton();
                 b.show();
             }
