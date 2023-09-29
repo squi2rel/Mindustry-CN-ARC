@@ -61,7 +61,7 @@ public class LCanvas extends Table{
 
     /** @return if statement elements should have rows. */
     public static boolean useRows(){
-        return Core.graphics.getWidth() < Scl.scl(900f) * 1.2f;
+        return Core.graphics.getWidth() - (Core.settings.getBool("logicSupport") ? 400f : 0f) < Scl.scl(900f) * 1.2f;
     }
 
     public static void tooltip(Cell<?> cell, String key){

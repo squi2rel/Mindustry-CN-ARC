@@ -10,7 +10,7 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import static mindustry.Vars.*;
 
 public class CoreItemsDisplay extends Table{
-    public final ObjectSet<Item> usedItems = new ObjectSet<>();
+    private final ObjectSet<Item> usedItems = new ObjectSet<>();
     private CoreBuild core;
 
     public CoreItemsDisplay(){

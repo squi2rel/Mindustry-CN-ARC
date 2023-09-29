@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 
 public class RCoreItemsDisplay extends CoreItemsDisplay {
     private Interval timer = new Interval(), timer2 = new Interval();
-    public final ObjectSet<Item> usedItems = new ObjectSet<>();
+    private final ObjectSet<Item> usedItems = new ObjectSet<>();
     private final ObjectSet<UnitType> usedUnits = new ObjectSet<>();
     private int[] updateItems = new int[content.items().size];
     private int[] lastItems = new int[content.items().size];
@@ -183,5 +183,9 @@ public class RCoreItemsDisplay extends CoreItemsDisplay {
                 }
             }
         }
+    }
+
+    public boolean hadItem(Item item){
+        return usedItems.contains(item);
     }
 }

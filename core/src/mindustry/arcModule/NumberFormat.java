@@ -1,5 +1,6 @@
 package mindustry.arcModule;
 
+import arc.math.Mathf;
 import arc.util.Strings;
 
 import java.util.regex.Pattern;
@@ -31,6 +32,9 @@ public class NumberFormat {
     }
     public static String formatInteger(long number, int maxDeci, String format){
 
+        if(number == Long.MAX_VALUE) return "Inf";
+        if(number == Long.MIN_VALUE) return "-Inf";
+
         String unit, sign = number < 0 ? "-" : "";
         number = Math.abs(number);
         double fnumber;
@@ -60,21 +64,23 @@ public class NumberFormat {
 
         String unit = "", sign = number < 0 ? "-" : "";
         number = Math.abs(number);
-        if (number >= 1E12f) {
+
+        if (number < 0.00001f) return format(format, sign + number, "");
+
+        if (number >= 1E12f || Mathf.equal(number, 1E12f, 1E6f)) {
             int exponent = (int) Math.log10(number);
             float mantissa = (float) (number / Math.pow(10, exponent));
             return format(format, sign + format("@E@", Strings.autoFixed(mantissa, 1), exponent), "");
-        } else if (number >= 1E9f) {
+        } else if (number >= 1E9f || Mathf.equal(number, 1E9f, 1E3f)) {
             number /= 1E9f;
             unit = "B";
-        } else if (number >= 1E6f) {
+        } else if (number >= 1E6f || Mathf.equal(number, 1E6f, 1f)) {
             number /= 1E6f;
             unit = "M";
-        } else if (number >= 1E3f && !(maxDeci > 2 && number < Math.pow(10, maxDeci + 1))) {
+        } else if (number >= 1E3f || Mathf.equal(number, 1E3f, 1E-3f) && !(maxDeci > 2 && number < Math.pow(10, maxDeci + 1))) {
             number /= 1E3f;
             unit = "K";
         }
-        if (number < 0.00001f) return format(format, sign + number, unit);
         return format(format, sign + fixed(number, maxDeci - (int) Math.log10(number)), unit);
     }
 

@@ -13,6 +13,8 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
+import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -94,6 +96,14 @@ public class MessageBlock extends Block{
             font.getData().setScale(1f);
 
             Pools.free(l);
+        }
+
+        @Override
+        public void draw() {
+            super.draw();
+            if (Core.settings.getBool("displayallmessage", false)) {
+                Draw.draw(Layer.overlayUI - 0.1f, this::drawSelect);
+            }
         }
 
         @Override

@@ -876,7 +876,7 @@ public class SchematicsDialog extends BaseDialog{
 
     boolean arcSchematicCanBuild(Schematic s){
         for (ItemStack item : s.requirements()){
-            if (!ui.hudfrag.coreItems.usedItems.contains(item.item)) return false;
+            if (!ui.hudfrag.coreItems.hadItem(item.item)) return false;
         }
         for (Block block: state.rules.bannedBlocks){
             if (s.containsBlock(block)) return false;
