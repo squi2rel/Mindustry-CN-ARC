@@ -300,6 +300,11 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        if (Hack.fastIn && Core.input.keyDown(Binding.select)) {
+            Unit on = selectedUnit();
+            if (on != null) Call.unitControl(player, on);
+        }
+
         if(!scene.hasMouse() && !locked && state.rules.possessionAllowed){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
                 Unit on = selectedUnit();

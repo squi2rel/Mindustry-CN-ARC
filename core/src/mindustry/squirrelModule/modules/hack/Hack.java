@@ -43,7 +43,7 @@ import static mindustry.Vars.*;
 
 public class Hack {
     public static boolean noFog, useWindowedMenu;
-    public static boolean chooseUUID, randomUSID, simMobile, autoGG;
+    public static boolean chooseUUID, randomUSID, simMobile, autoGG, fastIn;
     public static String chosenUUID = null;
     public static int autoGGDelay;
 
@@ -68,6 +68,7 @@ public class Hack {
         manager.register("多人", "randomUSID", new Config("随机USID", null, changed(e -> randomUSID = e)));
         manager.register("多人", "simMobile", new Config("伪装手机", null, changed(e -> simMobile = e)));
         manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 0, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
+        manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
 
         manager.register("移动", "immediatelyTurn", new Config("瞬间转向", null, changed(e -> immediatelyTurn = e)));
         manager.register("移动", "ignoreTurn", new Config("无视旋转", null, changed(e -> ignoreTurn = e)));

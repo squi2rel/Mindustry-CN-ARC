@@ -30,6 +30,11 @@ public class SMisc {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, l = str.length(); i < l; i++) {
             rot = (rot + step) % PI20;
+            if (str.charAt(i) == '[') {
+                sb.append("[#").append(color(rot).toString(), 0, 6).append("]").append("[[");
+                i++;
+                continue;
+            }
             sb.append("[#").append(color(rot).toString(), 0, 6).append("]").append(str.charAt(i));
             if (str.charAt(i) == '[') sb.append('[');
         }
