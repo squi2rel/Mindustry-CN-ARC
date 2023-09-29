@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.squirrelModule.modules.hack.Hack;
+import mindustry.squirrelModule.modules.hack.command.CommandParser;
 import mindustry.ui.*;
 
 import static arc.Core.*;
@@ -201,7 +202,7 @@ public class ChatFragment extends Table{
     private void sendMessage(){
         String message = chatfield.getText().trim();
         clearChatInput();
-        if (!message.startsWith("..") && Hack.resolveMessage(message)) return;
+        if (!message.startsWith("..") && CommandParser.resolveMessage(message)) return;
         if (message.startsWith("..")) message = message.substring(1);
 
         //avoid sending prefix-empty messages

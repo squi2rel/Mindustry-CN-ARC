@@ -24,6 +24,7 @@ import mindustry.squirrelModule.modules.hack.Config;
 import mindustry.squirrelModule.modules.tools.SMisc;
 
 import static mindustry.Vars.ui;
+import static mindustry.squirrelModule.modules.tools.SMisc.PI20;
 
 public class ControlTable extends Table {
     static float lineAdd = 0.06f, rotateDiv = 5f;
@@ -125,7 +126,7 @@ public class ControlTable extends Table {
                                     return;
                                 }
                                 for (float i = 0; i <= height; i++) {
-                                    Draw.color(SMisc.color((((Time.globalTime / rotateDiv) % (Mathf.PI * 20)) + id * lineAdd * 40 + (40 - i) * lineAdd) % (Mathf.PI * 20)));
+                                    Draw.color(SMisc.color((((Time.globalTime / rotateDiv) % PI20) + id * lineAdd * 40 + (40 - i) * lineAdd) % PI20));
                                     Lines.line(x, y + i, x + width, y + i);
                                 }
                             }

@@ -13,6 +13,8 @@ import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.squirrelModule.modules.hack.Manager;
 import mindustry.squirrelModule.modules.tools.SMisc;
 
+import static mindustry.squirrelModule.modules.tools.SMisc.PI20;
+
 public class InfoControl {
     public static final float step = 0.1f, lineAdd = 1.5f;
     public Manager manager;
@@ -46,12 +48,12 @@ public class InfoControl {
             table.table(t -> manager.flatList.each((k, v) -> {
                 if (!v.enabled) return;
                 table.add(SMisc.packColor(thisColor[0]) + v.displayName + " [white]" + v.func.text()).fontScale(1.25f).pad(0, 5, 0, 5).left().row();
-                thisColor[0] = (thisColor[0] + lineAdd) % (Mathf.PI * 20);
+                thisColor[0] = (thisColor[0] + lineAdd) % PI20;
             })).left();
             table.toFront();
         }
         manager.controlGroup.toFront();
-        color = (color + step * Time.delta) % (Mathf.PI * 20);
+        color = (color + step * Time.delta) % PI20;
     }
 
     public Config getConfig(String name) {
