@@ -455,10 +455,11 @@ public class AdvanceToolTable extends Table {
                     if (elevation)
                         sendFormatChat("/js u.elevation = 1");
                     if (!unitStatus.isEmpty()) {
-                        sendFormatChat("/js statuses = Reflect.get(u, \"statuses\")");
+                        sendFormatChat("/js statuses = (fb = (clazz = u.getClass().getSuperclass()) == Unit) ? Reflect.get(u, \"statuses\") : clazz.getDeclaredField(\"statuses\")");
+                        sendFormatChat("/js clazz = null; !fb && statuses.setAccessible(true)");
                         unitStatus.each(entry -> {
                             if (!entry.effect.reactive) {
-                                sendFormatChat("/js statuses.add(new StatusEntry().set(StatusEffects.@, @))", entry.effect.name, entry.time * 60f);
+                                sendFormatChat("/js {e = new StatusEntry().set(StatusEffects.@, @);fb ? statuses.add(e) : statuses.get(u).add(e)}", entry.effect.name, entry.time * 60f);
                             }
                             else sendFormatChat("/js u.apply(StatusEffects.@)", entry.effect.name);
                         });
