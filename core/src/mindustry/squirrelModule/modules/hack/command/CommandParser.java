@@ -6,10 +6,8 @@ import arc.math.Mathf;
 import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.struct.ObjectMap;
-import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Time;
-import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.squirrelModule.modules.tools.SMisc;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -90,6 +88,7 @@ public class CommandParser {
                         found[0] = true;
                         if (Objects.equals(args[1], "off") || Objects.equals(args[1], "none") || Objects.equals(args[1], "null")) {
                             keyMap.remove(c);
+                            Core.settings.remove("key-" + c.internalName);
                             ui.chatfrag.addMessage("[green]已解除 " + c.displayName + " 的键位绑定");
                             return;
                         }
@@ -132,6 +131,7 @@ public class CommandParser {
                                     bind.hide();
                                     if(Core.app.isAndroid()) return false;
                                     keyMap.put(c, button);
+                                    Core.settings.put("key-" + c.internalName, button.name());
                                     return false;
                                 }
 
@@ -140,9 +140,11 @@ public class CommandParser {
                                     bind.hide();
                                     if (keycode == KeyCode.escape) {
                                         keyMap.remove(c);
+                                        Core.settings.remove("key-" + c.internalName);
                                         return false;
                                     }
                                     keyMap.put(c, keycode);
+                                    Core.settings.put("key-" + c.internalName, keycode.name());
                                     return false;
                                 }
                             });
