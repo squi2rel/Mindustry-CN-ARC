@@ -122,14 +122,14 @@ public class arcChatPicture {
             t.button("添加到本地", () -> new floatFigure(oriImage, player)).width(300f).row();
             t.button("上传到云以分享", () -> {
                 ui.arcInfo("上传中，请等待...");
-                var post = Http.post("http://squirrel.gq/api/upload");
+                var post = Http.post("http://124.220.46.174/api/upload");
                 post.contentStream = figureFile.read();
                 post.header("filename", figureFile.name());
                 post.header("size", String.valueOf(figureFile.length()));
                 post.header("token", "3ab6950d5970c57f938673911f42fd32");
                 post.timeout = 10000;
                 post.error(e -> Core.app.post(() -> ui.arcInfo("发生了一个错误:"+e.toString())));
-                post.submit(r -> figureLink.setText("http://squirrel.gq/api/get?id=" + r.getResultAsString()));
+                post.submit(r -> figureLink.setText("http://124.220.46.174/api/get?id=" + r.getResultAsString()));
             }).width(300f);
 
         });

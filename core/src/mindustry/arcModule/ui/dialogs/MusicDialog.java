@@ -535,14 +535,14 @@ public class MusicDialog extends BaseDialog {
         public void getMusicInfo(String rid, Cons<MusicInfo> callback, boolean noTip, MusicInfo src) {
             callback.get(new MusicInfo() {{
                 src = thisId;
-                url = "https://squirrel.gq/api/get?id=" + rid;
+                url = "http://124.220.46.174/api/get?id=" + rid;
                 id = rid;
             }});
         }
 
         @Override
         public void upload(Fi file, Cons<MusicInfo> callback) {
-            Http.HttpRequest post = Http.post("https://squirrel.gq/api/upload");
+            Http.HttpRequest post = Http.post("http://124.220.46.174/api/upload");
             post.contentStream = file.read();
             post.header("filename", file.name());
             post.header("size", String.valueOf(file.length()));
