@@ -5,14 +5,10 @@ import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
-import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.util.Log;
 import arc.util.Time;
-import mindustry.arcModule.ui.window.Window;
-import mindustry.gen.Icon;
 import mindustry.squirrelModule.modules.tools.SMisc;
-import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
 import java.util.Arrays;
@@ -115,20 +111,18 @@ public class CommandParser {
         registerCmd(new Command("binds", "打开键位绑定菜单") {
             @Override
             public void get(String[] args) {
-                Window b = new Window("键位绑定", 600, 400, Icon.copy.getRegion(), ui.WindowManager);
-                Table body = new Table();
-                body.setBackground(Styles.black3);
-                body.table(t1 -> t1.pane(t2 -> ui.infoControl.manager.list.each((t, seq) -> {
+                BaseDialog b = new BaseDialog("键位绑定");
+                b.cont.table(t1 -> t1.pane(t2 -> ui.infoControl.manager.list.each((t, seq) -> {
                     t2.table(t3 -> {
                         t3.table(t4 -> t4.add(t).color(getThemeColor())).row();
                         t3.image().height(4).growX().pad(2).color(getThemeColor());
                     }).growX().row();
                     seq.each(c -> t2.table(t3 -> {
-                        t3.table(t4 -> t4.label(() -> SMisc.packColor(ui.infoControl.getColor()) + c.displayName)).width(150f);
+                        t3.table(t4 -> t4.label(() -> SMisc.packColor(ui.infoControl.getColor()) + c.displayName)).growX();
                         t3.table(t4 -> t4.label(() -> {
                             KeyCode name = keyMap.get(c);
                             return name == null ? "无" : name.value;
-                        })).width(150f);
+                        })).growX();
                         t3.table(t4 -> t4.button("重新绑定", () -> {
                             BaseDialog bind = new BaseDialog("绑定");
                             bind.addListener(new InputListener() {
@@ -156,13 +150,12 @@ public class CommandParser {
                             });
                             bind.cont.add("请按一个键...");
                             bind.show();
-                            Time.runTask(1f, () -> body.getScene().setScrollFocus(bind));
-                        }).growX()).width(150f);
+                            Time.runTask(1f, () -> b.getScene().setScrollFocus(bind));
+                        }).growX()).growX();
                     }).growX().row());
                 })).grow()).grow();
-                b.setBody(body);
-                b.add();
-                b.setMinSize(450, 100);
+                b.addCloseButton();
+                b.show();
             }
         });
     }
