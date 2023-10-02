@@ -221,13 +221,16 @@ public class Hack {
                         items = it.ammoTypes.keys().toSeq().toArray(Item.class);
                     }
                     if (items == null) return;
+                    boolean accepted = false;
                     for (Item i : items) {
                         if (!build.acceptItem(null, i)) continue;
+                        accepted = true;
                         if (unit.stack.amount != 0 && unit.stack.item == i) {
                             Call.transferInventory(player, build);
                             return;
                         }
                     }
+                    if (!accepted) return;
                     for (Item i : items) {
                         if (core != null && !core.items.has(i, holdFillMinItem == 0 ? 1 : holdFillMinItem)) continue;
                         if (unit.stack.amount != 0) {
