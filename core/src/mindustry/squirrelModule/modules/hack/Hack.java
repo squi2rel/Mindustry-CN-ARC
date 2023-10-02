@@ -13,6 +13,8 @@ import arc.scene.event.ChangeListener;
 import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
+import arc.struct.Seq;
+import arc.util.Align;
 import arc.util.Time;
 import arc.util.Timer;
 import arc.util.Tmp;
@@ -27,6 +29,7 @@ import mindustry.graphics.Layer;
 import mindustry.input.Binding;
 import mindustry.squirrelModule.modules.hack.command.CommandParser;
 import mindustry.squirrelModule.modules.tools.SMisc;
+import mindustry.squirrelModule.ui.MemoryCheckBox;
 import mindustry.squirrelModule.ui.MemorySlider;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
@@ -42,18 +45,17 @@ import static arc.Core.settings;
 import static mindustry.Vars.*;
 
 public class Hack {
+    public static final ObjectMap<Block, Item[]> fillIndexer = new ObjectMap<>();
+    public static final ObjectMap<Config, KeyCode> keyMap = new ObjectMap<>();
     public static boolean noFog, useWindowedMenu;
     public static boolean chooseUUID, randomUSID, simMobile, autoGG, fastIn;
     public static String chosenUUID = null;
     public static int autoGGDelay;
-
     public static boolean immediatelyTurn, ignoreTurn, unitTrans, noKB, noHitbox, noSpawnKB, infDrag, immeMove, ignoreShield, voidWalk, speed;
     public static float KBMulti, boundX, boundY, boundW, boundH, speedMulti;
-    public static boolean weaponImmeTurn, forceControl, holdFill, autoFill, allowBlue;
+    public static boolean weaponImmeTurn, forceControl, holdFill, autoFill, allowBlue, holdFillMode;
     public static int holdFillInterval, holdFillMinItem, autoFillInterval, autoFillMaxCount;
     public static long lastFillTime, lastAutoFillTime;
-    public static final ObjectMap<Block, Item[]> fillIndexer = new ObjectMap<>();
-    public static final ObjectMap<Config, KeyCode> keyMap = new ObjectMap<>();
 
     public static void init() {
         if (!settings.getBool("squirrel"))
@@ -92,7 +94,7 @@ public class Hack {
 
         manager.register("交互", "weaponImmeTurn", new Config("武器瞬间转向", null, changed(e -> weaponImmeTurn = e)));
         manager.register("交互", "forceControl", new Config("强制控制", null, changed(e -> forceControl = e)));
-        manager.register("交互", "holdFill", new Config("按住装填", new Element[]{new Label(""), slider("holdFill", 50f, 500f, 1f, 100f, f -> holdFillInterval = Mathf.ceil(f), 0, f -> "间隔 " + holdFillInterval + "ms"), new Label(""), slider("holdFill2", 0f, 1000f, 1f, 500f, f -> holdFillMinItem = Mathf.ceil(f), 2, f -> "核心物资下限 " + holdFillMinItem)}, changed(e -> holdFill = e, c -> holdFillInterval + "ms")));
+        manager.register("交互", "holdFill", new Config("按住装填", new Element[]{new Label(""), slider("holdFill", 50f, 500f, 1f, 100f, f -> holdFillInterval = Mathf.ceil(f), 0, f -> "间隔 " + holdFillInterval + "ms"), new Label(""), slider("holdFill2", 0f, 1000f, 1f, 500f, f -> holdFillMinItem = Mathf.ceil(f), 2, f -> "核心物资下限 " + holdFillMinItem), check("holdFill", "填满", false, b -> holdFillMode = b)}, changed(e -> holdFill = e, c -> holdFillInterval + "ms")));
         manager.register("交互", "autoFill", new Config("自动装超速", new Element[]{new Label(""), slider("autoFill", 50f, 2000f, 1f, 100f, f -> autoFillInterval = Mathf.ceil(f), 0, f -> "检测间隔 " + autoFillInterval + "ms"), new Label(""), slider("autoFill2", 1f, 20f, 1f, 5f, f -> autoFillMaxCount = Mathf.ceil(f), 2, f -> "每次装 " + autoFillMaxCount + " 个超速")}, changed(e -> autoFill = e, c -> autoFillInterval + "ms")));
         manager.register("交互", "allowBlue", new Config("允许蓝图", null, changed(e -> allowBlue = e)));
         initFill();
@@ -165,6 +167,20 @@ public class Hack {
         return s;
     }
 
+    public static MemoryCheckBox check(String name, String tips, boolean def, Cons<Boolean> func) {
+        MemoryCheckBox c = new MemoryCheckBox(name, tips, def);
+        c.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Element actor) {
+                if (actor == c) {
+                    func.get(c.isChecked());
+                }
+            }
+        });
+        Core.app.post(() -> func.get(c.isChecked()));
+        return c;
+    }
+
     private static void initFill() {
         fillIndexer.put(Blocks.cyclone, new Item[]{Items.surgeAlloy, Items.plastanium, Items.blastCompound, Items.metaglass});
         fillIndexer.put(Blocks.swarmer, new Item[]{Items.surgeAlloy, Items.blastCompound, Items.pyratite});
@@ -177,6 +193,8 @@ public class Hack {
         fillIndexer.put(Blocks.scatter, new Item[]{Items.metaglass, Items.lead, Items.scrap});
         fillIndexer.put(Blocks.foreshadow, new Item[]{Items.surgeAlloy});
         fillIndexer.put(Blocks.spectre, new Item[]{Items.thorium, Items.graphite, Items.pyratite});
+        Seq<Item> allItems = new Seq<>();
+        allItems.addAll(Items.serpuloItems).addAll(Items.erekirItems);
         Events.run(EventType.Trigger.update, () -> {
             try {
                 if (!holdFill) return;
@@ -189,13 +207,13 @@ public class Hack {
                 Unit unit = player.unit();
                 if (unit.type.itemCapacity == 0) return;
                 CoreBlock.CoreBuild core = player.closestCore();
-                if (core == null) return;
-                if (!unit.hasItem() && Tmp.v1.set(player.x, player.y).sub(Tmp.v2.set(core.x, core.y)).len() > itemTransferRange)
+                if (!unit.hasItem() && core == null) return;
+                if (!unit.hasItem() && core != null && Tmp.v1.set(player.x, player.y).sub(Tmp.v2.set(core.x, core.y)).len() > itemTransferRange)
                     return;
                 Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 if (tile == null) return;
                 Building build = tile.build;
-                if (build == null || build.team != player.team()) return;
+                if (build == null || build.items == null || build.team != player.team()) return;
                 Block type = build.block;
                 if (type instanceof ItemTurret it) {
                     Item[] items = fillIndexer.get(type);
@@ -204,12 +222,14 @@ public class Hack {
                     }
                     if (items == null) return;
                     for (Item i : items) {
-                        if (!core.items.has(i, holdFillMinItem == 0 ? 1 : holdFillMinItem)) continue;
                         if (!build.acceptItem(null, i)) continue;
                         if (unit.stack.amount != 0 && unit.stack.item == i) {
                             Call.transferInventory(player, build);
                             return;
                         }
+                    }
+                    for (Item i : items) {
+                        if (core != null && !core.items.has(i, holdFillMinItem == 0 ? 1 : holdFillMinItem)) continue;
                         if (unit.stack.amount != 0) {
                             Call.transferInventory(player, core);
                         }
@@ -218,26 +238,56 @@ public class Hack {
                         return;
                     }
                 }
-                ItemStack[] items;
-                if (type instanceof UnitFactory) {
-                    int plan = ((UnitFactory.UnitFactoryBuild) build).currentPlan;
-                    if (plan == -1) return;
-                    items = ((UnitFactory) type).plans.get(plan).requirements;
-                } else {
-                    ConsumeItems consume = ((ConsumeItems) type.consumeBuilder.find(c -> c instanceof ConsumeItems));
-                    if (consume == null) return;
-                    items = consume.items;
-                }
-                if (items == null) return;
-                for (ItemStack i : items) {
-                    if (build.items.has(i.item, i.amount)) continue;
-                    if (!core.items.has(i.item, holdFillMinItem == 0 ? 1 : holdFillMinItem)) continue;
-                    if (unit.stack.amount != 0) {
-                        Call.transferInventory(player, core);
+                if (holdFillMode) {
+                    for (Item i : allItems) {
+                        if (build.acceptItem(null, i)) {
+                            if (unit.stack.amount != 0 && unit.stack.item == i) {
+                                Call.transferInventory(player, build);
+                                return;
+                            }
+                            if (core == null) return;
+                            if (!core.items.has(i, holdFillMinItem == 0 ? 1 : holdFillMinItem))
+                                continue;
+                            if (unit.stack.amount != 0) {
+                                Call.transferInventory(player, core);
+                            }
+                            if (unit.stack.amount == 0) {
+                                Call.requestItem(player, core, i, unit.type.itemCapacity);
+                            }
+                            Call.transferInventory(player, build);
+                        }
                     }
-                    Call.requestItem(player, core, i.item, unit.type.itemCapacity);
-                    Call.transferInventory(player, build);
-                    return;
+                } else {
+                    ItemStack[] items;
+                    if (type instanceof UnitFactory) {
+                        int plan = ((UnitFactory.UnitFactoryBuild) build).currentPlan;
+                        if (plan == -1) return;
+                        items = ((UnitFactory) type).plans.get(plan).requirements;
+                    } else {
+                        ConsumeItems consume = ((ConsumeItems) type.consumeBuilder.find(c -> c instanceof ConsumeItems));
+                        if (consume == null) return;
+                        items = consume.items;
+                    }
+                    if (items == null) return;
+                    for (ItemStack i : items) {
+                        if (build.items.has(i.item, i.amount))
+                            continue;
+                        if (unit.stack.amount != 0 && unit.stack.item == i.item) {
+                            Call.transferInventory(player, build);
+                            return;
+                        }
+                        if (core == null) return;
+                        if (unit.stack.amount != 0) {
+                            Call.transferInventory(player, core);
+                        }
+                        if (!core.items.has(i.item, holdFillMinItem == 0 ? 1 : holdFillMinItem))
+                            continue;
+                        if (unit.stack.amount == 0) {
+                            Call.requestItem(player, core, i.item, unit.type.itemCapacity);
+                        }
+                        Call.transferInventory(player, build);
+                        return;
+                    }
                 }
             } catch (Exception e) {
                 ui.showException(e);
@@ -314,10 +364,6 @@ public class Hack {
         });
     }
 
-    interface StrInt<T> {
-        String get(T p);
-    }
-
     public static void updateInput() {
         keyMap.each((c, k) -> {
             if (Core.input.keyTap(k)) {
@@ -333,5 +379,9 @@ public class Hack {
             KeyCode k = KeyCode.valueOf(kn);
             keyMap.put(c, k);
         });
+    }
+
+    interface StrInt<T> {
+        String get(T p);
     }
 }

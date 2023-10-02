@@ -807,7 +807,7 @@ public class DesktopInput extends InputHandler{
     protected void updateMovement(Unit unit){
         UnitType type = unit.type;
 
-        float speed = unit.speed() * Hack.speedMulti;
+        float speed = Hack.speed ? unit.speed() * Hack.speedMulti : unit.speed();
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
