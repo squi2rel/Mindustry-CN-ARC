@@ -134,8 +134,10 @@ public class HudSettingsTable extends Table {
                         for (int i = 0; i < settings.getInt("arcQuickMsg"); i++) {
                             if (i % settings.getInt("arcQuickMsgKey", 8) == 0) t.row();
                             int finalI = i;
-                            t.button(settings.getString(getArcQuickMsgShortName(i)), NCtextStyle, () ->
-                                    Call.sendChatMessage(settings.getString(getArcQuickMsgName(finalI)))
+                            t.button(settings.getString(getArcQuickMsgShortName(i)), NCtextStyle, () ->{
+                                if (settings.getBool(getArcQuickMsgJs(finalI))) mods.getScripts().runConsole(settings.getString(getArcQuickMsgName(finalI)));
+                                else Call.sendChatMessage(settings.getString(getArcQuickMsgName(finalI)));
+                            }
                             ).size(30);
                         }
                         t.button("\uE87C", NCtextStyle, this::arcQuickMsgTable).size(30, 30).tooltip("快捷消息");
@@ -159,7 +161,7 @@ public class HudSettingsTable extends Table {
                         control.input.logicCutscene = false;
                         ui.arcInfo("已移除逻辑视角锁定");
                     }).checked(a -> Core.settings.getBool("removeLogicLock")).size(30, 30).tooltip("逻辑锁定");
-                    t.button("\uF6C2", NCtextStyle, RFuncs::worldProcessor).size(30).tooltip("地图世处信息");
+                    //t.button("\uF6C2", NCtextStyle, RFuncs::worldProcessor).size(30).tooltip("地图世处信息");
                     t.button("[cyan]雾", textStyle, () -> {
                         if (!state.rules.pvp || player.team().id == 255) renderer.fogEnabled = !renderer.fogEnabled;
                     }).checked(a -> renderer.fogEnabled).size(30, 30).tooltip("战争迷雾").visible(() -> !state.rules.pvp || player.team().id == 255);
@@ -208,7 +210,7 @@ public class HudSettingsTable extends Table {
             });
         }
 
-        button("[cyan]控", () -> {
+        button("[cyan]控", textStyle, () -> {
             expandList = !expandList;
             rebuild();
         }).width(32f).fillY();
@@ -238,12 +240,16 @@ public class HudSettingsTable extends Table {
             }).row();
             t.pane(tt -> {
                 tt.add("第i个").width(50f);
+                if (settings.getBool("easyJS")) tt.add("JS").width(50f);
                 tt.add("按钮显示\n(建议单个字符)").width(100f);
                 tt.add("              输入信息").width(400f).center().row();
 
                 for (int i = 0; i < settings.getInt("arcQuickMsg", 0); i++) {
                     tt.add(i + "  ");
                     int finalI = i;
+                    if (settings.getBool("easyJS")) {
+                        tt.check("", settings.getBool(getArcQuickMsgJs(finalI)) ,js-> settings.put(getArcQuickMsgJs(finalI), js));
+                    }
                     tt.field(settings.getString(getArcQuickMsgShortName(finalI), "?"), text -> settings.put(getArcQuickMsgShortName(finalI), text)).maxTextLength(10);
                     tt.field(settings.getString(getArcQuickMsgName(finalI), "未输入指令"), text -> settings.put(getArcQuickMsgName(finalI), text)).maxTextLength(300).width(350f);
                     tt.row();
@@ -266,6 +272,10 @@ public class HudSettingsTable extends Table {
 
     private String getArcQuickMsgName(int i) {
         return "arcQuickMsg" + i;
+    }
+
+    private String getArcQuickMsgJs(int i) {
+        return "arcQuickMsgJs" + i;
     }
 
     public interface StringProcessor {

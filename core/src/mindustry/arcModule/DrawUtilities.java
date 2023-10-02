@@ -3,8 +3,10 @@ package mindustry.arcModule;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
+import arc.math.geom.Vec2;
 import arc.scene.ui.layout.Scl;
 import arc.util.Align;
+import arc.util.Time;
 import arc.util.pooling.Pools;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
@@ -17,10 +19,13 @@ import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static arc.graphics.g2d.Draw.color;
+import static arc.graphics.g2d.Lines.line;
 import static arc.graphics.g2d.Lines.stroke;
 import static mindustry.Vars.*;
 
 public class DrawUtilities {
+    private static Vec2 vector = new Vec2();
+
     public static float arcDrawText(String text, float scl, float dx, float dy, Color color, int halign) {
         Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -118,9 +123,9 @@ public class DrawUtilities {
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
         Lines.stroke(2f, Color.darkGray);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
         Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.white);
@@ -159,4 +164,35 @@ public class DrawUtilities {
             }
         });
     }
+
+    public static void arcDashCircling(float x, float y, float radius) {
+        arcDashCircling(x, y, radius, 0.5f);
+    }
+
+    public static void arcDashCircling(float x, float y, float radius, float speed) {
+        arcDashCircle(x, y, radius, Time.time * speed);
+    }
+
+    public static void arcDashCircle(float x, float y, float radius) {
+        arcDashCircle(x, y, radius, 0);
+    }
+
+    public static void arcDashCircle(float x, float y, float radius, float rotation) {
+        float scaleFactor = 0.6f;
+        int sides = 10 + (int) (radius * scaleFactor);
+        if (sides % 2 == 1) sides++;
+
+        vector.set(0, 0);
+
+        for (int i = 0; i < sides; i += 2) {
+            vector.set(radius, 0).rotate(360f / sides * i + 90 + rotation);
+            float x1 = vector.x;
+            float y1 = vector.y;
+
+            vector.set(radius, 0).rotate(360f / sides * (i + 1) + 90 + rotation);
+
+            line(x1 + x, y1 + y, vector.x + x, vector.y + y);
+        }
+    }
+
 }

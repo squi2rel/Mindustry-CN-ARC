@@ -52,6 +52,7 @@ public class HudFragment{
     private AuxilliaryTable auxilliaryTable;
     private AdvanceToolTable advanceToolTable = new AdvanceToolTable();
     public HudSettingsTable hudSettingsTable = new HudSettingsTable();
+    public AdvanceBuildTool advanceBuildTool = new AdvanceBuildTool();
 
     private Boolean arcShowObjectives = false, hideObjectives = true;
 
@@ -512,9 +513,12 @@ public class HudFragment{
         });
 
         parent.fill(t -> {
-            t.name = "FloatingSettings";
             t.right().add(hudSettingsTable);
             t.visible(() -> Core.settings.getBool("showFloatingSettings") && shown);
+        });
+        parent.fill(t -> {
+            t.right().add(advanceBuildTool).padTop(100f);
+            t.visible(() -> Core.settings.getBool("showAdvanceBuildTool") && shown);
         });
 
         //spawner warning

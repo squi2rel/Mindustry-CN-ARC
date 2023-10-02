@@ -9,6 +9,7 @@ import mindustry.arcModule.*;
 import mindustry.arcModule.Marker.*;
 import mindustry.input.*;
 import mindustry.ui.*;
+import mindustry.ui.fragments.ChatFragment;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.ui.RStyles.*;
@@ -16,8 +17,6 @@ import static mindustry.arcModule.ui.RStyles.*;
 public class AuxilliaryTable extends Table {
     private boolean show = true;
     private boolean showMark = true;
-
-    public static boolean teamMark = false;
 
     public MarkType markType = Marker.mark;
     public Element mobileHitter = new Element();
@@ -109,8 +108,8 @@ public class AuxilliaryTable extends Table {
                         }
                         t.button("D", clearLineNoneTogglet, District::unitSpawnMenu)
                                 .checked(b -> false).size(40).tooltip("区域规划器");
-                        t.button("T", clearLineNoneTogglet, () -> teamMark = !teamMark)
-                                .checked(b -> teamMark).size(40).tooltip("前缀添加/t");
+                        t.button("T", clearLineNoneTogglet, () -> ui.chatfrag.nextMode())
+                                .checked(b -> ui.chatfrag.mode == ChatFragment.ChatMode.team).size(40).tooltip("前缀添加/t");
                     }).left();
                 }
             }).fillX().left();

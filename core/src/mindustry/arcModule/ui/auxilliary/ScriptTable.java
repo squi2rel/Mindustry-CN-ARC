@@ -29,9 +29,7 @@ public class ScriptTable extends BaseToolsTable{
 
         scriptButton(Blocks.buildTower.uiIcon, "在建造列表加入被摧毁建筑", () -> Vars.player.buildDestroyedBlocks());
 
-        scriptButton(Blocks.message.uiIcon, "锁定上个标记点", () -> {
-            Marker.lockonLastMark();
-        });
+        scriptButton(Blocks.message.uiIcon, "锁定上个标记点", Marker::lockonLastMark);
 
         scriptButton(Icon.modeAttack, "自动攻击", () -> {
             boolean at = Core.settings.getBool("autotarget");

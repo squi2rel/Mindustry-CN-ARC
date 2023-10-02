@@ -10,12 +10,12 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.Groups;
 import mindustry.ui.*;
+import mindustry.ui.fragments.ChatFragment;
 import mindustry.world.Block;
 import mindustry.world.blocks.logic.LogicBlock;
 
 import static arc.graphics.Color.RGBtoHSV;
 import static mindustry.Vars.*;
-import static mindustry.arcModule.ui.auxilliary.AuxilliaryTable.teamMark;
 
 public class RFuncs {
 
@@ -179,7 +179,7 @@ public class RFuncs {
 
     public static StringBuilder getPrefix(String color, String type) {
         StringBuilder prefix = new StringBuilder();
-        if (teamMark) prefix.append("/t ");
+        if (ui.chatfrag.mode == ChatFragment.ChatMode.team) prefix.append("/t ");
         prefix.append(arcVersionPrefix);
         prefix.append("[").append(color).append("]");
         prefix.append("<").append(type).append(">");

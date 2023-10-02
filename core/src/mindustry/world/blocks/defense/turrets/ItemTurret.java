@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.Time;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.arcModule.NumberFormat;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
@@ -88,11 +89,10 @@ public class ItemTurret extends Turret{
         super.setBars();
 
         addBar("ammo", (ItemTurretBuild entity) ->
-            new Bar(
-                "stat.ammo",
-                Pal.ammo,
-                () -> (float)entity.totalAmmo / maxAmmo
-            )
+                new Bar("子弹" + ((float) entity.totalAmmo > 0 ? NumberFormat.formatPercent(((ItemTurret.ItemEntry) entity.ammo.peek()).item.emoji(), entity.totalAmmo, maxAmmo) : ""),
+                        Pal.ammo,
+                        () -> (float) entity.totalAmmo / maxAmmo
+                )
         );
     }
 
