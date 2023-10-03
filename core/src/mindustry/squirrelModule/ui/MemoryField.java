@@ -1,26 +1,28 @@
 package mindustry.squirrelModule.ui;
 
 import arc.Core;
+import arc.func.Boolf;
 import arc.scene.Element;
 import arc.scene.event.ChangeListener;
 import arc.scene.ui.CheckBox;
+import arc.scene.ui.TextField;
 import mindustry.squirrelModule.modules.hack.Config;
 
-public class MemoryCheckBox extends CheckBox {
+public class MemoryField extends TextField {
     public Config conf;
 
-    public MemoryCheckBox(String name, String tips, boolean def) {
-        super(tips);
-        memory("s-" + name + "-b", def);
+    public MemoryField(String name, String def) {
+        super(def);
+        memory("s-" + name + "-s", def);
     }
 
-    private void memory(String name, boolean def) {
-        setChecked(Core.settings.getBool(name, def));
+    private void memory(String name, String def) {
+        setText(Core.settings.getString(name, def));
         addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Element actor) {
-                if (actor == MemoryCheckBox.this) {
-                    Core.settings.put(name, isChecked());
+                if (actor == MemoryField.this) {
+                    Core.settings.put(name, getText());
                 }
             }
         });

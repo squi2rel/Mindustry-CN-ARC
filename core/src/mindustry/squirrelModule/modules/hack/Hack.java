@@ -11,10 +11,10 @@ import arc.math.Mathf;
 import arc.scene.Element;
 import arc.scene.event.ChangeListener;
 import arc.scene.ui.Label;
+import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.Align;
 import arc.util.Time;
 import arc.util.Timer;
 import arc.util.Tmp;
@@ -30,6 +30,7 @@ import mindustry.input.Binding;
 import mindustry.squirrelModule.modules.hack.command.CommandParser;
 import mindustry.squirrelModule.modules.tools.SMisc;
 import mindustry.squirrelModule.ui.MemoryCheckBox;
+import mindustry.squirrelModule.ui.MemoryField;
 import mindustry.squirrelModule.ui.MemorySlider;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
@@ -56,6 +57,8 @@ public class Hack {
     public static boolean weaponImmeTurn, forceControl, holdFill, autoFill, allowBlue, holdFillMode;
     public static int holdFillInterval, holdFillMinItem, autoFillInterval, autoFillMaxCount;
     public static long lastFillTime, lastAutoFillTime;
+    public static boolean customPoke;
+    public static String customPokeText = null;
 
     public static void init() {
         if (!settings.getBool("squirrel"))
@@ -100,6 +103,7 @@ public class Hack {
         initFill();
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
+        manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), field("customPoke", "戳了{name}[white]一下，并提醒你留意对话框", s -> customPokeText = s)}, changed(e -> customPoke = e)));
 
         initKeys();
         CommandParser.initCommands();
@@ -179,6 +183,32 @@ public class Hack {
         });
         Core.app.post(() -> func.get(c.isChecked()));
         return c;
+    }
+
+    public static MemoryField field(String name, String def, Cons<String> func) {
+        MemoryField f = new MemoryField(name, def);
+        f.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Element actor) {
+                if (actor == f) {
+                    func.get(f.getText());
+                }
+            }
+        });
+        Core.app.post(() -> func.get(f.getText()));
+        return f;
+    }
+
+    public static MemoryField field(String name, String def, TextField.TextFieldValidator valid, Cons<String> func) {
+        MemoryField f = field(name, def, func);
+        f.setValidator(valid);
+        return f;
+    }
+
+    public static MemoryField field(String name, String def, TextField.TextFieldValidator valid, TextField.TextFieldFilter filter, Cons<String> func) {
+        MemoryField f = field(name, def, valid, func);
+        f.setFilter(filter);
+        return f;
     }
 
     private static void initFill() {

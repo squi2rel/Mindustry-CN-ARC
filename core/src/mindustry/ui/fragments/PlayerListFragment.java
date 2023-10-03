@@ -18,6 +18,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -382,8 +383,6 @@ public class PlayerListFragment{
     }
 
     private String arcAtPlayer(String name){
-        StringBuilder builder = new StringBuilder(getPrefix("coral","AT"));
-        builder.append("戳了").append(name).append("[white]一下，并提醒你留意对话框");
-        return builder.toString();
+        return getPrefix("coral", "AT") + (Hack.customPoke ? Hack.customPokeText.replace("{name}", name) : "戳了" + name + "[white]一下，并提醒你留意对话框");
     }
 }

@@ -14,11 +14,6 @@ public class MemorySlider extends Slider {
         memory("s-" + name + "-v", def);
     }
 
-    public MemorySlider(String name, float min, float max, float stepSize, float def, boolean vertical, SliderStyle style) {
-        super(min, max, stepSize, vertical, style);
-        memory("s-" + name + "-v", def);
-    }
-
     private void memory(String name, float def) {
         setValue(Core.settings.getFloat(name, def));
         addListener(new ChangeListener() {
