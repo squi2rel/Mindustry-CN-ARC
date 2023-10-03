@@ -256,7 +256,7 @@ public class Hack {
                     if (items == null) return;
                     boolean accepted = false;
                     for (Item i : items) {
-                        if (build.acceptStack(unit.stack.item, unit.stack.amount, unit) == 0) continue;
+                        if (build.acceptStack(i, unit.type.itemCapacity, unit) == 0) continue;
                         accepted = true;
                         if (unit.stack.amount != 0 && unit.stack.item == i) {
                             Call.transferInventory(player, build);
@@ -277,7 +277,7 @@ public class Hack {
                 if (holdFillMode) {
                     if (type.itemCapacity == 0) return;
                     for (Item i : allItems) {
-                        if (build.acceptStack(unit.stack.item, unit.stack.amount, unit) != 0) {
+                        if (build.acceptStack(i, unit.type.itemCapacity, unit) != 0) {
                             if (unit.stack.amount != 0 && unit.stack.item == i) {
                                 Call.transferInventory(player, build);
                                 return;
@@ -354,7 +354,7 @@ public class Hack {
                     for (ItemStack i : items) {
                         if (b.items.has(i.item, i.amount)) continue;
                         if (!core.items.has(i.item)) continue;
-                        if (unit.stack.amount != 0 && b.acceptStack(unit.stack.item, unit.stack.amount, unit) != 0) {
+                        if (unit.stack.amount != 0 && b.acceptStack(i.item, unit.type.itemCapacity, unit) != 0) {
                             Call.transferInventory(player, b);
                             filled = true;
                             break;
