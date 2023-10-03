@@ -18,9 +18,11 @@ import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Timer;
 import arc.util.Tmp;
+import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.core.GameState;
+import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.gen.Call;
@@ -104,6 +106,7 @@ public class Hack {
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
         manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), field("customPoke", "戳了{name}[white]一下，并提醒你留意对话框", s -> customPokeText = s)}, changed(e -> customPoke = e)));
+        manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), field("customPrefix", "S~{ver}", s -> arcVersionPrefix = "<ARC" + s.replace("{ver}", Version.arcBuild <= 0 ? "Dev" : String.valueOf(Version.arcBuild)) + ">")}, changed(e -> arcVersionPrefix = e ? arcVersionPrefix : "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">")));
 
         initKeys();
         CommandParser.initCommands();
@@ -272,6 +275,7 @@ public class Hack {
                     }
                 }
                 if (holdFillMode) {
+                    if (type.itemCapacity == 0) return;
                     for (Item i : allItems) {
                         if (build.acceptItem(null, i)) {
                             if (unit.stack.amount != 0 && unit.stack.item == i) {
