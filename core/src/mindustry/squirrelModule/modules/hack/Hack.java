@@ -258,6 +258,7 @@ public class Hack {
                                 Call.requestItem(player, core, i, unit.type.itemCapacity);
                             }
                             Call.transferInventory(player, build);
+                            return;
                         }
                     }
                 } else {
