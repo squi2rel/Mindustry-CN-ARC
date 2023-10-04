@@ -102,6 +102,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     private WidgetGroup group = new WidgetGroup();
 
+    public Rect lastSelection = new Rect();
+
     public boolean arcScanMode = false;
 
     private final Eachable<BuildPlan> allPlans = cons -> {
@@ -1269,7 +1271,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(col2);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
-        District.applyVoidDistrict(x1,y1,x2,y2);
+        lastSelection.set(x1, y1, x2-x1, y2-y1);
+        lastSelection.normalize();
     }
 
     protected void flushSelectPlans(Seq<BuildPlan> plans){

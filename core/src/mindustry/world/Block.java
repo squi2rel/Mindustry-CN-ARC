@@ -533,6 +533,11 @@ public class Block extends UnlockableContent implements Senseable{
                 .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
     }
 
+    public float sumAttribute(@Nullable Attribute attr, Tile tile){
+        if(attr == null) return 0;
+        return tile.getLinkedTilesAs(this, tempTiles)
+                .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
+    }
     public TextureRegion getDisplayIcon(Tile tile){
         return tile.build == null ? uiIcon : tile.build.getDisplayIcon();
     }

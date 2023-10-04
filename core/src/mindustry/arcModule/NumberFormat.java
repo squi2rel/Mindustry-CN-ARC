@@ -10,7 +10,7 @@ import static arc.util.Strings.format;
 
 public class NumberFormat {
     private static final String defaultFormat = "@[gray]@[]";
-    private static final Pattern autoFixedRegex = Pattern.compile("(?<=\\.\\d{0,10})0+(?!\\d)|\\.0+(?!\\d)");
+    private static final Pattern autoFixedRegex = Pattern.compile("(?<=\\.\\d{0,10})0+(?!\\d|E)|\\.0+(?!\\d|E)");
 
     public static String formatInteger(long number){
         return formatInteger(number, 2, defaultFormat);
@@ -32,6 +32,7 @@ public class NumberFormat {
     }
     public static String formatInteger(long number, int maxDeci, String format){
 
+        //以后可能完全合并到formatFloat
         if(number == Long.MAX_VALUE) return "Inf";
         if(number == Long.MIN_VALUE) return "-Inf";
 
@@ -62,24 +63,32 @@ public class NumberFormat {
         if(number == Float.POSITIVE_INFINITY) return "Inf";
         if(number == Float.NEGATIVE_INFINITY) return "-Inf";
 
-        String unit = "", sign = number < 0 ? "-" : "";
+        String sign = number < 0 ? "-" : "", unit = "";
         number = Math.abs(number);
 
         if (number < 0.00001f) return format(format, sign + number, "");
 
-        if (number >= 1E12f || Mathf.equal(number, 1E12f, 1E6f)) {
-            int exponent = (int) Math.log10(number);
-            float mantissa = (float) (number / Math.pow(10, exponent));
-            return format(format, sign + format("@E@", Strings.autoFixed(mantissa, 1), exponent), "");
-        } else if (number >= 1E9f || Mathf.equal(number, 1E9f, 1E3f)) {
-            number /= 1E9f;
-            unit = "B";
-        } else if (number >= 1E6f || Mathf.equal(number, 1E6f, 1f)) {
-            number /= 1E6f;
-            unit = "M";
-        } else if (number >= 1E3f || Mathf.equal(number, 1E3f, 1E-3f) && !(maxDeci > 2 && number < Math.pow(10, maxDeci + 1))) {
-            number /= 1E3f;
-            unit = "K";
+        if (number >= Math.pow(10, maxDeci + 1)) {
+
+            float tolernce = (float) Math.pow(10, maxDeci + 2);
+
+            if (number >= 1E12f || Mathf.equal(1E12f, number, number / tolernce)) {
+
+                int exponent = Mathf.floor((float) Math.log10(number));
+                float mantissa = (float) (number / Math.pow(10, exponent));
+
+                return format(format, sign + format("@E@", fixed(mantissa, 1), exponent), "");
+
+            } else if (number >= 1E9f || Mathf.equal(1E9f, number, number / tolernce)) {
+                number /= 1E9f;
+                unit = "B";
+            } else if (number >= 1E6f || Mathf.equal(1E6f, number, number / tolernce)) {
+                number /= 1E6f;
+                unit = "M";
+            } else if (number >= 1E3f || Mathf.equal(1E3f, number, number / tolernce)) {
+                number /= 1E3f;
+                unit = "K";
+            }
         }
         return format(format, sign + fixed(number, maxDeci - (int) Math.log10(number)), unit);
     }

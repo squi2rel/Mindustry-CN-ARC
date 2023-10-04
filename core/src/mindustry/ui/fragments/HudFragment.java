@@ -1108,7 +1108,7 @@ public class HudFragment{
         });
 
         if (!getStatusText().isEmpty()) {
-            arcStatus.labelWrap(() -> hideObjectives ? getStatusText().substring(0, 20) : getStatusText()).width(showSkipWave? 150f : 190f);
+            arcStatus.labelWrap(() -> hideObjectives && getStatusText().length() > 20 ? getStatusText().substring(0, 20) : getStatusText()).width(showSkipWave ? 150f : 190f);
         } else {
             arcStatus.table(tt->{
                 tt.update(() -> {

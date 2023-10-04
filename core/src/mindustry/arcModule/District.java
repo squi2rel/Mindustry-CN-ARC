@@ -146,14 +146,15 @@ public class District {
         });
 
         disSet.addCloseButton();
+        disSet.shown(District::setVoidDistrict);
         disSet.show();
     }
 
-    public static void applyVoidDistrict(int x1, int y1, int x2, int y2) {
-        voidDistrict.districtA.x = x1;
-        voidDistrict.districtA.y = y1;
-        voidDistrict.districtB.x = x2;
-        voidDistrict.districtB.y = y2;
+    public static void setVoidDistrict() {
+        voidDistrict.districtA.x = control.input.lastSelection.x;
+        voidDistrict.districtA.y = control.input.lastSelection.y;
+        voidDistrict.districtB.x = control.input.lastSelection.x + control.input.lastSelection.width;
+        voidDistrict.districtB.y = control.input.lastSelection.y + control.input.lastSelection.height;
     }
 
     public static boolean resolveMessage(String text) {

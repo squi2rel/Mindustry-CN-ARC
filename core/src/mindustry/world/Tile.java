@@ -35,6 +35,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     protected Floor overlay;
     protected boolean changing = false;
 
+    public float buildEff = 0f;
+
     public Tile(int x, int y){
         this.x = (short)x;
         this.y = (short)y;
