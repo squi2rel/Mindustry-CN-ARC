@@ -579,11 +579,16 @@ public class UnitType extends UnlockableContent implements Senseable{
 
             bars.add(new Bar(() -> {
                 updateStatusTable(unit);
+                StringBuilder str = new StringBuilder();
                 if(unit.shield() > 0){
-                    return NumberFormat.autoFixed(unit.health) + "[gray]+[white]" + NumberFormat.autoFixed(unit.shield);
+                    str.append(NumberFormat.autoFixed(unit.health)).append("[gray]+[white]").append(NumberFormat.autoFixed(unit.shield));
                 }else{
-                    return NumberFormat.formatPercent("\uE813", unit.health, unit.maxHealth, 4);
+                    str.append(NumberFormat.formatPercent("\uE813", unit.health, unit.maxHealth, 4));
                 }
+                if (!Mathf.equal(unit.healthBalance.rawMean(), 0f, 0.1f)) {
+                    str.append(NumberFormat.autoFixed(unit.healthBalance.rawMean() * Time.toSeconds, 2, unit.healthBalance.rawMean() < 0 ? "[scarlet]@@/s[]" : "[acid]+@@/s[]"));
+                }
+                return str.toString();
             }, () -> Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 

@@ -13,6 +13,7 @@ import arc.util.Timer.*;
 import arc.util.io.Reads;
 import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.arcModule.ui.dialogs.USIDDialog;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -147,10 +148,6 @@ public class JoinDialog extends BaseDialog{
 
     void setupRemote(){
         remote.clear();
-
-        remote.button((Core.settings.getBool("showAccessibleServer")? "显示":"隐藏") + "版本不对的服务器",()->{Core.settings.put("showAccessibleServer",!Core.settings.getBool("showAccessibleServer"));setupRemote();}).fillX().row();
-        remote.button("replay", () -> replayController.shouldRecord(!replayController.shouldRecord())).update(b -> b.setText(replayController.shouldRecord() ? "关闭回放录制" : "开启回放录制")).fillX().row();
-        remote.button("加载回放文件", () -> platform.showFileChooser(true, "打开回放文件", "mrep", f -> Core.app.post(() -> replayController.startPlay(f.file())))).fillX().row();
         for(Server server : servers){
             if(server.lastHost != null){
                 int ServerVersion = server.lastHost.version;
@@ -342,6 +339,16 @@ public class JoinDialog extends BaseDialog{
         hosts.marginBottom(70f);
 
         section(steam ? "@servers.local.steam" : "@servers.local", local, false);
+        section("学术功能", new Table(t -> {
+            t.button((Core.settings.getBool("showAccessibleServer") ? "显示" : "隐藏") + "版本不对的服务器", Styles.flatBordert, () -> {
+                Core.settings.put("showAccessibleServer", !Core.settings.getBool("showAccessibleServer"));
+                setupRemote();
+            }).growX().height(48).row();
+            t.button("", Styles.flatBordert, () -> replayController.shouldRecord(!replayController.shouldRecord())).update(b -> b.setText(replayController.shouldRecord() ? "关闭回放录制" : "开启回放录制")).growX().height(48).row();
+            t.button("加载回放文件", Styles.flatBordert, () -> platform.showFileChooser(true, "打开回放文件", "mrep", f -> Core.app.post(() -> replayController.startPlay(f.file())))).growX().height(48).row();
+            t.button("usid管理器", Styles.flatBordert, () -> new USIDDialog().show()).growX().height(48);
+            USIDDialog.chooseUSID = Core.settings.getBool("arc-chooseUSID", false);
+        }), false);
         section("@servers.remote", remote, false);
         section("@servers.global", global, true);
 
