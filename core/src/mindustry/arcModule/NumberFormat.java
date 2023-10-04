@@ -60,6 +60,7 @@ public class NumberFormat {
 
     public static String formatFloat(float number, int maxDeci, String format){
 
+        if(Float.isNaN(number)) return "NaN";
         if(number == Float.POSITIVE_INFINITY) return "Inf";
         if(number == Float.NEGATIVE_INFINITY) return "-Inf";
 
