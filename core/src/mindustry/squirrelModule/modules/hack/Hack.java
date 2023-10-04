@@ -15,10 +15,10 @@ import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.Timer;
 import arc.util.Tmp;
-import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.core.GameState;
@@ -41,6 +41,7 @@ import mindustry.world.Tile;
 import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.blocks.storage.StorageBlock;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeItems;
 
@@ -241,9 +242,7 @@ public class Hack {
                 Unit unit = player.unit();
                 if (unit.type.itemCapacity == 0) return;
                 CoreBlock.CoreBuild core = player.closestCore();
-                if (!unit.hasItem() && core == null) return;
-                if (!unit.hasItem() && core != null && Tmp.v1.set(player.x, player.y).sub(Tmp.v2.set(core.x, core.y)).len() > itemTransferRange)
-                    return;
+                float len = core == null ? -1 : Tmp.v1.set(player.x, player.y).sub(Tmp.v2.set(core.x, core.y)).len();
                 Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 if (tile == null) return;
                 Building build = tile.build;
@@ -266,34 +265,20 @@ public class Hack {
                     }
                     if (!accepted) return;
                     for (Item i : items) {
-                        if (core != null && !core.items.has(i, holdFillMinItem == 0 ? 1 : holdFillMinItem)) continue;
-                        if (unit.stack.amount != 0) {
-                            Call.transferInventory(player, core);
+                        if (requestItem(unit, i, core, -1, len)) {
+                            Call.transferInventory(player, build);
+                            return;
                         }
-                        Call.requestItem(player, core, i, unit.type.itemCapacity);
-                        Call.transferInventory(player, build);
-                        return;
                     }
                 }
                 if (holdFillMode) {
                     if (type.itemCapacity == 0) return;
                     for (Item i : allItems) {
                         if (build.acceptStack(i, unit.type.itemCapacity, unit) != 0) {
-                            if (unit.stack.amount != 0 && unit.stack.item == i) {
+                            if (requestItem(unit, i, core, -1, len)) {
                                 Call.transferInventory(player, build);
                                 return;
                             }
-                            if (core == null) return;
-                            if (!core.items.has(i, holdFillMinItem == 0 ? 1 : holdFillMinItem))
-                                continue;
-                            if (unit.stack.amount != 0) {
-                                Call.transferInventory(player, core);
-                            }
-                            if (unit.stack.amount == 0) {
-                                Call.requestItem(player, core, i, unit.type.itemCapacity);
-                            }
-                            Call.transferInventory(player, build);
-                            return;
                         }
                     }
                 } else {
@@ -311,21 +296,10 @@ public class Hack {
                     for (ItemStack i : items) {
                         if (build.items.has(i.item, i.amount))
                             continue;
-                        if (unit.stack.amount != 0 && unit.stack.item == i.item) {
+                        if (requestItem(unit, i.item, core, -1, len)) {
                             Call.transferInventory(player, build);
                             return;
                         }
-                        if (core == null) return;
-                        if (unit.stack.amount != 0) {
-                            Call.transferInventory(player, core);
-                        }
-                        if (!core.items.has(i.item, holdFillMinItem == 0 ? 1 : holdFillMinItem))
-                            continue;
-                        if (unit.stack.amount == 0) {
-                            Call.requestItem(player, core, i.item, unit.type.itemCapacity);
-                        }
-                        Call.transferInventory(player, build);
-                        return;
                     }
                 }
             } catch (Exception e) {
@@ -343,7 +317,8 @@ public class Hack {
                 if (unit.type.itemCapacity == 0) return;
                 CoreBlock.CoreBuild core = player.closestCore();
                 if (core == null) return;
-                if (Tmp.v1.set(player.x, player.y).sub(Tmp.v2.set(core.x, core.y)).len() > itemTransferRange) return;
+                float len = Tmp.v1.set(player.x, player.y).sub(Tmp.v2.set(core.x, core.y)).len();
+                if (len > itemTransferRange) return;
                 final int[] cnt = {0};
                 indexer.eachBlock(player.team(), player.x, player.y, itemTransferRange, b -> b.block instanceof OverdriveProjector, b -> {
                     if (cnt[0] >= autoFillMaxCount) return;
@@ -355,17 +330,11 @@ public class Hack {
                     for (ItemStack i : items) {
                         if (b.items.has(i.item, i.amount)) continue;
                         if (!core.items.has(i.item)) continue;
-                        if (unit.stack.amount != 0 && b.acceptStack(i.item, unit.type.itemCapacity, unit) != 0) {
+                        if (requestItem(unit, i.item, core, b.acceptStack(i.item, unit.type.itemCapacity, unit), len)) {
                             Call.transferInventory(player, b);
                             filled = true;
                             break;
                         }
-                        if (unit.stack.amount != 0) {
-                            Call.transferInventory(player, core);
-                        }
-                        Call.requestItem(player, core, i.item, unit.type.itemCapacity);
-                        Call.transferInventory(player, b);
-                        filled = true;
                     }
                     if (filled) cnt[0]++;
                 });
@@ -373,6 +342,33 @@ public class Hack {
                 ui.showException(e);
             }
         });
+    }
+
+    private static boolean requestItem(Unit unit, Item item, @Nullable CoreBlock.CoreBuild core, int amount, float len) {
+        if (amount == 0) return false;
+        if (unit.stack.amount != 0 && unit.stack.item == item) return true;
+        boolean[] get = {false};
+        indexer.eachBlock(unit, itemTransferRange, b -> b instanceof StorageBlock.StorageBuild && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
+            if (get[0]) return;
+            if (unit.stack.amount != 0) dropItem(core, len);
+            Call.requestItem(player, b, item, amount == -1 ? b.items.get(item) : amount);
+            get[0] = true;
+        });
+        if (!get[0] && core != null) {
+            if (holdFillMinItem == 0 ? core.items.has(item) : core.items.has(item, holdFillMinItem)) {
+                Call.requestItem(player, core, item, amount == -1 ? unit.type.itemCapacity : amount);
+                get[0] = true;
+            }
+        }
+        return get[0];
+    }
+
+    private static void dropItem(@Nullable CoreBlock.CoreBuild core, float len) {
+        if (core != null && len <= itemTransferRange) {
+            Call.transferInventory(player, core);
+        } else {
+            Call.dropItem(0);
+        }
     }
 
     private static void buildUUID(Config config) {
