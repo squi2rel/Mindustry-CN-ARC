@@ -228,8 +228,7 @@ public class Hack {
         fillIndexer.put(Blocks.scatter, new Item[]{Items.metaglass, Items.lead, Items.scrap});
         fillIndexer.put(Blocks.foreshadow, new Item[]{Items.surgeAlloy});
         fillIndexer.put(Blocks.spectre, new Item[]{Items.thorium, Items.graphite, Items.pyratite});
-        Seq<Item> allItems = new Seq<>();
-        allItems.addAll(Items.serpuloItems).addAll(Items.erekirItems);
+        Seq<Item> allItems = content.items();
         Events.run(EventType.Trigger.update, () -> {
             try {
                 if (!holdFill) return;
@@ -248,24 +247,19 @@ public class Hack {
                 Building build = tile.build;
                 if (build == null || build.items == null || build.team != player.team()) return;
                 Block type = build.block;
+                if (type instanceof CoreBlock) return;
                 if (type instanceof ItemTurret it) {
                     Item[] items = fillIndexer.get(type);
                     if (items == null) {
                         items = it.ammoTypes.keys().toSeq().toArray(Item.class);
                     }
                     if (items == null) return;
-                    boolean accepted = false;
-                    for (Item i : items) {
-                        if (build.acceptStack(i, unit.type.itemCapacity, unit) == 0) continue;
-                        accepted = true;
-                        if (unit.stack.amount != 0 && unit.stack.item == i) {
-                            Call.transferInventory(player, build);
-                            return;
-                        }
+                    if (unit.stack.amount != 0 && build.acceptStack(unit.stack.item, unit.stack.amount, unit) != 0) {
+                        Call.transferInventory(player, build);
+                        return;
                     }
-                    if (!accepted) return;
                     for (Item i : items) {
-                        if (requestItem(unit, i, core, -1, len)) {
+                        if (requireItem(unit, i, core, -1, len, build)) {
                             Call.transferInventory(player, build);
                             return;
                         }
@@ -273,9 +267,13 @@ public class Hack {
                 }
                 if (holdFillMode) {
                     if (type.itemCapacity == 0) return;
+                    if (unit.stack.amount != 0 && build.acceptStack(unit.stack.item, unit.stack.amount, unit) != 0) {
+                        Call.transferInventory(player, build);
+                        return;
+                    }
                     for (Item i : allItems) {
                         if (build.acceptStack(i, unit.type.itemCapacity, unit) != 0) {
-                            if (requestItem(unit, i, core, -1, len)) {
+                            if (requireItem(unit, i, core, -1, len, build)) {
                                 Call.transferInventory(player, build);
                                 return;
                             }
@@ -296,7 +294,7 @@ public class Hack {
                     for (ItemStack i : items) {
                         if (build.items.has(i.item, i.amount))
                             continue;
-                        if (requestItem(unit, i.item, core, -1, len)) {
+                        if (requireItem(unit, i.item, core, -1, len, build)) {
                             Call.transferInventory(player, build);
                             return;
                         }
@@ -330,7 +328,7 @@ public class Hack {
                     for (ItemStack i : items) {
                         if (b.items.has(i.item, i.amount)) continue;
                         if (!core.items.has(i.item)) continue;
-                        if (requestItem(unit, i.item, core, b.acceptStack(i.item, unit.type.itemCapacity, unit), len)) {
+                        if (requireItem(unit, i.item, core, b.acceptStack(i.item, unit.type.itemCapacity, unit), len, b)) {
                             Call.transferInventory(player, b);
                             filled = true;
                             break;
@@ -344,11 +342,11 @@ public class Hack {
         });
     }
 
-    private static boolean requestItem(Unit unit, Item item, @Nullable CoreBlock.CoreBuild core, int amount, float len) {
+    private static boolean requireItem(Unit unit, Item item, @Nullable CoreBlock.CoreBuild core, int amount, float len, Building dst) {
         if (amount == 0) return false;
         if (unit.stack.amount != 0 && unit.stack.item == item) return true;
         boolean[] get = {false};
-        indexer.eachBlock(unit, itemTransferRange, b -> b instanceof StorageBlock.StorageBuild && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
+        indexer.eachBlock(unit, itemTransferRange, b -> b != dst && b instanceof StorageBlock.StorageBuild && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
             if (get[0]) return;
             if (unit.stack.amount != 0) dropItem(core, len);
             Call.requestItem(player, b, item, amount == -1 ? b.items.get(item) : amount);
@@ -356,6 +354,7 @@ public class Hack {
         });
         if (!get[0] && core != null) {
             if (holdFillMinItem == 0 ? core.items.has(item) : core.items.has(item, holdFillMinItem)) {
+                if (unit.stack.amount != 0) dropItem(core, len);
                 Call.requestItem(player, core, item, amount == -1 ? unit.type.itemCapacity : amount);
                 get[0] = true;
             }
