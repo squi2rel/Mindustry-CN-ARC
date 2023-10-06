@@ -18,7 +18,6 @@ import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.scene.utils.Elem;
 import arc.struct.ObjectMap;
-import arc.struct.Seq;
 import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.Timer;
@@ -30,7 +29,6 @@ import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.gen.Call;
-import mindustry.gen.Icon;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.input.Binding;
@@ -262,7 +260,6 @@ public class Hack {
                 Building build = tile.build;
                 if (build == null || build.items == null || build.team != player.team()) return;
                 Block type = build.block;
-                if (type instanceof CoreBlock) return;
                 if (chosenItem != null) {
                     if (build.acceptStack(chosenItem, unit.type.itemCapacity, unit) != 0 && requireItem(unit, chosenItem, core, -1, len, build)) {
                         Call.transferInventory(player, build);
@@ -365,7 +362,7 @@ public class Hack {
             get[0] = true;
         });
         Runnable co = () -> {
-            if (!get[0] && core != null && len <= itemTransferRange) {
+            if (!(dst.block instanceof CoreBlock) && !get[0] && core != null && len <= itemTransferRange) {
                 if (holdFillMinItem == 0 ? core.items.has(item) : core.items.has(item, holdFillMinItem)) {
                     if (unit.stack.amount != 0) dropItem(core, len);
                     Call.requestItem(player, core, item, amount == -1 ? unit.type.itemCapacity : amount);
