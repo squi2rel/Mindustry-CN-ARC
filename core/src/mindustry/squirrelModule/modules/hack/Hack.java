@@ -6,13 +6,17 @@ import arc.func.Cons;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.scene.Element;
 import arc.scene.event.ChangeListener;
+import arc.scene.style.Drawable;
+import arc.scene.ui.Button;
 import arc.scene.ui.Label;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
+import arc.scene.utils.Elem;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Nullable;
@@ -26,6 +30,7 @@ import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.gen.Call;
+import mindustry.gen.Icon;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.input.Binding;
@@ -38,6 +43,7 @@ import mindustry.type.Item;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.ItemSelection;
 import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.storage.CoreBlock;
@@ -60,6 +66,7 @@ public class Hack {
     public static boolean weaponImmeTurn, forceControl, holdFill, autoFill, allowBlue, holdFillMode;
     public static int holdFillInterval, holdFillMinItem, autoFillInterval, autoFillMaxCount;
     public static long lastFillTime, lastAutoFillTime;
+    public static Item chosenItem = null;
     public static boolean customPoke;
     public static String customPokeText = null;
 
@@ -101,7 +108,7 @@ public class Hack {
 
         manager.register("交互", "weaponImmeTurn", new Config("武器瞬间转向", null, changed(e -> weaponImmeTurn = e)));
         manager.register("交互", "forceControl", new Config("强制控制", null, changed(e -> forceControl = e)));
-        manager.register("交互", "holdFill", new Config("按住装填", new Element[]{new Label(""), slider("holdFill", 50f, 500f, 1f, 100f, f -> holdFillInterval = Mathf.ceil(f), 0, f -> "间隔 " + holdFillInterval + "ms"), new Label(""), slider("holdFill2", 0f, 1000f, 1f, 500f, f -> holdFillMinItem = Mathf.ceil(f), 2, f -> "核心物资下限 " + holdFillMinItem), check("holdFill", "填满", false, b -> holdFillMode = b)}, changed(e -> holdFill = e, c -> holdFillInterval + "ms")));
+        manager.register("交互", "holdFill", new Config("按住装填", new Element[]{new Label(""), slider("holdFill", 50f, 500f, 1f, 100f, f -> holdFillInterval = Mathf.ceil(f), 0, f -> "间隔 " + holdFillInterval + "ms"), new Label(""), slider("holdFill2", 0f, 1000f, 1f, 500f, f -> holdFillMinItem = Mathf.ceil(f), 2, f -> "核心物资下限 " + holdFillMinItem), check("holdFill", "填满", false, b -> holdFillMode = b), new Label("指定物品"), new Table(t -> ItemSelection.buildTable(null, t, content.items(), () -> chosenItem, i -> chosenItem = i))}, changed(e -> holdFill = e, c -> holdFillInterval + "ms")));
         manager.register("交互", "autoFill", new Config("自动装超速", new Element[]{new Label(""), slider("autoFill", 50f, 2000f, 1f, 100f, f -> autoFillInterval = Mathf.ceil(f), 0, f -> "检测间隔 " + autoFillInterval + "ms"), new Label(""), slider("autoFill2", 1f, 20f, 1f, 5f, f -> autoFillMaxCount = Mathf.ceil(f), 2, f -> "每次装 " + autoFillMaxCount + " 个超速")}, changed(e -> autoFill = e, c -> autoFillInterval + "ms")));
         manager.register("交互", "allowBlue", new Config("允许蓝图", null, changed(e -> allowBlue = e)));
         initFill();
@@ -216,6 +223,14 @@ public class Hack {
         return f;
     }
 
+    public static Button button(String text, Runnable callback) {
+        return Elem.newButton(text, callback);
+    }
+
+    public static Button button(TextureRegion text, Runnable callback) {
+        return Elem.newImageButton((Drawable) text, callback);
+    }
+
     private static void initFill() {
         fillIndexer.put(Blocks.cyclone, new Item[]{Items.surgeAlloy, Items.plastanium, Items.blastCompound, Items.metaglass});
         fillIndexer.put(Blocks.swarmer, new Item[]{Items.surgeAlloy, Items.blastCompound, Items.pyratite});
@@ -248,6 +263,11 @@ public class Hack {
                 if (build == null || build.items == null || build.team != player.team()) return;
                 Block type = build.block;
                 if (type instanceof CoreBlock) return;
+                if (chosenItem != null && build.acceptStack(chosenItem, unit.type.itemCapacity, unit) != 0) {
+                    if (requireItem(unit, chosenItem, core, -1, len, build)) {
+                        Call.transferInventory(player, build);
+                    }
+                }
                 if (type instanceof ItemTurret it) {
                     Item[] items = fillIndexer.get(type);
                     if (items == null) {

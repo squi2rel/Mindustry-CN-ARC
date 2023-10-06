@@ -14,6 +14,7 @@ import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.scene.event.Touchable;
 import arc.scene.style.Drawable;
+import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
@@ -138,10 +139,10 @@ public class ControlTable extends Table {
                             t4.add(":");
                             t4.clicked(() -> {
                                 if (configShowed[0]) {
-                                    settings[0].setElement(null);
+                                    settings[0].setElement(null).height(0);
                                     configShowed[0] = false;
                                 } else {
-                                    settings[0].setElement(new Table(t5 -> {
+                                    settings[0].setElement(new ScrollPane(new Table(t5 -> {
                                         t5.setBackground(gray2);
                                         for (Element e : value.element) {
                                             Element el = t5.add(e).growX().pad(5).left().get();
@@ -155,7 +156,7 @@ public class ControlTable extends Table {
                                             });
                                             t5.row();
                                         }
-                                    }));
+                                    }))).growX().update(p -> settings[0].height(Math.min(p.getPrefHeight(), 200)));
                                     configShowed[0] = true;
                                 }
                             });
