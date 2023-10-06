@@ -358,16 +358,14 @@ public class Hack {
         if (amount == 0) return false;
         if (unit.stack.amount != 0 && unit.stack.item == item) return true;
         boolean[] get = {false};
-        Runnable cont = () -> {
-            indexer.eachBlock(unit, itemTransferRange, b -> b != dst && b.block instanceof StorageBlock && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
-                if (get[0]) return;
-                if (unit.stack.amount != 0) dropItem(core, len);
-                Call.requestItem(player, b, item, amount == -1 ? b.items.get(item) : amount);
-                get[0] = true;
-            });
-        };
+        Runnable cont = () -> indexer.eachBlock(unit, itemTransferRange, b -> b != dst && b.block instanceof StorageBlock && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
+            if (get[0]) return;
+            if (unit.stack.amount != 0) dropItem(core, len);
+            Call.requestItem(player, b, item, amount == -1 ? b.items.get(item) : amount);
+            get[0] = true;
+        });
         Runnable co = () -> {
-            if (!get[0] && core != null) {
+            if (!get[0] && core != null && len <= itemTransferRange) {
                 if (holdFillMinItem == 0 ? core.items.has(item) : core.items.has(item, holdFillMinItem)) {
                     if (unit.stack.amount != 0) dropItem(core, len);
                     Call.requestItem(player, core, item, amount == -1 ? unit.type.itemCapacity : amount);
