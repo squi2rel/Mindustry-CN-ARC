@@ -243,7 +243,7 @@ public class Hack {
         fillIndexer.put(Blocks.scatter, new Item[]{Items.metaglass, Items.lead, Items.scrap});
         fillIndexer.put(Blocks.foreshadow, new Item[]{Items.surgeAlloy});
         fillIndexer.put(Blocks.spectre, new Item[]{Items.thorium, Items.graphite, Items.pyratite});
-        Seq<Item> allItems = content.items();
+        Item[] allItems = content.items().toArray(Item.class);
         Events.run(EventType.Trigger.update, () -> {
             try {
                 if (!holdFill) return;
@@ -266,37 +266,29 @@ public class Hack {
                 if (chosenItem != null && build.acceptStack(chosenItem, unit.type.itemCapacity, unit) != 0) {
                     if (requireItem(unit, chosenItem, core, -1, len, build)) {
                         Call.transferInventory(player, build);
-                    }
-                }
-                if (type instanceof ItemTurret it) {
-                    Item[] items = fillIndexer.get(type);
-                    if (items == null) {
-                        items = it.ammoTypes.keys().toSeq().toArray(Item.class);
-                    }
-                    if (items == null) return;
-                    if (unit.stack.amount != 0 && build.acceptStack(unit.stack.item, unit.stack.amount, unit) != 0) {
-                        Call.transferInventory(player, build);
                         return;
                     }
-                    for (Item i : items) {
-                        if (requireItem(unit, i, core, -1, len, build)) {
-                            Call.transferInventory(player, build);
-                            return;
-                        }
-                    }
                 }
-                if (holdFillMode) {
+                if (type instanceof ItemTurret || holdFillMode) {
+                    Item[] items;
+                    if (type instanceof ItemTurret it) {
+                        items = fillIndexer.get(type);
+                        if (items == null) {
+                            items = it.ammoTypes.keys().toSeq().toArray(Item.class);
+                        }
+                        if (items == null) return;
+                    } else {
+                        items = allItems;
+                    }
                     if (type.itemCapacity == 0) return;
                     if (unit.stack.amount != 0 && build.acceptStack(unit.stack.item, unit.stack.amount, unit) != 0) {
                         Call.transferInventory(player, build);
                         return;
                     }
-                    for (Item i : allItems) {
-                        if (build.acceptStack(i, unit.type.itemCapacity, unit) != 0) {
-                            if (requireItem(unit, i, core, -1, len, build)) {
-                                Call.transferInventory(player, build);
-                                return;
-                            }
+                    for (Item i : items) {
+                        if (build.acceptStack(i, unit.type.itemCapacity, unit) != 0 && requireItem(unit, i, core, -1, len, build)) {
+                            Call.transferInventory(player, build);
+                            return;
                         }
                     }
                 } else {
