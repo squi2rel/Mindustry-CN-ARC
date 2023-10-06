@@ -263,11 +263,11 @@ public class Hack {
                 if (build == null || build.items == null || build.team != player.team()) return;
                 Block type = build.block;
                 if (type instanceof CoreBlock) return;
-                if (chosenItem != null && build.acceptStack(chosenItem, unit.type.itemCapacity, unit) != 0) {
-                    if (requireItem(unit, chosenItem, core, -1, len, build)) {
+                if (chosenItem != null) {
+                    if (build.acceptStack(chosenItem, unit.type.itemCapacity, unit) != 0 && requireItem(unit, chosenItem, core, -1, len, build)) {
                         Call.transferInventory(player, build);
-                        return;
                     }
+                    return;
                 }
                 if (type instanceof ItemTurret || holdFillMode) {
                     Item[] items;
@@ -358,12 +358,14 @@ public class Hack {
         if (amount == 0) return false;
         if (unit.stack.amount != 0 && unit.stack.item == item) return true;
         boolean[] get = {false};
-        indexer.eachBlock(unit, itemTransferRange, b -> b != dst && b instanceof StorageBlock.StorageBuild && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
-            if (get[0]) return;
-            if (unit.stack.amount != 0) dropItem(core, len);
-            Call.requestItem(player, b, item, amount == -1 ? b.items.get(item) : amount);
-            get[0] = true;
-        });
+        if (!(dst.block instanceof StorageBlock)) {
+            indexer.eachBlock(unit, itemTransferRange, b -> b != dst && b.block instanceof StorageBlock && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
+                if (get[0]) return;
+                if (unit.stack.amount != 0) dropItem(core, len);
+                Call.requestItem(player, b, item, amount == -1 ? b.items.get(item) : amount);
+                get[0] = true;
+            });
+        }
         if (!get[0] && core != null) {
             if (holdFillMinItem == 0 ? core.items.has(item) : core.items.has(item, holdFillMinItem)) {
                 if (unit.stack.amount != 0) dropItem(core, len);
