@@ -30,6 +30,14 @@ public class PowerInfo {
         this.need += need;
     }
 
+    private void clear(){
+        this.powerbal = 0;
+        this.stored = 0;
+        this.capacity = 0;
+        this.produced = 0;
+        this.need = 0;
+    }
+
     public int getPowerBalance() {
         return (int) (powerbal * 60);
     }
@@ -53,18 +61,11 @@ public class PowerInfo {
 
 
     public static void update() {
-        if (PowerGraph.activeGraphs == null) return;
-        PowerInfo newInfo = new PowerInfo();
-        PowerGraph.activeGraphs.each(item -> {
-            if (item != null) {
-                item.updateActive();
-                if (item.team == Vars.player.team()) {
-                    newInfo.add(item.getPowerBalance(), item.getLastPowerStored(), item.getLastCapacity(), item.getLastPowerProduced(), item.getLastPowerNeeded());
-                }
-
-            }
+        info.clear();
+        Groups.powerGraph.each(item->{
+            if (item.graph().team == Vars.player.team())
+                info.add(item.graph().getPowerBalance(), item.graph().getLastPowerStored(), item.graph().getLastCapacity(), item.graph().getLastPowerProduced(), item.graph().getLastPowerNeeded());
         });
-        info = newInfo;
     }
 
     public static Element getBars() {

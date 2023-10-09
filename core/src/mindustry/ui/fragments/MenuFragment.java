@@ -2,6 +2,7 @@ package mindustry.ui.fragments;
 
 import arc.Core;
 import arc.Events;
+import arc.files.Fi;
 import arc.graphics.Color;
 import arc.graphics.Pixmap;
 import arc.graphics.Texture;
@@ -59,6 +60,13 @@ public class MenuFragment{
     static long arcNewsLastUpdate = 0;
     static boolean haveNewerNews = false;
 
+    Fi arcBackground;
+    String arcBackgroundPath = Core.settings.getString("arcBackgroundPath");
+
+    Image img = new Image();
+
+    int arcBackgroundIndex = 0;
+
     public void build(Group parent){
         renderer = new MenuRenderer();
 
@@ -77,7 +85,14 @@ public class MenuFragment{
 
         parent = group;
 
-        parent.fill((x, y, w, h) -> renderer.render());
+        if (arcBackgroundPath != null && Core.files.absolute(arcBackgroundPath).exists() && Core.files.absolute(arcBackgroundPath).list().length >=1){
+            arcBackgroundIndex = (int) (Math.random() * Core.files.absolute(arcBackgroundPath).list().length);
+            nextBackGroundImg();
+            group.addChild(img);
+            img.setFillParent(true);
+        }else{
+            parent.fill((x, y, w, h) -> renderer.render());
+        }
 
         parent.fill(c -> {
             c.pane(Styles.noBarPane, cont -> {
@@ -111,6 +126,10 @@ public class MenuFragment{
             t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
         }));
 
+        parent.fill(c -> c.bottom().left().table(t -> {
+            t.background(Tex.buttonEdge3);
+            t.button("\uE83D", cleart, this::nextBackGroundImg).width(50f);
+        }).left().width(100));
 
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[cyan]") + Version.combined();
         String arcversionText = "\n[cyan]ARC version:" + Version.arcBuild;
@@ -168,6 +187,17 @@ public class MenuFragment{
             t.background(Tex.buttonEdge4);
             t.button("学术日报", cleart, MenuFragment::showArcNews).left().update(b -> b.setColor(haveNewerNews ? Tmp.c1.set(Color.white).lerp(Color.cyan, Mathf.absin(5f, 1f)) : Color.white)).growX();
         }).left().width(100));
+    }
+
+    private void nextBackGroundImg(){
+        arcBackgroundPath = Core.settings.getString("arcBackgroundPath");
+        arcBackgroundIndex += 1;
+        arcBackgroundIndex = arcBackgroundIndex % Core.files.absolute(arcBackgroundPath).findAll().size;
+        try{
+            arcBackground = Core.files.absolute(arcBackgroundPath).findAll().get(arcBackgroundIndex);
+            img.setDrawable(new TextureRegion(new Texture(arcBackground)));
+        } catch (Exception ignored) {
+        }
     }
 
     public static void fetchArcNews() {

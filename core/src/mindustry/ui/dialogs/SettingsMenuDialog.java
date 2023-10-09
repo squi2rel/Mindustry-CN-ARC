@@ -791,6 +791,7 @@ public class SettingsMenuDialog extends BaseDialog{
             });
             specmode.sliderPref("fontSize", 10, 5, 25, 1, i -> "x " + Strings.fixed(i * 0.1f, 1));
             specmode.stringInput("themeColor", "ffd37f");
+            specmode.stringInput("arcBackgroundPath", "");
             specmode.addCategory("specGameMode");
             specmode.checkPref("autoSelSchematic", false);
             specmode.checkPref("researchViewer", false);
@@ -1163,8 +1164,8 @@ public class SettingsMenuDialog extends BaseDialog{
                 field.field(value, text -> {
                     settings.put(name, text);
                     value = text;
-                }).padLeft(30);
-                table.add(field).left().pad(10).padTop(15).padBottom(4).row();
+                }).growX().padLeft(30);
+                table.add(field).growX().pad(10).padTop(15).padBottom(4).row();
             }
         }
 

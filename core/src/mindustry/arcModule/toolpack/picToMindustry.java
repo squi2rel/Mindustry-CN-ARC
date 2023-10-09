@@ -110,8 +110,14 @@ public class picToMindustry {
         image = Pixmaps.scale(oriImage, scale);
         tTable.clear();
         tTable.table(t -> {
+            t.add("路径").color(getThemeColor()).padRight(25f).padBottom(10f);
+            t.button("\uE874", ()-> Core.app.setClipboardText(originFile.absolutePath()));
+            t.add(originFile.absolutePath()).padBottom(10f).row();
+
             t.add("名称").color(getThemeColor()).padRight(25f).padBottom(10f);
+            t.button("\uE874", ()-> Core.app.setClipboardText(originFile.name()));
             t.add(originFile.name()).padBottom(10f).row();
+
             t.add("原始大小").color(getThemeColor()).padRight(25f);
             t.add(formatNumber(oriImage.width) + "\uE815" + formatNumber(oriImage.height));
         }).padBottom(20f).row();

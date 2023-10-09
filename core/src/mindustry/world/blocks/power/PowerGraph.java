@@ -8,7 +8,6 @@ import mindustry.gen.*;
 import mindustry.world.consumers.*;
 import mindustry.game.Team;
 import mindustry.Vars;
-import mindustry.ui.*;
 
 public class PowerGraph{
     private static final Queue<Building> queue = new Queue<>();
@@ -34,22 +33,11 @@ public class PowerGraph{
     private long lastFrameUpdated = -1;
     private final int graphID;
     private static int lastGraphID;
-    public static ObjectSet<PowerGraph> activeGraphs = new ObjectSet<>();
 
     public PowerGraph(){
         entity = PowerGraphUpdater.create();
         entity.graph = this;
         graphID = lastGraphID++;
-        activeGraphs.add(this);
-    }
-
-    public void updateActive() {
-        if (!active) return;
-        if (Vars.state.isPaused()) lastFrameUpdated = Core.graphics.getFrameId();
-        if (!(Core.graphics.getFrameId() - lastFrameUpdated < 2)) {
-            activeGraphs.remove(this);
-            active = false;
-        }
     }
 
     public PowerGraph(boolean noEntity){
@@ -233,9 +221,8 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(Core.graphics.getFrameId() == lastFrameUpdated){
-            return;
-        }else if(!consumers.isEmpty() && consumers.first().cheating()){
+        team = this.all.first().team;
+        if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
             for(Building tile : consumers){
                 tile.power.status = 1f;
@@ -306,7 +293,6 @@ public class PowerGraph{
                 if(build.power.graph.entity != null) build.power.graph.entity.remove();
             }
 
-            team = build.team;
             build.power.graph = this;
             build.power.init = true;
             all.add(build);

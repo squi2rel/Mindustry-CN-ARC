@@ -1,5 +1,7 @@
 package mindustry.arcModule.ui;
 
+import arc.Core;
+import arc.Events;
 import arc.func.Cons;
 import arc.func.Floatf;
 import arc.graphics.Color;
@@ -10,14 +12,18 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Tmp;
+import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.dialogs.BlockSelectDialog;
 import mindustry.content.Blocks;
 import mindustry.content.Liquids;
 import mindustry.content.UnitTypes;
 import mindustry.entities.units.BuildPlan;
+import mindustry.game.EventType;
 import mindustry.game.Teams;
+import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.input.DesktopInput;
 import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
@@ -45,6 +51,11 @@ public class AdvanceBuildTool extends Table {
     private Block original = Blocks.conveyor, newBlock = Blocks.titaniumConveyor;
     private Block autoBuild = Blocks.turbineCondenser;
 
+    private Block searchBlock = Blocks.itemSource;
+    private Building searchBuild;
+    private Seq<Building> buildingSeq = new Seq<>();
+    private int searchBlockIndex = 0;
+
     public BuildTiles buildTiles = new BuildTiles();
 
     public AdvanceBuildTool() {
@@ -68,6 +79,9 @@ public class AdvanceBuildTool extends Table {
         }};
         rebuild();
         right();
+        Events.on(EventType.WorldLoadEvent.class, e -> {
+            rebuild();
+        });
     }
 
     void rebuild() {
@@ -120,7 +134,24 @@ public class AdvanceBuildTool extends Table {
                             rebuild();
                         }
                     });
-                }).fillX();
+                }).fillX().row();
+                t.table(tt -> {
+                    tt.button("S", NCtextStyle, this::searchBlock).tooltip("[cyan]搜索方块").growX().height(30f).update(button -> {
+                        buildingSeq = player.team().data().buildings.select(building1 -> building1.block == searchBlock);
+                        if (buildingSeq.size == 0) button.setText("[lightgray]\uE88A");
+                        else button.setText("\uE88A " + searchBlockIndex + "/" + buildingSeq.size);
+                    });
+                    tt.button(searchBlock.emoji(), NCtextStyle, ()->{
+                        new BlockSelectDialog(Block::isPlaceable, block -> searchBlock = block, block -> searchBlock == block).show().hidden(this::rebuild);
+                        searchBlockIndex = 0;
+                    }).tooltip("[acid]搜索替换").width(30f).height(30f);
+                }).fillX().row();
+                t.table(tt -> {
+                    tt.button(Blocks.worldMessage.emoji(), textStyle, () -> {
+                        Core.settings.put("displayallmessage", !Core.settings.getBool("displayallmessage", false));
+                    }).checked(a -> Core.settings.getBool("displayallmessage")).size(30, 30).tooltip("开关信息板全显示");
+                    tt.button(Blocks.worldProcessor.emoji(), NCtextStyle, RFuncs::worldProcessor).size(30).tooltip("地图世处信息");
+                }).fillX().row();
             });
         }
 
@@ -212,6 +243,22 @@ public class AdvanceBuildTool extends Table {
             }
         }
         return true;
+    }
+
+    void searchBlock(){
+        if (buildingSeq.size == 0){
+            ui.arcInfo("[violet]方块搜索\n[acid]未找到此方块");
+            return;
+        }
+        searchBuild = buildingSeq.get(searchBlockIndex);
+
+        if (control.input instanceof DesktopInput input) {
+            input.panning = true;
+        }
+        Core.camera.position.set(searchBuild.tile.x * tilesize, searchBuild.tile.y * tilesize);
+        ui.arcInfo("[violet]方块搜索\n[acid]找到方块[cyan]" + searchBlockIndex + "[acid]/[cyan]" + buildingSeq.size + "[white]" + searchBlock.emoji());
+        searchBuild.block.placeEffect.at(searchBuild.x, searchBuild.y, searchBuild.block.size);
+        searchBlockIndex = (searchBlockIndex + 1) % buildingSeq.size;
     }
 
     enum BuildRange {

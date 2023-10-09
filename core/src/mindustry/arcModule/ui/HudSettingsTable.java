@@ -10,7 +10,6 @@ import arc.scene.event.*;
 
 import arc.*;
 import arc.graphics.*;
-import mindustry.arcModule.RFuncs;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
 import mindustry.gen.*;
@@ -161,7 +160,6 @@ public class HudSettingsTable extends Table {
                         control.input.logicCutscene = false;
                         ui.arcInfo("已移除逻辑视角锁定");
                     }).checked(a -> Core.settings.getBool("removeLogicLock")).size(30, 30).tooltip("逻辑锁定");
-                    //t.button("\uF6C2", NCtextStyle, RFuncs::worldProcessor).size(30).tooltip("地图世处信息");
                     t.button("[cyan]雾", textStyle, () -> {
                         if (!state.rules.pvp || player.team().id == 255) renderer.fogEnabled = !renderer.fogEnabled;
                     }).checked(a -> renderer.fogEnabled).size(30, 30).tooltip("战争迷雾").visible(() -> !state.rules.pvp || player.team().id == 255);
@@ -169,7 +167,7 @@ public class HudSettingsTable extends Table {
                 sp.row();
                 sp.table(t -> {
                     t.button("[red]灯", textStyle, () -> {
-                        state.rules.lighting = !state.rules.lighting;
+                        settings.put("drawlight", !settings.getBool("drawlight"));
                     }).checked(a -> state.rules.lighting).size(30, 30).name("灯光").tooltip("[cyan]开灯啊！");
                     t.button("[acid]效", textStyle, () -> {
                         Core.settings.put("effects", !Core.settings.getBool("effects"));
@@ -183,9 +181,6 @@ public class HudSettingsTable extends Table {
                     t.button("[acid]天", textStyle, () -> {
                         Core.settings.put("showweather", !Core.settings.getBool("showweather"));
                     }).checked(a -> Core.settings.getBool("showweather")).size(30, 30).tooltip("天气显示");
-                    t.button("[acid]信", textStyle, () -> {
-                        Core.settings.put("displayallmessage", !Core.settings.getBool("displayallmessage", false));
-                    }).checked(a -> Core.settings.getBool("displayallmessage")).size(30, 30).tooltip("开关信息板全显示");
                     if (settings.getBool("developMode"))
                         t.button(StatusEffects.burning.emoji(), textStyle, () -> {
                             state.rules.fire = !state.rules.fire;
