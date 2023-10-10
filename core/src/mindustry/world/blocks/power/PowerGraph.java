@@ -221,7 +221,7 @@ public class PowerGraph{
     }
 
     public void update(){
-        team = this.all.first().team;
+        team = all.size == 0 ? null : all.first().team;
         if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
             for(Building tile : consumers){
