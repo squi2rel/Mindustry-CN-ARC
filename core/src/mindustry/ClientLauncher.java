@@ -10,6 +10,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.arcModule.TimeControl;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -65,10 +66,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         boolean gb = ram >= 1024 * 1024 * 1024;
         Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
 
-        Time.setDeltaProvider(() -> {
-            float result = Core.graphics.getDeltaTime() * 60f;
-            return ((Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f)) * gameSpeed;
-        });
+        Time.setDeltaProvider(TimeControl.deltaProvider);
 
         batch = new SortedSpriteBatch();
         assets = new AssetManager();

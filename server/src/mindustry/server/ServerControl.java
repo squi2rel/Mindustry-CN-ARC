@@ -10,6 +10,7 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import mindustry.arcModule.TimeControl;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -148,7 +149,7 @@ public class ServerControl implements ApplicationListener{
             return useColors ? addColors(text) : removeColors(text);
         };
 
-        Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f * gameSpeed);
+        Time.setDeltaProvider(TimeControl.deltaProvider);
 
         registerCommands();
 

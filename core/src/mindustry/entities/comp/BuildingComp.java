@@ -77,6 +77,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     transient boolean enabled = true;
     transient @Nullable Building lastDisabler;
+    transient @Nullable Building lastLogicController;
 
     @Nullable PowerModule power;
     @Nullable ItemModule items;
@@ -1525,6 +1526,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(result == null) continue;
             table.add(result).growX();
             table.row();
+        }
+        if (lastLogicController != null) {
+            table.add(lastLogicController.block.emoji() + " [lightgray](" + lastLogicController.tileX() + ", " + lastLogicController.tileY() + ")").growX().left().row();
+        }
+        if (Time.time < healSuppressionTime){
+            table.add("\uF89B[red]\uE815").update(label -> {
+                if (healSuppressionTime > 0) label.setText("\uF89B[red]\uE815 [white]~ " + UI.formatTime(healSuppressionTime - Time.time));
+                else label.visible = false;
+            }).row();
         }
     }
 

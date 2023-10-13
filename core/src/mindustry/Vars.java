@@ -47,7 +47,6 @@ public class Vars implements Loadable{
     public static String userContentURL = "https://ghps.cc/https://raw.github.com";
     public static boolean replaying = false;
     public static ReplayController replayController;
-    public static float gameSpeed = 1f;
 
     /** 开始游玩时间 */
     public static Long startPlayTime = Time.millis();
@@ -362,10 +361,6 @@ public class Vars implements Loadable{
         changeLogRead = Math.abs(Integer.parseInt(("" + uuid.hashCode()).substring(0, 2)));
 
         replayController = new ReplayController();
-
-        Events.on(EventType.ResetEvent.class, e -> {
-            gameSpeed = 1f;
-        });
     }
 
     /** Checks if a launch failure occurred.
@@ -549,10 +544,5 @@ public class Vars implements Loadable{
     public static Boolean arcInfoControl(){
         return   (!arcCheatServer && (Core.settings.getBool("showOtherTeamState") ||
                         player.team().id == 255 || state.rules.mode() != Gamemode.pvp));
-    }
-
-    public static void changeGameSpeed(float speed){
-        gameSpeed = speed;
-        ui.announce(Strings.format("当前游戏速度：@倍", gameSpeed));
     }
 }

@@ -40,6 +40,7 @@ import mindustry.world.blocks.payloads.UnitPayload;
 import java.util.Objects;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.TimeControl.*;
 import static mindustry.content.UnitTypes.*;
 import static mindustry.ui.Styles.*;
 
@@ -138,40 +139,33 @@ public class AdvanceToolTable extends Table {
                             tBox.add("沙漏：").left();
 
                             tBox.button("/2", cleart, () -> {
-                                changeGameSpeed(gameSpeed / 2f);
+                                changeGameSpeed(0.5f);
                             }).tooltip("[acid]将时间流速放慢到一半").size(40f, 30f);
 
                             tBox.button("×2", cleart, () -> {
-                                changeGameSpeed(gameSpeed * 2f);
+                                changeGameSpeed(2f);
                             }).tooltip("[acid]将时间流速加快到两倍").size(40f, 30f);
 
                             tBox.button("[red]S", cleart, () -> {
-                                changeGameSpeed(0);
+                                setGameSpeed(0f);
                             }).tooltip("[acid]暂停时间").size(30f, 30f);
 
                             tBox.button("[green]N", cleart, () -> {
-                                changeGameSpeed(1);
+                                setGameSpeed(1f);
                             }).tooltip("[acid]恢复原速").size(30f, 30f);
-                            /*
+
                             tBox.button("[white]F", cleart, () -> {
-                                timeAcce = 1;
-                                fpslock = true;
-                                Time.setDeltaProvider(() -> 60f / targetfps);
-                                ui.announce("当前帧率锁定：" + targetfps);
+                                lockFps();
                             }).tooltip("[acid]帧率模拟").size(30f, 30f);
-                            tBox.field(Integer.toString((int) targetfps), s -> {
+
+                            tBox.field(Integer.toString(targetFps), s -> {
                                 int num = Integer.parseInt(s);
-                                targetfps = 10 <= num && num < 10000 ? num : 60;
-                                if (fpslock) {
-                                    Time.setDeltaProvider(() -> 60f / targetfps);
-                                    ui.announce("当前帧率锁定：" + targetfps);
-                                }
+                                setTargetFps(2 <= num && num < 10000 ? num : 60);
                             }).valid(s -> {
                                 if (!Strings.canParsePositiveInt(s)) return false;
                                 int num = Integer.parseInt(s);
-                                return 10 <= num && num < 10000;
-                            }).tooltip("允许的范围：10~9999").size(90f, 30f);
-                            */
+                                return 2 <= num && num < 10000;
+                            }).tooltip("允许的范围：2~9999").size(90f, 30f);
                         }).left();
                     }).left().row();
                 }

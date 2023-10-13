@@ -2631,5 +2631,14 @@ public class Fx{
     simpleRect = new Effect(60f,e -> {
         color(e.color);
         Fill.square(e.x,e.y,2f * e.fout(),45);
+    }),
+
+    arcIndexer = new Effect(120f, e -> {
+        color(getThemeColor());
+        Lines.circle(e.x, e.y, 8f);
+        for(int i = 0; i < 3; i++){
+            float rot = i * 120f + 90f;
+            Drawf.simpleArrow(e.x, e.y,e.x  + Angles.trnsx(rot, 120f),e.y +  + Angles.trnsy(rot, 120f),100f - 80f * e.fin(),-4f, getThemeColor());
+        }
     });
 }

@@ -130,7 +130,7 @@ public class MenuFragment{
         parent.fill(c -> c.bottom().left().table(t -> {
             t.background(Tex.buttonEdge3);
             t.button("\uE83D", cleart, this::nextBackGroundImg).width(50f);
-        }).left().width(100));
+        }).visible(!Core.settings.getString("arcBackgroundPath").isEmpty()).left().width(100));
 
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[cyan]") + Version.combined();
         String arcversionText = "\n[cyan]ARC version:" + Version.arcBuild;

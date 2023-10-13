@@ -12,7 +12,6 @@ import arc.scene.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.types.LogicAI;
 import mindustry.arcModule.Marker;
 import mindustry.content.UnitTypes;
 import mindustry.core.*;
@@ -317,14 +316,6 @@ public class DesktopInput extends InputHandler{
                     Call.buildingControlSelect(player, build);
                     recentRespawnTimer = 1f;
                 }
-            }
-        }
-
-        if (Core.input.keyDown(KeyCode.shiftLeft) && Core.input.keyTap(Binding.select)) {
-            Unit u = selectedUnit();
-            if (u != null && u.controller() instanceof LogicAI ai && ai.controller != null && ai.controller.isValid()) {
-                panning = true;
-                camera.position.set(ai.controller.x, ai.controller.y);
             }
         }
 

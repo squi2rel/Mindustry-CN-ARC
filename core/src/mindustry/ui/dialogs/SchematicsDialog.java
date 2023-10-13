@@ -15,11 +15,10 @@ import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.toolpack.picToMindustry;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.content.Blocks;
-import mindustry.content.Items;
 import mindustry.content.Planets;
 import mindustry.content.UnitTypes;
 import mindustry.ctype.*;
@@ -31,9 +30,7 @@ import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.Block;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.production.GenericCrafter;
-import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.StatUnit;
 
 import java.util.regex.*;
@@ -57,6 +54,8 @@ public class SchematicsDialog extends BaseDialog{
     private String surpuloTags = UnitTypes.gamma.emoji(), erekirTags = UnitTypes.emanate.emoji();
     private  Seq<String> planetTags = new Seq<String>().add(surpuloTags,erekirTags);
     public static final String ShareType = "[blue]<Schem>";
+
+    private boolean clipbroad = false;
     private boolean fromShare = false;
 
     public SchematicsDialog(){
@@ -361,37 +360,33 @@ public class SchematicsDialog extends BaseDialog{
                 t.defaults().size(280f, 60f).left();
                 if(steam && !s.hasSteamID()){
                     t.button("@schematic.shareworkshop", Icon.book, style,
-                        () -> platform.publish(s)).marginLeft(12f);
+                            () -> platform.publish(s)).marginLeft(12f);
                     t.row();
                     dialog.hide();
                 }
-                t.button("@schematic.copy", Icon.copy, style, () -> {
-                    dialog.hide();
-                    ui.showInfoFade("@copied");
-                    Core.app.setClipboardText(schematics.writeBase64(s));
-                }).marginLeft(12f);
-                t.row();
                 t.button("@schematic.exportfile", Icon.export, style, () -> {
                     dialog.hide();
                     platform.export(s.name(), schematicExtension, file -> Schematics.write(s, file));
                 }).marginLeft(12f);
                 t.row();
-                t.button("标记蓝图[cyan][简]", Icon.export, style, () -> {
-                    String message = arcSchematicsInfo(s,false);
-                    int seperator = 145;
-                    for (int i=0; i < message.length()/(float)seperator;i++){
-                        Call.sendChatMessage(message.substring(i*seperator,Math.min(message.length(),(i+1)*seperator)));
-                    }
+                t.button("[cyan]剪贴板[white]/[gray]消息框", Icon.copy, style, () -> {
+                    clipbroad = !clipbroad;
+                }).marginLeft(12f).update(button -> button.setText(clipbroad? "[cyan]剪贴板[white]/[gray]消息框" : "[gray]剪贴板[white]/[cyan]消息框"));
+                t.row();
+
+                t.button("蓝图代码", Icon.copy, style, () -> {
                     dialog.hide();
+                    arcSendBlueprintMsg(schematics.writeBase64(s));
                 }).marginLeft(12f);
                 t.row();
-                t.button("标记蓝图[cyan][详]", Icon.export, style, () -> {
-                    String message = arcSchematicsInfo(s,true);
-                    int seperator = 145;
-                    for (int i=0; i < message.length()/(float)seperator;i++){
-                        Call.sendChatMessage(message.substring(i*seperator,Math.min(message.length(),(i+1)*seperator)));
-                    }
+                t.button("记录蓝图[cyan][简]", Icon.export, style, () -> {
                     dialog.hide();
+                    arcSendBlueprintMsg(arcSchematicsInfo(s,false));
+                }).marginLeft(12f);
+                t.row();
+                t.button("记录蓝图[cyan][详]", Icon.export, style, () -> {
+                    dialog.hide();
+                    arcSendBlueprintMsg(arcSchematicsInfo(s,true));
                 }).marginLeft(12f);
                 t.row();
                 t.button("分享蓝图", Icon.export, style, () -> {
@@ -399,9 +394,10 @@ public class SchematicsDialog extends BaseDialog{
                         Http.HttpRequest req = Http.post("https://pastebin.com/api/api_post.php", "api_dev_key=sdBDjI5mWBnHl9vBEDMNiYQ3IZe0LFEk&api_option=paste&api_paste_expire_date=10M&api_paste_code=" + schematics.writeBase64(s));
                         req.submit(r -> {
                             String code = r.getResultAsString();
-                            Core.app.post(() -> Call.sendChatMessage(getPrefix("blue", "Schem") + " " + code.substring(code.lastIndexOf('/') + 1)));
+                            if (clipbroad) arcSendClipBroadMsg(s, code);
+                            else RFuncs.sendChatMsg(getPrefix("blue", "Schem") + " " + code.substring(code.lastIndexOf('/') + 1));
                         });
-                        req.error(e -> Core.app.post(() -> ui.showException("分享失败", e)));
+                        req.error(e -> Core.app.post(() -> {ui.showException("分享失败", e);if (clipbroad) arcSendClipBroadMsg(s, "x");}));
                     } catch (Exception e) {
                         ui.showException("分享失败", e);
                     }
@@ -409,9 +405,41 @@ public class SchematicsDialog extends BaseDialog{
                 }).marginLeft(12f);
             });
         });
-
         dialog.addCloseButton();
         dialog.show();
+    }
+
+    private void arcSendBlueprintMsg(String msg) {
+        if (clipbroad) Core.app.setClipboardText(msg);
+        else RFuncs.sendChatMsg(msg);
+        ui.arcInfo(clipbroad ? "已保存至剪贴板" : "已发送到聊天框");
+    }
+
+    private void arcSendClipBroadMsg(Schematic schem, String msg){
+        StringBuilder s = new StringBuilder();
+        s.append("这是一条来自").append(arcVersionPrefix).append("的分享记录\n");
+        s.append("分享者：").append(player.name).append("\n");
+        s.append("蓝图代码链接：").append(msg).append("\n");
+        s.append("蓝图造价：");
+        ItemSeq arr = schem.requirements();
+        for(ItemStack stack : arr){
+            s.append(stack.item.localizedName).append(stack.amount).append("|");
+        }
+        s.append("\n").append("电力：");
+        float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
+        if(!Mathf.zero(prod)){
+            s.append("+").append(Strings.autoFixed(prod, 2));
+            if(!Mathf.zero(cons)){
+                s.append("|");
+            }
+        }
+        if(!Mathf.zero(cons)){
+            s.append("-").append(Strings.autoFixed(cons, 2));
+        }
+        if (schematics.writeBase64(schem).length() > 3500) s.append("\n").append("蓝图代码过长，请点击链接查看");
+        else s.append("\n").append("蓝图代码：\n").append(schematics.writeBase64(schem));
+        Core.app.setClipboardText(Strings.stripColors(s.toString()));
+        ui.arcInfo("已保存至剪贴板");
     }
 
     public boolean resolveSchematic(String msg, @Nullable Player sender) {
@@ -436,7 +464,7 @@ public class SchematicsDialog extends BaseDialog{
         return true;
     }
 
-    private String arcSchematicsInfo(Schematic schem,boolean description){
+    private String arcSchematicsInfo(Schematic schem, boolean description){
         String builder = arcVersionPrefix;
         builder+="标记了蓝图["+schem.name()+"]";
         builder+="。属性："+schem.width+"x"+schem.height+"，"+schem.tiles.size+"个建筑。";

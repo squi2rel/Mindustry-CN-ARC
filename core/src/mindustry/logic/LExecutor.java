@@ -610,6 +610,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
             if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
+                b.lastLogicController = exec.build;
 
                 if(type == LAccess.enabled && !exec.bool(p1)){
                     b.lastDisabler = exec.build;

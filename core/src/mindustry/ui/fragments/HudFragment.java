@@ -38,6 +38,7 @@ import static mindustry.arcModule.RFuncs.arcColorTime;
 import static mindustry.arcModule.RFuncs.calWaveTimer;
 import static mindustry.gen.Tex.*;
 import static mindustry.ui.Styles.*;
+import static mindustry.arcModule.TimeControl.*;
 
 public class HudFragment{
     private static final float dsize = 65f, pauseHeight = 36f;
@@ -404,7 +405,7 @@ public class HudFragment{
                 info.row();
                 info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style(Styles.outlineLabel).name("fps");
                 info.row();
-                info.label(() -> "倍速: " + String.format("%.2f", gameSpeed)).left().style(Styles.outlineLabel);
+                info.label(() -> "倍速: " + String.format("%.2f", getGameSpeed())).left().style(Styles.outlineLabel);
                 info.row();
                 if (!android){
                     info.label(() -> "缩放: " + String.format("%.2f", renderer.getScale())).left().style(Styles.outlineLabel);

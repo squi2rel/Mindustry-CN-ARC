@@ -29,6 +29,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.TimeControl.*;
 
 public class ReplayController {
     public static final int version = 2;
@@ -103,10 +104,10 @@ public class ReplayController {
                 t.setBackground(Styles.black3);
                 t.table(tt -> {
                     //tt.button("快进10s", () -> skip = timeEscaped() + 10000000000L);//TODO bug
-                    tt.button("倍率x2", () -> changeGameSpeed(gameSpeed * 2));
-                    tt.button("倍率/2", () -> changeGameSpeed(gameSpeed / 2));
-                    tt.button("暂停回放", () -> changeGameSpeed(0));
-                    tt.button("恢复原速", () -> changeGameSpeed(1));
+                    tt.button("倍率x2", () -> changeGameSpeed(2f));
+                    tt.button("倍率/2", () -> changeGameSpeed(0.5f));
+                    tt.button("暂停回放", () -> setGameSpeed(0f));
+                    tt.button("恢复原速", () -> setGameSpeed(1f));
                     tt.button("回放信息", this::showInfo);
                 }).row();
                 t.label(() -> "当前倍率:" + gameSpeed).row();

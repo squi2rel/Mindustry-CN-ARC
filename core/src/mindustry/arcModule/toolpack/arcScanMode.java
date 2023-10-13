@@ -15,12 +15,16 @@ import arc.struct.*;
 import arc.util.Align;
 import arc.util.Time;
 import arc.util.Tmp;
+import mindustry.ai.types.LogicAI;
 import mindustry.content.Items;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
+import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.input.Binding;
+import mindustry.input.DesktopInput;
 import mindustry.type.Item;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
@@ -35,7 +39,9 @@ import mindustry.world.blocks.storage.Unloader;
 import mindustry.world.meta.BlockGroup;
 
 
+import static arc.Core.camera;
 import static mindustry.Vars.*;
+import static mindustry.arcModule.RFuncs.arcSetCamera;
 import static mindustry.arcModule.RFuncs.calWaveTimer;
 import static mindustry.arcModule.toolpack.arcPlayerEffect.drawNSideRegion;
 import static mindustry.arcModule.toolpack.arcWaveSpawner.*;
@@ -107,6 +113,7 @@ public class arcScanMode {
         //detailTransporter();
         detailTransporter2();
         detailBuildMode();
+        findLogic();
     }
 
     public static void detailBuildMode(){
@@ -214,18 +221,20 @@ public class arcScanMode {
         spawnerTable.clear();
     }
 
-    private static void detailTransporter() {
-        if (!control.input.arcScanMode) return;
-
-        //check tile being hovered over
+    private static void findLogic(){
+        if (!Core.input.keyTap(Binding.select) || !control.input.arcScanMode) return;
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if (hoverTile == null || hoverTile.build == null || !hoverTile.build.displayable() || hoverTile.build.inFogTo(player.team())) {
-            return;
+        if(hoverTile != null){
+            //if the tile has a building, display it
+            if(hoverTile.build != null && hoverTile.build.displayable()  && !hoverTile.build.inFogTo(player.team())
+                && hoverTile.build.lastLogicController != null){
+                arcSetCamera(hoverTile.build.lastLogicController.tile);
+            }
         }
-        forwardIndex = 0; forwardBuild.clear();
-
-        forward(hoverTile.build, hoverTile.build);
-        //drawBuild();
+        Unit u = control.input.selectedUnit();
+        if (u != null && u.controller() instanceof LogicAI ai && ai.controller != null && ai.controller.isValid()) {
+            arcSetCamera(ai.controller.x, ai.controller.y);
+        }
     }
 
     private static void forward(Building cur, Building last) {
@@ -312,13 +321,6 @@ public class arcScanMode {
         });
     }
 
-    private static void drawBuild() {
-        forwardBuild.each(building -> Drawf.selected(building, Tmp.c1.set(Color.red).a(Mathf.absin(4f, 1f) * 0.5f + 0.5f)));
-
-        forwardIndex = 0;
-        forwardBuild.clear();
-    }
-
     private static boolean canAccept(Block block) {
         if (block.group == BlockGroup.transportation) return true;
         for (Item item : content.items()) {
@@ -328,8 +330,6 @@ public class arcScanMode {
         }
         return false;
     }
-
-
 
     public static Seq<Point> path = new Seq<>(), source = new Seq<>();
     public static void detailTransporter2() {
