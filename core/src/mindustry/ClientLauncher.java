@@ -45,7 +45,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         checkLaunch();
         loadLogger();
 
-        loader = new LoadRenderer();
+        loader = new YuanShenLoadRenderer();
         Events.fire(new ClientCreateEvent());
 
         loadFileLogger();
@@ -175,6 +175,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
+        assets.load(new YuanShenLoadRenderer.LoadLock());
     }
 
     @Override
@@ -259,7 +260,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(settings.getBool("bossKeyPressing", false)) {
             return "计算器";
         }
-        return "Mindustry-CN-ARC-SQUIRREL | 版本号 " + (Version.arcBuild <= 0 ? "dev" : Version.arcBuild) + " | VAPE";
+        return "Mindustry-CN-ARC-SQUIRREL | VAPE";
     }
 
     @Override

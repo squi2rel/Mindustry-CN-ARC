@@ -63,7 +63,7 @@ public class JoinDialog extends BaseDialog{
             up = Styles.black5;
         }};
 
-        loadServers();
+        Core.app.post(this::loadServers);
 
         //mobile players don't get information >:(
         boolean infoButton = !steam && !mobile;

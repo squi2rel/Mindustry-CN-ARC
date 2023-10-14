@@ -283,7 +283,7 @@ public class UI implements ApplicationListener, Loadable{
         listfrag.build(hudGroup);
         consolefrag.build(hudGroup);
         loadfrag.build(group);
-        new YuanShenFragment().build(group);
+        new YuanShenFragment().build();
         infoControl.build(squirrelGroup);
 
         initArcWave();
