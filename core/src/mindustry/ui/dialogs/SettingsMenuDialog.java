@@ -792,6 +792,13 @@ public class SettingsMenuDialog extends BaseDialog{
             specmode.sliderPref("fontSize", 10, 5, 25, 1, i -> "x " + Strings.fixed(i * 0.1f, 1));
             specmode.stringInput("themeColor", "ffd37f");
             specmode.stringInput("arcBackgroundPath", "");
+            specmode.checkPref("yuanshen", false, b -> {
+                if (b) {
+                    dataDirectory.child("yuanshen").writeString("原神，启动！");
+                } else {
+                    dataDirectory.child("yuanshen").delete();
+                }
+            });
             specmode.addCategory("specGameMode");
             specmode.checkPref("autoSelSchematic", false);
             specmode.checkPref("researchViewer", false);
