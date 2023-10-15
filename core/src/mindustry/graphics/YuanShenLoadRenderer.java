@@ -69,10 +69,10 @@ public class YuanShenLoadRenderer extends LoadRenderer {
         Draw.color(bg);
         Fill.crect((width - size.x) / 2f, 0, size.x, size.y);
         Draw.color(draw);
-        Fill.crect((width - size.x) / 2f, 0, status == 2 ? size.x * 0.93f : status >= 3 ? size.x : size.x * Core.assets.getProgress(), size.y);
+        Fill.crect((width - size.x) / 2f, 0, status == 3 ? size.x * 0.93f : status >= 4 ? size.x : size.x * Core.assets.getProgress(), size.y);
         Draw.color(Color.white);
         Draw.rect(YuanShen, width / 2f, size.y / 2f, size.x, size.y);
-        if (status >= 3) {
+        if (status >= 4) {
             Draw.alpha(Mathf.clamp((float) (Time.millis() - time) / 1000, 0, 1f));
             Fill.rect(width / 2f, size.y / 2f, size.x, size.y);
         }
@@ -83,18 +83,21 @@ public class YuanShenLoadRenderer extends LoadRenderer {
                 status++;
             }
             case 1 -> {
+                if (fadeIn.getPosition() != 0) status++;
+            }
+            case 2 -> {
                 if (fadeIn.getPosition() == 0) {
                     loop.play();
                     status++;
                 }
             }
-            case 2 -> {
+            case 3 -> {
                 if (Core.assets.getCurrentLoading() == null || Core.assets.getCurrentLoading().type == LoadLock.class) {
                     time = Time.millis();
                     status++;
                 }
             }
-            case 3 -> {
+            case 4 -> {
                 if ((Time.millis() - time) > 1000) {
                     status++;
                     loadEnd = true;
@@ -105,7 +108,7 @@ public class YuanShenLoadRenderer extends LoadRenderer {
         Events.run(EventType.Trigger.update, () -> {
             if (loop != null && !loop.isLooping() && loop.getPosition() == 0) {
                 fadeOut.play();
-                Timer.schedule(() -> shouldPlay = true, 7.2f);
+                Timer.schedule(() -> shouldPlay = true, 8f);
                 Timer.schedule(() -> {
                     fadeOut.dispose();
                     fadeOut = null;

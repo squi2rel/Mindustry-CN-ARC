@@ -19,7 +19,6 @@ import mindustry.gen.Tex;
 import mindustry.graphics.YuanShenLoadRenderer;
 
 public class YuanShenFragment {
-    private static final Runnable empty = () -> {};
     private static TextureRegionDrawable YuanShenTexture;
 
     public void build() {
@@ -42,8 +41,8 @@ public class YuanShenFragment {
             }
         }).grow().update(i -> {
             if (YuanShenLoadRenderer.shouldPlay) {
-                i.actions(Actions.sequence(Actions.fadeIn(0.9f), Actions.delay(2f), Actions.fadeOut(0.7f), Actions.run(() -> t.actions(Actions.fadeOut(0.3f), Actions.remove(group)))));
-                i.update(empty);
+                i.actions(Actions.sequence(Actions.fadeIn(0.9f), Actions.delay(2f), Actions.fadeOut(0.7f), Actions.run(() -> t.actions(Actions.fadeOut(0.5f), Actions.remove(group)))));
+                i.update(() -> {});
             }
         }).get().color.a = 0;
         t.setBackground(Tex.whiteui);
