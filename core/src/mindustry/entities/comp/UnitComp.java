@@ -75,8 +75,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Move based on preferred unit movement type. */
     public void movePref(Vec2 movement){
-        if (!isShooting() && Hack.immediatelyTurn && movement.angle() != 0) rotation = movement.angle();
-        if(type.omniMovement || Hack.unitTrans){
+        if (Hack.immediatelyTurn && movement.angle() != 0) rotation = movement.angle();
+        if(type.omniMovement || Hack.ignoreTurn){
             moveAt(movement);
         }else{
             rotateMove(movement);
@@ -95,7 +95,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         moveAt(Tmp.v2.trns(rotation, vec.len()));
 
         if(!vec.isZero()){
-            rotation = Angles.moveToward(rotation, vec.angle(), type.rotateSpeed * Time.delta);
+            rotation = Angles.moveToward(rotation, vec.angle(), Hack.immediatelyTurn ? 360f : type.rotateSpeed * Time.delta);
         }
     }
 

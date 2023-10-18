@@ -875,6 +875,7 @@ public class DesktopInput extends InputHandler{
 
         unit.movePref(movement);
         if (!autoAim) unit.aim(aimPos);
+        if (Hack.lockTurn && player.shooting) unit.rotation = aimPos.cpy().sub(unit.x, unit.y).angle();
         unit.controlWeapons(true, player.shooting && !boosted);
 
         player.boosting = Core.input.keyDown(Binding.boost) || Core.settings.getBool("forceBoost");

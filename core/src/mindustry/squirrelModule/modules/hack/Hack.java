@@ -59,9 +59,9 @@ public class Hack {
     public static boolean chooseUUID, randomUSID, simMobile, autoGG, fastIn;
     public static String chosenUUID = null;
     public static int autoGGDelay;
-    public static boolean immediatelyTurn, ignoreTurn, unitTrans, noKB, noHitbox, noSpawnKB, infDrag, immeMove, ignoreShield, voidWalk, speed, ignoreProcessor;
+    public static boolean immediatelyTurn, ignoreTurn, noKB, noHitbox, noSpawnKB, infDrag, immeMove, ignoreShield, voidWalk, speed, ignoreProcessor;
     public static float KBMulti, boundX, boundY, boundW, boundH, speedMulti;
-    public static boolean weaponImmeTurn, forceControl, holdFill, autoFill, allowBlue, holdFillMode, holdFillMode2;
+    public static boolean lockTurn, forceControl, holdFill, autoFill, allowBlue, holdFillMode, holdFillMode2;
     public static int holdFillInterval, holdFillMinItem, autoFillInterval, autoFillMaxCount;
     public static long lastFillTime, lastAutoFillTime;
     public static Item chosenItem = null;
@@ -85,7 +85,6 @@ public class Hack {
 
         manager.register("移动", "immediatelyTurn", new Config("瞬间转向", null, changed(e -> immediatelyTurn = e)));
         manager.register("移动", "ignoreTurn", new Config("无视旋转", null, changed(e -> ignoreTurn = e)));
-        manager.register("移动", "unitTrans", new Config("单位平移", null, changed(e -> unitTrans = e)));
         manager.register("移动", "noHitbox", new Config("无视碰撞", null, changed(e -> noHitbox = e)));
         manager.register("移动", "noSpawnKB", new Config("无视刷怪圈", null, changed(e -> noSpawnKB = e)));
         manager.register("移动", "infDrag", new Config("立即停止", null, changed(e -> infDrag = e)));
@@ -104,7 +103,7 @@ public class Hack {
         manager.register("移动", "speed", new Config("单位加速", new Element[]{new Label(""), slider("速度倍率", 1f, 5f, 0.01f, 1f, f -> speedMulti = f, 0, f -> "单位速度倍率 " + speedMulti)}, changed(e -> speed = e)));
         manager.register("移动", "ignoreProcessor", new Config("无视世处", null, changed(e -> ignoreProcessor = e)));
 
-        manager.register("交互", "weaponImmeTurn", new Config("武器瞬间转向", null, changed(e -> weaponImmeTurn = e)));
+        manager.register("交互", "lockTurn", new Config("锁定方向", new Element[]{new Label("锁定方向到武器角度")}, changed(e -> lockTurn = e)));
         manager.register("交互", "forceControl", new Config("强制控制", null, changed(e -> forceControl = e)));
         manager.register("交互", "holdFill", new Config("按住装填", new Element[]{new Label(""), slider("holdFill", 50f, 500f, 1f, 100f, f -> holdFillInterval = Mathf.ceil(f), 0, f -> "间隔 " + holdFillInterval + "ms"), new Label(""), slider("holdFill2", 0f, 1000f, 1f, 500f, f -> holdFillMinItem = Mathf.ceil(f), 2, f -> "核心物资下限 " + holdFillMinItem), check("holdFill", "填满", false, b -> holdFillMode = b), check("holdFill2", "核心优先", false, b -> holdFillMode2 = b), new Label("指定物品"), new Table(t -> ItemSelection.buildTable(null, t, content.items(), () -> chosenItem, i -> chosenItem = i))}, changed(e -> holdFill = e, c -> holdFillInterval + "ms")));
         manager.register("交互", "autoFill", new Config("自动装超速", new Element[]{new Label(""), slider("autoFill", 50f, 2000f, 1f, 100f, f -> autoFillInterval = Mathf.ceil(f), 0, f -> "检测间隔 " + autoFillInterval + "ms"), new Label(""), slider("autoFill2", 1f, 20f, 1f, 5f, f -> autoFillMaxCount = Mathf.ceil(f), 2, f -> "每次装 " + autoFillMaxCount + " 个超速")}, changed(e -> autoFill = e, c -> autoFillInterval + "ms")));
