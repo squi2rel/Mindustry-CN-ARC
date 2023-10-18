@@ -20,6 +20,8 @@ import mindustry.world.Tile;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.DrawUtilities.arcDashCircling;
+import static mindustry.arcModule.NumberFormat.formatFloat;
+import static mindustry.arcModule.NumberFormat.formatInteger;
 
 public class arcWaveSpawner {
 
@@ -169,15 +171,15 @@ public class arcWaveSpawner {
                 t.add("[accent]" + amountL).growX().padRight(50f);
                 if (doesRow) t.row();
                 t.add("\uE813").width(50f);
-                t.add("[accent]" + NumberFormat.formatInteger(healthL)).growX().padRight(50f);
+                t.add("[accent]" + formatInteger(healthL)).growX().padRight(50f);
                 if (doesRow) t.row();
                 if (effHealthL != healthL) {
                     t.add("\uE810").width(50f);
-                    t.add("[accent]" + NumberFormat.formatInteger(effHealthL)).growX().padRight(50f);
+                    t.add("[accent]" + formatInteger(effHealthL)).growX().padRight(50f);
                     if (doesRow) t.row();
                 }
                 t.add("\uE86E").width(50f);
-                t.add("[accent]" + NumberFormat.formatInteger(dpsL)).growX();
+                t.add("[accent]" + formatInteger(dpsL)).growX();
             });
         }
 
@@ -191,24 +193,25 @@ public class arcWaveSpawner {
                 groups.each(waveGroup -> (spawn == -1 || waveGroup.group.spawn == -1 ||waveGroup.group.spawn == spawn) && pre.get(waveGroup.group),wg -> {
                     count[0] ++;
                     if (count[0] % perCol == 0) t.row();
-                    StringBuilder groupInfo = new StringBuilder();
-                    groupInfo.append(wg.group.type.emoji());
-                    if (wg.group.spawn != -1 && spawn == -1) groupInfo.append("*");
+                    t.table(tt->{
+                        tt.table(ttt->{
+                            ttt.image(wg.group.type.uiIcon).size(30);
+                            ttt.add(wg.group.type.typeColor() + wg.amount).fillX();
+                        }).row();
+                        StringBuilder groupInfo = new StringBuilder();
+                        if (wg.shield > 0f)
+                            groupInfo.append(formatFloat(wg.shield));
+                        groupInfo.append("\n[]");
+                        if (wg.group.spawn != -1 && spawn == -1) groupInfo.append("*");
+                        if (wg.group.effect != null && wg.group.effect != StatusEffects.none)
+                            groupInfo.append(wg.group.effect.emoji());
+                        if (wg.group.items != null && wg.group.items.amount > 0)
+                            groupInfo.append(wg.group.items.item.emoji());
+                        if (wg.group.payloads != null && wg.group.payloads.size > 0)
+                            groupInfo.append("\uE87B");
+                        tt.add(groupInfo.toString()).fill();
+                    }).height(80f).width(70f);
 
-                    groupInfo.append(wg.group.type.typeColor());
-
-                    groupInfo.append("\n").append(wg.amount);
-                    groupInfo.append("\n");
-                    if (wg.shield > 0f)
-                        groupInfo.append(UI.formatAmount((long) wg.shield));
-                    groupInfo.append("\n[]");
-                    if (wg.group.effect != null && wg.group.effect != StatusEffects.none)
-                        groupInfo.append(wg.group.effect.emoji());
-                    if (wg.group.items != null && wg.group.items.amount > 0)
-                        groupInfo.append(wg.group.items.item.emoji());
-                    if (wg.group.payloads != null && wg.group.payloads.size > 0)
-                        groupInfo.append("\uE87B");
-                    t.add(groupInfo.toString()).height(80f).width(70f);
                 });
             });
         }

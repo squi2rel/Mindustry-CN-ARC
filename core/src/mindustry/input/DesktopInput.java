@@ -13,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.arcModule.Marker;
+import mindustry.content.Items;
 import mindustry.content.UnitTypes;
 import mindustry.core.*;
 import mindustry.entities.Predict;
@@ -726,6 +727,14 @@ public class DesktopInput extends InputHandler{
             settings.put("superUnitEffect", (level + 1) % 3);
         }
 
+        if (input.keyDown(Binding.oreAdsorption) && player.unit().tileOn() != null) {
+            player.unit().tileOn().circle(Mathf.ceil(player.unit().type.mineRange / 8f), tile -> {
+                Tile ptile = player.unit().mineTile;
+                if ((ptile == null || player.dst(ptile) > player.dst(tile) || ptile.drop() == Items.sand) && canMine(tile) && tile.drop() != Items.sand) {
+                    player.unit().mineTile = tile;
+                }
+            });
+        }
     }
 
     @Override

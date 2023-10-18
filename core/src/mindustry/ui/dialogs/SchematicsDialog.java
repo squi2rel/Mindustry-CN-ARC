@@ -420,6 +420,7 @@ public class SchematicsDialog extends BaseDialog{
         s.append("这是一条来自").append(arcVersionPrefix).append("的分享记录\n");
         s.append("分享者：").append(player.name).append("\n");
         s.append("蓝图代码链接：").append(msg).append("\n");
+        s.append("蓝图名：").append(schem.name()).append("\n");
         s.append("蓝图造价：");
         ItemSeq arr = schem.requirements();
         for(ItemStack stack : arr){

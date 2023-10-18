@@ -85,7 +85,8 @@ public enum Binding implements KeyBind{
     console(KeyCode.f8),
     lockonLastMark(KeyCode.f12),
     arcDetail(KeyCode.f12),
-    arcScanMode(KeyCode.f12)
+    arcScanMode(KeyCode.f12),
+    oreAdsorption(KeyCode.f12)
     ;
 
     private final KeybindValue defaultValue;

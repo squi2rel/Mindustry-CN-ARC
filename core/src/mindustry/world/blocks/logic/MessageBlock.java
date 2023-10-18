@@ -115,8 +115,9 @@ public class MessageBlock extends Block{
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
+                    String contents = this.message.toString();
                     Core.input.getTextInput(new TextInput(){{
-                        text = message.toString();
+                        text = contents;
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> {

@@ -3,6 +3,7 @@ package mindustry.arcModule.ui.dialogs;
 import arc.Core;
 import arc.func.Boolf;
 import arc.func.Cons;
+import arc.scene.style.TextureRegionDrawable;
 import arc.struct.EnumSet;
 import arc.struct.Seq;
 import mindustry.game.Team;
@@ -13,8 +14,7 @@ import mindustry.world.Block;
 import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.BlockGroup;
 
-import static mindustry.Vars.content;
-import static mindustry.Vars.getThemeColor;
+import static mindustry.Vars.*;
 
 public class BlockSelectDialog extends BaseDialog {
     public BlockSelectDialog(Boolf<Block> condition, Cons<Block> cons, Boolf<Block> checked) {
@@ -31,10 +31,10 @@ public class BlockSelectDialog extends BaseDialog {
                 td.add(blockGroup.toString()).row();
                 td.image().color(getThemeColor()).fillX().row();
                 td.table(ttd -> blocks.select(block1 -> block1.group == blockGroup).each(block1 -> {
-                    ttd.button(block1.emoji(), Styles.cleart, () -> {
+                    ttd.button(new TextureRegionDrawable(block1.uiIcon), Styles.cleari, iconSmall, () -> {
                         cons.get(block1);
                         if (autoHide) hide();
-                    }).pad(3f).checked(b -> checked.get(block1)).size(50f);
+                    }).tooltip(block1.localizedName).pad(3f).checked(b -> checked.get(block1)).size(50f);
                     if (ttd.getChildren().size % 10 == 0) ttd.row();
                 }));
             });
