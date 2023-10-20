@@ -8,6 +8,7 @@ import arc.util.Strings;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.gen.Building;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.input.DesktopInput;
@@ -33,6 +34,10 @@ public class RFuncs {
 
     public static void arcSetCamera(Tile tile) {
         arcSetCamera(tile.worldx(), tile.worldy());
+    }
+
+    public static void arcSetCamera(Building building) {
+        arcSetCamera(building.x, building.y);
     }
 
     public static void arcSetCamera(float x, float y) {

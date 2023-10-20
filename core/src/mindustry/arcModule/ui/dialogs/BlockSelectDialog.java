@@ -4,6 +4,7 @@ import arc.Core;
 import arc.func.Boolf;
 import arc.func.Cons;
 import arc.scene.style.TextureRegionDrawable;
+import arc.scene.ui.layout.Table;
 import arc.struct.EnumSet;
 import arc.struct.Seq;
 import mindustry.game.Team;
@@ -17,14 +18,32 @@ import mindustry.world.meta.BlockGroup;
 import static mindustry.Vars.*;
 
 public class BlockSelectDialog extends BaseDialog {
+
+    private String searchBlock = "";
+    private Table blockTable = new Table();
+
     public BlockSelectDialog(Boolf<Block> condition, Cons<Block> cons, Boolf<Block> checked) {
         this(condition, cons, checked, true);
     }
 
     public BlockSelectDialog(Boolf<Block> condition, Cons<Block> cons, Boolf<Block> checked, boolean autoHide) {
         super("方块选择器");
+        rebuild(condition, cons, checked, autoHide);
         cont.pane(td -> {
-            Seq<Block> blocks = content.blocks().select(block -> condition.get(block) && (Core.settings.getBool("allBlocksReveal") || !block.isHidden())).sort(block -> block.group.ordinal());
+            td.field("",t->{
+                searchBlock = t.length() > 0 ? t.toLowerCase() : "";
+                rebuild(condition, cons, checked, autoHide);
+            }).maxTextLength(50).growX().get().setMessageText("搜索...");
+            td.row();
+            td.add(blockTable);
+        });
+        addCloseButton();
+    }
+
+    private void rebuild(Boolf<Block> condition, Cons<Block> cons, Boolf<Block> checked, boolean autoHide){
+        blockTable.clear();
+        blockTable.table(td->{
+            Seq<Block> blocks = content.blocks().select(block -> condition.get(block) && (searchBlock.length()==0 || block.name.contains(searchBlock) || block.localizedName.contains(searchBlock)) &&(block.privileged || Core.settings.getBool("allBlocksReveal") || !block.isHidden())).sort(block -> block.group.ordinal());
             Seq<BlockGroup> blockGroups = blocks.map(block -> block.group).distinct();
             blockGroups.each(blockGroup -> {
                 td.row();
@@ -39,6 +58,5 @@ public class BlockSelectDialog extends BaseDialog {
                 }));
             });
         });
-        addCloseButton();
     }
 }

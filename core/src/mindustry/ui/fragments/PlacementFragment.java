@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.arcModule.ui.dialogs.BlockSelectDialog;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -804,6 +805,17 @@ public class PlacementFragment{
                         boolean needsAssign = categoryEmpty[currentCategory.ordinal()];
 
                         int f = 0;
+                        if (maxRow > 5){
+                            categories.button(Icon.zoom, Styles.clearTogglei, () -> {
+                                new BlockSelectDialog(block -> block.replaceable, block -> {
+                                    control.input.block = block;
+                                    currentCategory = block.category;
+                                    rebuildCategory.run();
+                                    }, block -> control.input.block == block).show();
+                            }).group(group);
+                            categories.image(Styles.black6);
+                            categories.row();
+                        }
                         for(Category cat : getCategories()){
                             if(f++ % 2 == 0) categories.row();
 

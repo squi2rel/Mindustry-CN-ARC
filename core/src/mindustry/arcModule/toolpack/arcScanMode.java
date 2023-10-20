@@ -39,9 +39,8 @@ import mindustry.world.blocks.storage.Unloader;
 import mindustry.world.meta.BlockGroup;
 
 
-import static arc.Core.camera;
 import static mindustry.Vars.*;
-import static mindustry.arcModule.RFuncs.arcSetCamera;
+import static mindustry.arcModule.RFuncs.*;
 import static mindustry.arcModule.RFuncs.calWaveTimer;
 import static mindustry.arcModule.toolpack.arcPlayerEffect.drawNSideRegion;
 import static mindustry.arcModule.toolpack.arcWaveSpawner.*;
@@ -228,12 +227,12 @@ public class arcScanMode {
             //if the tile has a building, display it
             if(hoverTile.build != null && hoverTile.build.displayable()  && !hoverTile.build.inFogTo(player.team())
                 && hoverTile.build.lastLogicController != null){
-                arcSetCamera(hoverTile.build.lastLogicController.tile);
+                arcSetCamera(hoverTile.build.lastLogicController);
             }
         }
         Unit u = control.input.selectedUnit();
         if (u != null && u.controller() instanceof LogicAI ai && ai.controller != null && ai.controller.isValid()) {
-            arcSetCamera(ai.controller.x, ai.controller.y);
+            arcSetCamera(ai.controller);
         }
     }
 

@@ -183,6 +183,13 @@ public class SchematicsDialog extends BaseDialog{
                         Core.settings.put("arcSchematicCanBuild", !Core.settings.getBool("arcSchematicCanBuild"));
                         rebuildPane.run();
                     }).size(tagh).pad(2).tooltip("可建造(核心有此类资源+地图未禁用)").checked(t->Core.settings.getBool("arcSchematicCanBuild"));
+            if (Core.settings.getBool("autoSelSchematic")) {
+                in.add("蓝图包含：").padLeft(20f).padRight(4);
+                in.button(control.input.block == null ? "[red]\uE815" : control.input.block.emoji(), Styles.togglet, () -> {
+                    control.input.block = null;
+                    rebuildPane.run();
+                }).size(tagh).pad(2).tooltip("蓝图需包含此建筑").checked(t -> control.input.block != null);
+            }
         }).height(tagh).fillX();
 
         cont.row();
