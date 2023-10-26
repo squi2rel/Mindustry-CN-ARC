@@ -8,7 +8,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.Fx;
+import mindustry.arcModule.NumberFormat;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -19,6 +19,7 @@ import mindustry.world.meta.*;
 
 import static arc.Core.settings;
 import static mindustry.Vars.*;
+import static mindustry.arcModule.NumberFormat.buildPercent;
 
 public class OverdriveProjector extends Block{
     public final int timerUse = timers++;
@@ -85,7 +86,9 @@ public class OverdriveProjector extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        addBar("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", Mathf.round(Math.max((entity.realBoost() * 100 - 100), 0))), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
+        addBar("boost", (OverdriveBuild entity) -> new Bar(() ->
+                "超速：" + (entity.realBoost() <= 1 ? "[red]\uE815": "+" + (int)((entity.realBoost() - 1) * 100) + "%"),
+                () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
     }
 
     public class OverdriveBuild extends Building implements Ranged{
@@ -142,8 +145,7 @@ public class OverdriveProjector extends Block{
 
             float realRange = range + phaseHeat * phaseRangeBoost;
             float pro_Transparency = (float)Core.settings.getInt("overdrive_zone") / 100f;
-            if(status() == BlockStatus.active&& pro_Transparency > 0.02f){
-
+            if(realBoost() > 1 && pro_Transparency > 0.02f){
                 if(settings.getBool("animatedshields")){
                     Draw.z(Layer.overdrive);
                     Draw.color(Color.valueOf("#ff8920"), phaseColor, 1 - pro_Transparency * realBoost() * realBoost() / 4.25f);

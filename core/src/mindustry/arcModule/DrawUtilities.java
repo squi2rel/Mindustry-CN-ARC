@@ -3,6 +3,7 @@ package mindustry.arcModule;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
+import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.scene.ui.layout.Scl;
 import arc.util.Align;
@@ -10,6 +11,7 @@ import arc.util.Time;
 import arc.util.pooling.Pools;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
+import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.ui.Fonts;
 import mindustry.world.blocks.defense.MendProjector;
@@ -25,6 +27,9 @@ import static mindustry.Vars.*;
 
 public class DrawUtilities {
     private static Vec2 vector = new Vec2();
+
+    private static int arcCircleIndex = 0;
+    static float iconSize = 0;
 
     public static float arcDrawText(String text, float scl, float dx, float dy, Color color, int halign) {
         Font font = Fonts.outline;
@@ -195,4 +200,41 @@ public class DrawUtilities {
         }
     }
 
+    public static void drawNSideRegion(float x, float y, int n, float range, float rotation, Color color, float fraction, TextureRegion region, boolean regionColor){
+        Draw.z(Layer.effect - 2f);
+        Draw.color(color);
+
+        Lines.stroke(2f);
+
+        for (int i = 0; i < n; i++) {
+            float frac = 360f * (1 - fraction * n)/n/2;
+            float rot = rotation + i * 360f / n + frac;
+            if (!regionColor){
+                Draw.color(color);
+                Lines.arc(x, y, range, 0.25f, rot, (int) (50 + range / 10));
+                Draw.color();
+            }else{
+                Lines.arc(x, y, range, 0.25f, rot, (int) (50 + range / 10));
+            }
+            Draw.rect(region, x + range * Mathf.cos((float) Math.toRadians(rot-frac)),  y + range * Mathf.sin((float) Math.toRadians(rot-frac)),12f,12f);
+        }
+        Draw.reset();
+    }
+
+    /*
+    public static void arcRegionCircle(float x, float y, float offset, float range, int size, Seq<TextureRegion> textureRegionSeq){
+        if (textureRegionSeq.size == 0) return;
+        arcCircleIndex = 0;
+        iconSize = 6f + 2f * size;
+        textureRegionSeq.each(textureRegion -> {
+            arcCircleIndex += 1;
+            for (int i = 0; i < 4; i++) {
+                float rot = (i + ((float) arcCircleIndex) / textureRegionSeq.size) / 4 * 360f + Time.time * 0.5f;
+                Draw.rect(textureRegion,
+                        x + offset + (Mathf.sin((float) Math.toRadians(rot)) * (range + BulletType.rangeChange + iconSize + 1f)),
+                        y + offset + (Mathf.cos((float) Math.toRadians(rot)) * (range + BulletType.rangeChange + iconSize + 1f)),
+                        iconSize, iconSize, -rot);
+            }
+        });
+    }*/
 }

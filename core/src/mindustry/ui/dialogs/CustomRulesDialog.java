@@ -282,7 +282,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             t.defaults().size(140f, 50f);
 
-            for(Planet planet : content.planets().select(p -> p.accessible && p.visible && p.isLandable())){
+            for(Planet planet : content.planets()){
                 t.button(planet.localizedName, style, () -> {
                     planet.applyRules(rules);
                 }).group(group).checked(b -> rules.planet == planet);

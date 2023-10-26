@@ -2,27 +2,17 @@ package mindustry.arcModule.toolpack;
 
 import arc.Core;
 import arc.Events;
-import arc.func.Cons;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
-import arc.scene.event.Touchable;
 import arc.scene.ui.Dialog;
-import arc.scene.ui.Label;
-import arc.scene.ui.Slider;
-import arc.scene.ui.layout.Table;
-import arc.util.Strings;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;
-import mindustry.gen.Icon;
-import mindustry.gen.Iconc;
-import mindustry.gen.Player;
-import mindustry.gen.Unit;
+import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -31,6 +21,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import java.lang.reflect.Field;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.DrawUtilities.drawNSideRegion;
 import static mindustry.arcModule.ElementUtils.*;
 
 public class arcPlayerEffect {
@@ -154,26 +145,26 @@ public class arcPlayerEffect {
         // 特效轨迹
         if (show && Mathf.chanceDelta(effectChance)) playerEffect.at(unit.x, unit.y, effectColor);
         Draw.reset();
+
+        //玩家专属特效
+        if (unit.controller() == player){
+            detailBuildMode();
+        }
     }
 
-    public static void drawNSideRegion(float x, float y, int n, float range, float rotation, Color color, float fraction, TextureRegion region, boolean regionColor){
-        Draw.z(Layer.effect - 2f);
-        Draw.color(color);
-
-        Lines.stroke(2f);
-
-        for (int i = 0; i < n; i++) {
-            float frac = 360f * (1 - fraction * n)/n/2;
-            float rot = rotation + i * 360f / n + frac;
-            if (!regionColor){
-                Draw.color(color);
-                Lines.arc(x, y, range, 0.25f, rot, (int) (50 + range / 10));
-                Draw.color();
-            }else{
-                Lines.arc(x, y, range, 0.25f, rot, (int) (50 + range / 10));
-            }
-            Draw.rect(region, x + range * Mathf.cos((float) Math.toRadians(rot-frac)),  y + range * Mathf.sin((float) Math.toRadians(rot-frac)),12f,12f);
+    private static void detailBuildMode(){
+        if (!Core.settings.getBool("arcBuildInfo")) return;
+        if (control.input.droppingItem) {
+            Color color = player.within(Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY()), itemTransferRange)? Color.gold: Color.red;
+            drawNSideRegion(player.unit().x, player.unit().y, 3, player.unit().type.buildRange, player.unit().rotation, color, 0.25f, player.unit().stack.item.uiIcon, false);
+        }else if (control.input.isBuilding || control.input.selectedBlock() || !player.unit().plans().isEmpty()) {
+            drawNSideRegion(player.unit().x, player.unit().y, 3, player.unit().type.buildRange, player.unit().rotation, Pal.heal, 0.25f, Icon.wrench.getRegion(),true);
         }
-        Draw.reset();
+    }
+
+    static void drawControlTurret(){
+        if (player.unit() instanceof BlockUnitc unitc){
+            unitc.tile().drawSelect();
+        }
     }
 }
