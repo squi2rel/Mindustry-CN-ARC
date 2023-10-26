@@ -42,15 +42,15 @@ public class ClassBuilder extends JSBuilder {
     }
 
     public void addVariable(String name, String defaultValue) {
-        vars.add(new CodeBlock(name + "=" + defaultValue + ";"));
+        vars.add(new CodeBlock(name + " = " + defaultValue + ";"));
     }
 
     public CodeBlock addMethod(String name, String[] args) {
         StringBuilder sb = new StringBuilder();
         for (String i : args) {
-            sb.append(i).append(",");
+            sb.append(i).append(", ");
         }
-        if (args.length != 0) sb.deleteCharAt(sb.length() - 1);
+        if (args.length != 0) sb.delete(sb.length() - 2, sb.length());
         CodeBlock cb = new CodeBlock(spaces + 4);
         func.add(cb);
         return cb.addSynx(name, sb.toString());
@@ -60,7 +60,7 @@ public class ClassBuilder extends JSBuilder {
     public String build() {
         String space = calcSpace(spaces);
         String space2 = calcSpace(spaces + 4);
-        StringBuilder sb = new StringBuilder(space + "class " + className + "{");
+        StringBuilder sb = new StringBuilder(space + "class " + className + " {");
         for (CodeBlock i : vars) {
             sb.append("\n").append(space2).append(i.build());
         }

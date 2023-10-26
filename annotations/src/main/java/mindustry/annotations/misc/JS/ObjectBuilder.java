@@ -23,7 +23,7 @@ public class ObjectBuilder extends JSBuilder {
                 sb.append("\n").append(calcSpace(codeSpaces)).append(name.key).append(",");
             } else {
                 if (code.isBlock) continue;
-                sb.append("\n").append(calcSpace(codeSpaces)).append(name.key).append(":").append(code.build()).append(",");
+                sb.append("\n").append(calcSpace(codeSpaces)).append(name.key).append(" : ").append(code.build()).append(",");
             }
         }
         sb.deleteCharAt(sb.length() - 1);

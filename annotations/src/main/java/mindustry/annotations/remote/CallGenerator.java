@@ -23,8 +23,8 @@ import static mindustry.annotations.BaseProcessor.*;
 public class CallGenerator{
 
     static String[] bridgeTable = {"boolean", "char", "byte"};
-    static HashMap<String, String> methodTable = new HashMap<>();
-    static HashMap<String, String> methodTableString = new HashMap<>();
+    static StringMap methodTable = new StringMap();
+    static StringMap methodTableString = new StringMap();
     static int build = 146;//坏
 
     static {
@@ -49,25 +49,25 @@ public class CallGenerator{
         CodeBlock code = new CodeBlock(0);
         int[] packetID = {4};
         code.add("//CODEGEN from squi2rel (github.com/squi2rel/Mindustry-CN-ARC) build" + build);
-        code.add("const Packet=require(\"./Packet\")");
-        code.add("const TypeIO=require(\"./TypeIO\")");
-        code.add("const crc32=require(\"crc-32\")");
-        code.add("const Packets=new Map()");
+        code.add("const Packet = require(\"./Packet\")");
+        code.add("const TypeIO = require(\"./TypeIO\")");
+        code.add("const crc32 = require(\"crc-32\")");
+        code.add("const Packets = new Map()");
         code.add("class StreamBegin extends Packet{\n" +
-                "    _id=0;\n" +
-                "    static #lastid=0;\n" +
+                "    _id = 0;\n" +
+                "    static #lastid = 0;\n" +
                 "    total;\n" +
                 "    type;\n" +
-                "    constructor(){\n" +
+                "    constructor() {\n" +
                 "        super();\n" +
                 "        this.id=StreamBegin.#lastid++\n" +
                 "    }\n" +
-                "    write(buf){\n" +
+                "    write(buf) {\n" +
                 "        buf.putInt(this.id);\n" +
                 "        buf.putInt(this.total);\n" +
                 "        buf.put(type)\n" +
                 "    }\n" +
-                "    read(buf){\n" +
+                "    read(buf) {\n" +
                 "        this.id=buf.getInt();\n" +
                 "        this.total=buf.getInt();\n" +
                 "        this.type=buf.get()\n" +
@@ -75,36 +75,36 @@ public class CallGenerator{
                 "}\n" +
                 "Packets.set(0,StreamBegin);\n" +
                 "class StreamChunk extends Packet{\n" +
-                "    _id=1;\n" +
+                "    _id = 1;\n" +
                 "    id;\n" +
                 "    data;\n" +
-                "    write(buf){\n" +
+                "    write(buf) {\n" +
                 "        buf.putInt(this.id);\n" +
                 "        buf.putShort(this.data.length);\n" +
                 "        buffer.put(this.data)\n" +
                 "    }\n" +
-                "    read(buf){\n" +
+                "    read(buf) {\n" +
                 "        this.id=buf.getInt();\n" +
                 "        this.data=buf.get(buf.getShort())\n" +
                 "    }\n" +
                 "}\n" +
-                "Packets.set(1,StreamChunk);\n" +
+                "Packets.set(1, StreamChunk);\n" +
                 "class WorldStream extends Packet{\n" +
-                "    _id=2;\n" +
+                "    _id = 2;\n" +
                 "    stream;\n" +
-                "    handleClient(nc){\n" +
-                "        if(nc.game){\n" +
+                "    handleClient(nc) {\n" +
+                "        if(nc.game) {\n" +
                 "            nc.loadWorld(this)\n" +
                 "        }\n" +
                 "    }\n" +
                 "}\n" +
-                "Packets.set(2,WorldStream);\n" +
-                "class ConnectPacket extends Packet{\n" +
-                "    _id=3;\n" +
+                "Packets.set(2, WorldStream);\n" +
+                "class ConnectPacket extends Packet {\n" +
+                "    _id = 3;\n" +
                 "    name;\n" +
                 "    usid;\n" +
                 "    uuid;\n" +
-                "    write(buf){\n" +
+                "    write(buf) {\n" +
                 "        buf.putInt(" + build + ");\n" +
                 "        TypeIO.writeString(buf,\"official\");\n" +
                 "        TypeIO.writeString(buf,this.name);\n" +
@@ -118,7 +118,7 @@ public class CallGenerator{
                 "        buf.put(0)\n" +
                 "    }\n" +
                 "}\n" +
-                "Packets.set(3,ConnectPacket)");
+                "Packets.set(3, ConnectPacket)");
 
         //go through each method entry in this class
         for(MethodEntry ent : methods){
@@ -189,20 +189,22 @@ public class CallGenerator{
             //write the completed packet class
             JavaFile.builder(packageName, packet.build()).build().writeTo(BaseProcessor.filer);
 
-            code.add("Packets.set(" + packetID[0]++ + "," + ent.packetClassName + ")");
+            code.add("Packets.set(" + packetID[0]++ + ", " + ent.packetClassName + ")");
         }
 
         callBuilder.addMethod(register.build());
 
-        ObjectBuilder ob = code.add("module.exports=", cb -> cb.noSemicolon = true).newObject();
+        for(MethodEntry ent : methods){
+            code.add("global." + ent.packetClassName + " = " + ent.packetClassName);
+        }
+        ObjectBuilder ob = code.add("module.exports = ", cb -> cb.noSemicolon = true).newObject();
         ob.set("StreamBegin").set("StreamChunk").set("WorldStream").set("ConnectPacket");
 
         for(MethodEntry ent : methods){
             ob.set(ent.packetClassName);
         }
 
-        ob.set("get", new CodeBlock("n=>Packets.get(n)"));
-
+        ob.set("get", new CodeBlock("n => Packets.get(n)"));
         //build and write resulting class
         TypeSpec spec = callBuilder.build();
         JavaFile.builder(packageName, spec).build().writeTo(BaseProcessor.filer);
@@ -516,12 +518,12 @@ public class CallGenerator{
         return false;
     }
     public static String fullReplace(String str) {
-        Set<String> list = methodTable.keySet();
+        ObjectMap.Keys<String> list = methodTable.keys();
         String[] result = {str};
         for (String k : list) {
             result[0] = result[0].replaceAll(k, methodTable.get(k));
         }
-        Set<String> list2 = methodTableString.keySet();
+        ObjectMap.Keys<String> list2 = methodTableString.keys();
         for (String k : list2) {
             result[0] = result[0].replace(k, methodTableString.get(k));
         }
