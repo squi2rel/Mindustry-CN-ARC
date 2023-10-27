@@ -27,6 +27,7 @@ import mindustry.content.Items;
 import mindustry.core.GameState;
 import mindustry.core.Version;
 import mindustry.game.EventType;
+import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Call;
 import mindustry.gen.Unit;
@@ -257,7 +258,7 @@ public class Hack {
                 Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 if (tile == null) return;
                 Building build = tile.build;
-                if (build == null || build.items == null || build.team != player.team()) return;
+                if (build == null || build.items == null || build.team != player.team() || (state.rules.onlyDepositCore && !(build instanceof CoreBlock.CoreBuild))) return;
                 Block type = build.block;
                 if (chosenItem != null) {
                     if (build.acceptStack(chosenItem, unit.type.itemCapacity, unit) != 0 && requireItem(unit, chosenItem, core, -1, len, build)) {
@@ -315,7 +316,7 @@ public class Hack {
         Events.run(EventType.Trigger.update, () -> {
             try {
                 if (!autoFill) return;
-                if (state.getState() != GameState.State.playing) return;
+                if (state.getState() != GameState.State.playing || state.rules.onlyDepositCore) return;
                 if (Time.millis() - lastAutoFillTime < autoFillInterval) return;
                 lastAutoFillTime = Time.millis();
                 if (player.dead()) return;
@@ -354,7 +355,7 @@ public class Hack {
         if (amount == 0) return false;
         if (unit.stack.amount != 0 && unit.stack.item == item) return true;
         boolean[] get = {false};
-        Runnable cont = () -> indexer.eachBlock(unit, itemTransferRange, b -> b != dst && b instanceof StorageBlock.StorageBuild && ((StorageBlock.StorageBuild) b).linkedCore == null && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
+        Runnable cont = () -> indexer.eachBlock(null, unit.x, unit.y, itemTransferRange, b -> b != dst && (b.team == unit.team || b.team == Team.derelict) && b instanceof StorageBlock.StorageBuild && ((StorageBlock.StorageBuild) b).linkedCore == null && b.items != null && (amount == -1 ? b.items.has(item) : b.items.has(item, amount)), b -> {
             if (get[0]) return;
             if (unit.stack.amount != 0) dropItem(core, len);
             Call.requestItem(player, b, item, amount == -1 ? b.items.get(item) : amount);
