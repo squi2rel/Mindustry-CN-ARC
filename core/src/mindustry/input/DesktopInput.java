@@ -877,11 +877,15 @@ public class DesktopInput extends InputHandler{
         if (!autoAim) unit.aim(aimPos);
         unit.controlWeapons(true, player.shooting && !boosted);
         if (Hack.lockTurn && player.shooting) {
-            for (WeaponMount w : unit.mounts) {
-                if (w.weapon.controllable) {
-                    unit.rotation += (w.rotate ? w.targetRotation : w.weapon.baseRotation);
+            for (int i = 0, l = unit.mounts.length; i < l; i++) {
+                WeaponMount w = unit.mounts[i];
+                if (w.weapon.rotate && w.weapon.controllable) {
+                    unit.rotation += w.targetRotation;
                     w.rotation = 0;
                     break;
+                }
+                if (i == l - 1) {
+                    unit.rotation = aimPos.cpy().sub(unit.x, unit.y).angle();
                 }
             }
         }
