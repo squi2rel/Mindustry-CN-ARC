@@ -20,6 +20,7 @@ import mindustry.graphics.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.ui.*;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.blocks.production.GenericCrafter;
@@ -148,7 +149,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         CoreBuild core;
 
-        if(!dead()){
+        if(!dead() || Hack.immeRespawn && unit.health <= 0){
             set(unit);
             unit.team(team);
             deathTimer = 0;
@@ -157,11 +158,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             if(unit.type.canBoost){
                 unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() || boosting || (unit.isFlying() && !unit.canLand()) ? 1f : 0f, unit.type.riseSpeed);
             }
-        }else if((core = bestCore()) != null){
+        }else if((core = Hack.spawnOnCursor ? Hack.spawnOnBigger ? team.cores().min(Structs.comps(Structs.comparingInt(c -> -c.block.size), Structs.comparingFloat(c -> c.dst(mouseX, mouseY)))) : team.cores().min(Structs.comparingFloat(c -> c.dst(mouseX, mouseY))) : bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
-            if(deathTimer >= deathDelay){
+            if(Hack.immeRespawn || deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
                 core.requestSpawn(self());
                 deathTimer = 0;

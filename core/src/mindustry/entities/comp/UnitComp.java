@@ -84,7 +84,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void moveAt(Vec2 vector){
-        moveAt(vector, Hack.immeMove ? 1f : type.accel);
+        moveAt(vector, Hack.immediatelyMove ? 1f : type.accel);
     }
 
     public void approach(Vec2 vector){
