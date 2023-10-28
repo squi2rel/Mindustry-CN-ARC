@@ -26,6 +26,7 @@ import arc.util.Tmp;
 import mindustry.gen.Icon;
 import mindustry.ui.Styles;
 
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.ARCVars.getThemeColor;
 import static mindustry.Vars.ui;
 
@@ -43,7 +44,7 @@ public class Window {
     private static Window front = null;
 
     public Window() {
-        this(ui.WindowManager);
+        this(arcui.WindowManager);
     }
 
     public Window(WindowManager manager) {
@@ -388,13 +389,13 @@ public class Window {
                 public boolean mouseMoved(InputEvent event, float x, float y) {
                     if (fillParent || minSized) return true;
                     if (x < 7 && y < 7 || x > getWidth() - 7 && y > getHeight() - 7) {
-                        Core.graphics.cursor(ui.resizeRightCursor);
+                        Core.graphics.cursor(arcui.resizeRightCursor);
                     } else if (x > getWidth() - 7 && y < 7 || x < 7 && y > getHeight() - 7) {
-                        Core.graphics.cursor(ui.resizeLeftCursor);
+                        Core.graphics.cursor(arcui.resizeLeftCursor);
                     } else if (x < 7 || x > getWidth() - 7) {
-                        Core.graphics.cursor(ui.resizeHorizontalCursor);
+                        Core.graphics.cursor(arcui.resizeHorizontalCursor);
                     } else if (y < 7 || y > getHeight() - 7) {
-                        Core.graphics.cursor(ui.resizeVerticalCursor);
+                        Core.graphics.cursor(arcui.resizeVerticalCursor);
                     } else if (!cursorRestored) {
                         Core.graphics.restoreCursor();
                         return cursorRestored = true;

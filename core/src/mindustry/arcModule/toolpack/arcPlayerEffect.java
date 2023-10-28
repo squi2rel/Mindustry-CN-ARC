@@ -10,6 +10,7 @@ import arc.scene.ui.Dialog;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;
@@ -22,6 +23,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import java.lang.reflect.Field;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.DrawUtilities.drawNSideRegion;
 import static mindustry.arcModule.ElementUtils.*;
 
@@ -83,7 +85,7 @@ public class arcPlayerEffect {
         Core.settings.put("arcPlayerEffectTime", playerEffect.lifetime);
         Core.settings.put("arcPlayerEffectType", refEffect.id);
         Core.settings.put("arcPlayerEffectCooldown", effectCooldown);
-        ui.arcInfo("[cyan]已保存设置");
+        arcui.arcInfo("[cyan]已保存设置");
     }
 
     private static void readConfig() {
@@ -93,7 +95,7 @@ public class arcPlayerEffect {
         playerEffect.lifetime = Core.settings.getFloat("arcPlayerEffectTime");
         effectTime = (int) playerEffect.lifetime;
         effectCooldown = Core.settings.getInt("arcPlayerEffectCooldown");
-        ui.arcInfo("[cyan]已读取设置");
+        arcui.arcInfo("[cyan]已读取设置");
     }
 
     public static void drawPlayerEffect(Unit unit) {

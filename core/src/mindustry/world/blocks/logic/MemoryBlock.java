@@ -3,21 +3,18 @@ package mindustry.world.blocks.logic;
 import arc.Core;
 import arc.graphics.Color;
 import arc.scene.event.Touchable;
-import arc.scene.ui.Dialog;
 import arc.scene.ui.Label;
-import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
-import arc.util.Strings;
 import arc.util.Time;
 import arc.util.io.*;
-import mindustry.editor.arcWaveInfoDialog;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.gen.*;
 import mindustry.ui.Styles;
-import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 
 public class MemoryBlock extends Block{
     public int memoryCapacity = 32;
@@ -127,7 +124,7 @@ public class MemoryBlock extends Block{
                 }).size(40);
                 t.button(Icon.refreshSmall,Styles.cleari,()->{
                     rebuildInfo();
-                    ui.arcInfo("已更新内存元！");
+                    arcui.arcInfo("已更新内存元！");
                 }).size(40);
 
                 Label rowNum = t.add("每行 "+numPerRow).get();
@@ -166,7 +163,7 @@ public class MemoryBlock extends Block{
                         tt.touchable = Touchable.enabled;
                         tt.tapped(()->{
                             Core.app.setClipboardText(memory[finalIndex]+"");
-                            ui.arcInfo("[cyan]复制内存[white]\n " + memory[finalIndex]);
+                            arcui.arcInfo("[cyan]复制内存[white]\n " + memory[finalIndex]);
                         });
                     });
                     index+=1;

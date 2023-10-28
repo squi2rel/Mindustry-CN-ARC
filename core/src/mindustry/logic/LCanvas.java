@@ -14,13 +14,14 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static mindustry.Vars.ui;
+import static mindustry.arcModule.ARCVars.arcui;
 
 public class LCanvas extends Table{
     public static final int maxJumpsDrawn = 100;
@@ -497,7 +498,7 @@ public class LCanvas extends Table{
             if(st instanceof PrintStatement pst){ //print->代码
                 Seq<LStatement> lsStatement = LAssembler.read(pst.value.replace("_"," "),privileged);
                 stNew = lsStatement.first();
-                if (stNew instanceof InvalidStatement) ui.arcInfo("[orange]警告：转换失败，请输入正确格式\n[cyan]" + LogicDialog.transText);
+                if (stNew instanceof InvalidStatement) arcui.arcInfo("[orange]警告：转换失败，请输入正确格式\n[cyan]" + LogicDialog.transText);
                 else if(stNew instanceof JumpStatement jst && jst.destIndex != -1){
                     jst.dest = (StatementElem) statements.getChildren().get(jst.destIndex);
                 }

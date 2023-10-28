@@ -19,6 +19,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
@@ -39,6 +40,7 @@ import mindustry.world.blocks.storage.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.DrawUtilities.arcDrawText;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
 import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
@@ -300,7 +302,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 if(viewInt==1) viewInt = 60;
                 else if (viewInt==60) viewInt = 120;
                 else viewInt = 1;
-                ui.arcInfo("调整资源输入|输出显示周期为 [orange]" + viewInterval(viewInt));
+                arcui.arcInfo("调整资源输入|输出显示周期为 [orange]" + viewInterval(viewInt));
             }).size(100f, 54f).pad(2).bottom();
             buttons.button("区块名称", Icon.bookOpen, () -> alwaysShowName = !alwaysShowName).size(100f, 54f).pad(2).bottom();
             addTech();

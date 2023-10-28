@@ -5,6 +5,7 @@ import arc.assets.Loadable;
 import arc.graphics.Color;
 import arc.struct.Seq;
 import mindustry.Vars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.core.Version;
 import mindustry.game.Gamemode;
 import mindustry.game.Team;
@@ -12,6 +13,7 @@ import mindustry.game.Team;
 import static arc.Core.settings;
 
 public class ARCVars implements Loadable {
+    public static ARCUI arcui = new ARCUI();
     public static final int minimapSize = 40;
     public static boolean unitHide = false;
 

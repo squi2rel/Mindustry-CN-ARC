@@ -30,6 +30,7 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 
 public class LExecutor{
     public static final int maxInstructions = 1000;
@@ -1557,8 +1558,14 @@ public class LExecutor{
             }
 
             switch(type){
-                case notify -> {ui.hudfrag.showToast(Icon.info, text);ui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.logicNotify,text).sendMessage());}
-                case announce -> {ui.announce(text, exec.numf(duration));ui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.logicAnnounce,text).sendMessage());}
+                case notify -> {
+                    ui.hudfrag.showToast(Icon.info, text);
+                    MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.logicNotify,text).sendMessage());
+                }
+                case announce -> {
+                    ui.announce(text, exec.numf(duration));
+                    MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.logicAnnounce,text).sendMessage());
+                }
                 case toast -> ui.showInfoToast(text, exec.numf(duration));
                 //TODO desync?
                 case mission -> state.rules.mission = text;

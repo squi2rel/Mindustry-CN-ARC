@@ -43,6 +43,7 @@ import mindustry.ui.Styles;
 import java.util.concurrent.TimeUnit;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.gen.Tex.discordBanner;
 import static mindustry.ui.Styles.cleart;
 
@@ -72,7 +73,7 @@ public class MenuFragment{
         renderer = new MenuRenderer();
 
         if (!Core.settings.getBool("arcDisableModWarning")){
-            ui.aboutcn_arc.show();
+            arcui.aboutcn_arc.show();
         }
         Core.settings.put("locale", "zh_CN");
 
@@ -242,7 +243,7 @@ public class MenuFragment{
                             b.add().grow();
                             b.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[id]))).padRight(5);
                         }, RStyles.flatt, () -> {
-                            Window w = new Window(idx == -1 ? news[id + 1] : news[id + 1].substring(0, idx), 600, 400, Icon.book.getRegion(), ui.WindowManager);
+                            Window w = new Window(idx == -1 ? news[id + 1] : news[id + 1].substring(0, idx), 600, 400, Icon.book.getRegion(), arcui.WindowManager);
                             Table content = new Table();
                             ScrollPane pane = new ScrollPane(content);
                             content.table(t2 -> {
@@ -337,7 +338,7 @@ public class MenuFragment{
                     if (!haveNews) {
                         t.add("这里什么都没有");
                     }
-                    Window w = new Window("学术日报", 600, 400, Icon.book.getRegion(), ui.WindowManager);
+                    Window w = new Window("学术日报", 600, 400, Icon.book.getRegion(), arcui.WindowManager);
                     w.setBody(new Table(t2 -> t2.add(p).grow()) {{
                         setBackground(Styles.black3);
                     }});
@@ -389,11 +390,11 @@ public class MenuFragment{
                 tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
                 mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
                 exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
-                cn_arc = new MobileButton(Icon.info,"@aboutcn_arc.button",  ui.aboutcn_arc::show),
+                cn_arc = new MobileButton(Icon.info,"@aboutcn_arc.button",  arcui.aboutcn_arc::show),
                 //mindustrywiki = new MobileButton(Icon.book, "@mindustrywiki.button", ui.mindustrywiki::show),
-                updatedialog = new MobileButton(Icon.info,"@updatedialog.button",  ui.updatedialog::show),
+                updatedialog = new MobileButton(Icon.info,"@updatedialog.button",  arcui.updatedialog::show),
                 database = new MobileButton(Icon.book, "@database",  ui.database::show),
-                achievements = new MobileButton(Icon.star, "@achievements",  ui.achievements::show);
+                achievements = new MobileButton(Icon.star, "@achievements",  arcui.achievements::show);
 
         play.clicked(this::randomLabel);
         custom.clicked(this::randomLabel);
@@ -517,10 +518,10 @@ public class MenuFragment{
                                 new MenuButton("@schematics", Icon.paste, ui.schematics::show),
                                 new MenuButton("@database", Icon.book, ui.database::show),
                                 new MenuButton("@about.button", Icon.info, ui.about::show),
-                                new MenuButton("@updatedialog.button", Icon.distribution, ui.updatedialog::show)
+                                new MenuButton("@updatedialog.button", Icon.distribution, arcui.updatedialog::show)
                         ),
                         new MenuButton("@settings", Icon.settings, ui.settings::show),
-                        new MenuButton("@aboutcn_arc.button", Icon.info, ui.aboutcn_arc::show)
+                        new MenuButton("@aboutcn_arc.button", Icon.info, arcui.aboutcn_arc::show)
                 );
             } else {
                 buttons(t,
@@ -535,13 +536,13 @@ public class MenuFragment{
                                 new MenuButton("@schematics", Icon.paste, ui.schematics::show),
                                 new MenuButton("@database", Icon.book, ui.database::show),
                                 new MenuButton("@about.button", Icon.info, ui.about::show),
-                                new MenuButton("@updatedialog.button", Icon.distribution, ui.updatedialog::show)
+                                new MenuButton("@updatedialog.button", Icon.distribution, arcui.updatedialog::show)
                         ),
 
-                        new MenuButton("@achievements", Icon.star, ui.achievements::show),
+                        new MenuButton("@achievements", Icon.star, arcui.achievements::show),
                         new MenuButton("@mods", Icon.book, ui.mods::show),
                         new MenuButton("@settings", Icon.settings, ui.settings::show),
-                        new MenuButton("@aboutcn_arc.button", Icon.info, ui.aboutcn_arc::show)
+                        new MenuButton("@aboutcn_arc.button", Icon.info, arcui.aboutcn_arc::show)
                 );
 
             }

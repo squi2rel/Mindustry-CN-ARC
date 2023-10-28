@@ -21,6 +21,7 @@ import mindustry.graphics.Pal;
 import mindustry.input.DesktopInput;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.DrawUtilities.arcDrawText;
 import static mindustry.arcModule.RFuncs.getPrefix;
 
@@ -106,7 +107,7 @@ public class Marker {
                 pos.fromString(posStr);
 
                 mark(markType, pos.scl(tilesize), false);
-                ui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.markLoc, text, pos));
+                MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.markLoc, text, pos));
                 return true;
             } catch (Throwable e) {
                 Log.err("Cannot resolve position");
@@ -135,7 +136,7 @@ public class Marker {
             }
 
             mark(findLocalizedName("集合"), pos.scl(tilesize), false);
-            ui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.markLoc, text, pos));
+            MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.markLoc, text, pos));
             return true;
         }
         return false;
@@ -206,7 +207,7 @@ public class Marker {
             String text = getPrefix(color, name) +
                     "(" + World.toTile(pos.x) + "," + World.toTile(pos.y) + ")";
             Call.sendChatMessage(text);
-            ui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.markLoc, text, pos));
+            MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.markLoc, text, pos));
         }
 
         public void showArrow(Vec2 pos) {

@@ -7,6 +7,7 @@ import arc.graphics.Colors;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.*;
 import mindustry.editor.*;
 import mindustry.gen.*;
@@ -16,6 +17,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.ui.RStyles.*;
 import static mindustry.input.InputHandler.follow;
 import static mindustry.input.InputHandler.followIndex;
@@ -36,7 +38,7 @@ public class MapInfoTable extends BaseToolsTable{
 
         button(Icon.map, clearAccentNonei, mapInfoDialog::show).tooltip("地图信息");
         button(Items.copper.emoji(), clearLineNonet, this::floorStatisticDialog).tooltip("矿物信息");
-        button(Icon.chatSmall, clearAccentNonei, () -> ui.MessageDialog.show()).tooltip("中央监控室");
+        button(Icon.chatSmall, clearAccentNonei, () -> arcui.MessageDialog.show()).tooltip("中央监控室");
         button(Icon.playersSmall,clearAccentNonei,()->{
             if(ui.listfrag.players.size>1){
                 if(control.input instanceof DesktopInput){
@@ -45,10 +47,10 @@ public class MapInfoTable extends BaseToolsTable{
                 if(follow == null) follow = ui.listfrag.players.get(0);
                 followIndex = (followIndex + 1)>=ui.listfrag.players.size?  0 : followIndex + 1;
                 follow = ui.listfrag.players.get(followIndex);
-                ui.arcInfo("视角追踪：" + follow.name,3f);
+                arcui.arcInfo("视角追踪：" + follow.name,3f);
             }
         }).tooltip("切换跟踪玩家");
-        button(Icon.starSmall, clearAccentNonei, ui.achievements::show).tooltip("统计与成就");
+        button(Icon.starSmall, clearAccentNonei, arcui.achievements::show).tooltip("统计与成就");
         if(!mobile) button(Icon.editSmall,clearAccentNonei,this::uiTable).tooltip("ui大全");
     }
 

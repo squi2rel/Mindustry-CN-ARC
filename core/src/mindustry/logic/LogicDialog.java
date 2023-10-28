@@ -15,6 +15,7 @@ import arc.util.Log;
 import arc.util.Nullable;
 import arc.util.Strings;
 import arc.util.Time;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.core.GameState.State;
 import mindustry.ctype.Content;
 import mindustry.game.Team;
@@ -28,6 +29,7 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.logic.LCanvas.tooltip;
 
 public class LogicDialog extends BaseDialog{
@@ -112,28 +114,28 @@ public class LogicDialog extends BaseDialog{
             t.table(tt -> {
                 tt.button(Icon.cancelSmall, Styles.cleari, () -> {
                     Core.settings.put("logicSupport", !Core.settings.getBool("logicSupport"));
-                    ui.arcInfo("[orange]已关闭逻辑辅助器！");
+                    arcui.arcInfo("[orange]已关闭逻辑辅助器！");
                     rebuildMain();
                 }).size(50f);
                 tt.button(Icon.refreshSmall, Styles.cleari, () -> {
                     executor.build.updateCode(executor.build.code);
                     varsTable();
-                    ui.arcInfo("[orange]已更新逻辑显示！");
+                    arcui.arcInfo("[orange]已更新逻辑显示！");
                 }).size(50f);
                 tt.button(Icon.pauseSmall, Styles.cleari, () -> {
                     refreshing = !refreshing;
-                    ui.arcInfo("[orange]已" + (refreshing ? "开启" : "关闭") + "逻辑刷新");
+                    arcui.arcInfo("[orange]已" + (refreshing ? "开启" : "关闭") + "逻辑刷新");
                 }).checked(refreshing).size(50f);
                 tt.button(Icon.rightOpenOutSmall, Styles.cleari, () -> {
                     Core.settings.put("rectJumpLine", !Core.settings.getBool("rectJumpLine"));
-                    ui.arcInfo("[orange]已" + (refreshing ? "开启" : "关闭") + "方形跳转线");
+                    arcui.arcInfo("[orange]已" + (refreshing ? "开启" : "关闭") + "方形跳转线");
                     this.canvas.rebuild();
                 }).checked(refreshing).size(50f);
 
                 tt.button(Icon.playSmall, Styles.cleari, () -> {
                     if (state.isPaused()) state.set(State.playing);
                     else state.set(State.paused);
-                    ui.arcInfo(state.isPaused() ? "已暂停" : "已继续游戏");
+                    arcui.arcInfo(state.isPaused() ? "已暂停" : "已继续游戏");
                 }).checked(state.isPaused()).size(50f);
             });
         });
@@ -151,7 +153,7 @@ public class LogicDialog extends BaseDialog{
                             tv.touchable = Touchable.enabled;
                             tv.tapped(()->{
                                 Core.app.setClipboardText(s.name);
-                                ui.arcInfo("[cyan]复制变量名[white]\n " + s.name);
+                                arcui.arcInfo("[cyan]复制变量名[white]\n " + s.name);
                             });
                         });
                         tt.table(tv->{
@@ -159,7 +161,7 @@ public class LogicDialog extends BaseDialog{
                             tv.touchable = Touchable.enabled;
                             tv.tapped(()->{
                                 Core.app.setClipboardText(varPro.getText().toString());
-                                ui.arcInfo("[cyan]复制变量属性[white]\n " + varPro.getText());
+                                arcui.arcInfo("[cyan]复制变量属性[white]\n " + varPro.getText());
                             });
                             tv.update(()->{
                                 if(counter + Time.delta>period && refreshing){
@@ -184,7 +186,7 @@ public class LogicDialog extends BaseDialog{
                         tv.touchable = Touchable.enabled;
                         tv.tapped(()->{
                             Core.app.setClipboardText(varPro.getText().toString());
-                            ui.arcInfo("[cyan]复制信息版[white]\n " + varPro.getText());
+                            arcui.arcInfo("[cyan]复制信息版[white]\n " + varPro.getText());
                         });
                         tv.update(()->{
                             if(counter + Time.delta>period && refreshing){

@@ -25,6 +25,7 @@ import arc.util.serialization.Base64Coder;
 import arc.util.serialization.JsonReader;
 import arc.util.serialization.JsonValue;
 import mindustry.Vars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.RStyles;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -49,6 +50,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.RFuncs.getPrefix;
 
 public class MusicDialog extends BaseDialog {
@@ -418,14 +420,14 @@ public class MusicDialog extends BaseDialog {
                 byte src = Byte.parseByte(mark);
                 String id = msg.substring(split + 1);
                 if (src < 0 || src > apis.size() || apis.get(src) == null && src != 0) {
-                    Core.app.post(() -> ui.arcInfo("[red]无法找到api!\n可能是学术版本太旧"));
+                    Core.app.post(() -> arcui.arcInfo("[red]无法找到api!\n可能是学术版本太旧"));
                 }
                 MusicApi current = apis.get(src);
                 current.getMusicInfo(id, info -> Core.app.post(() -> ui.showConfirm("松鼠音乐", (sender == null ? "" : sender.name) + "分享了一首来自" + current.name + "的音乐" + (info.name == null ? "" : ":\n" + info.author + " - " + info.name) + "\n播放?", () -> current.getInfoOrCall(info, this::play))));
             }
         } catch (Exception e) {
             Log.err(e);
-            Core.app.post(() -> ui.arcInfo("[orange]音乐读取失败"));
+            Core.app.post(() -> arcui.arcInfo("[orange]音乐读取失败"));
         }
         return true;
     }

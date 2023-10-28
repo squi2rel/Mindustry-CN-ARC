@@ -11,6 +11,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.dialogs.TeamSelectDialog;
 import mindustry.game.Team;
 import mindustry.input.*;
@@ -23,6 +24,7 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.RFuncs.getPrefix;
 import static mindustry.input.InputHandler.follow;
 
@@ -134,7 +136,7 @@ public class PlayerListFragment{
             iconTable.tapped(() -> {
                 if(!user.dead() && clickable){
                     Core.camera.position.set(user.unit());
-                    ui.arcInfo("定位玩家：" + user.name);
+                    arcui.arcInfo("定位玩家：" + user.name);
                     if(control.input instanceof DesktopInput input){
                         input.panning = true;
                     }
@@ -171,7 +173,7 @@ public class PlayerListFragment{
                         t.touchable = Touchable.enabled;
                         t.tapped(()->{
                             Core.app.setClipboardText(user.name);
-                            ui.arcInfo("复制昵称：" + user.name);
+                            arcui.arcInfo("复制昵称：" + user.name);
                         });
                     }
                 ).width(400f).pad(10f).left();
@@ -191,7 +193,7 @@ public class PlayerListFragment{
                     }
                     if(control.input instanceof DesktopInput){
                         ((DesktopInput) control.input).panning = follow == user;
-                        ui.arcInfo("追踪玩家：" + user.name);
+                        arcui.arcInfo("追踪玩家：" + user.name);
                     }
                 }).checked(b -> {
                     boolean checked = follow == user;

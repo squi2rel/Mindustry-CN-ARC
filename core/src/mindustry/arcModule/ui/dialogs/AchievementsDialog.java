@@ -7,6 +7,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.service.Achievement;
@@ -15,6 +16,7 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 
 public class AchievementsDialog extends BaseDialog {
     private ObjectMap<String, TextureRegion> textureCache = new ObjectMap<>();
@@ -133,7 +135,7 @@ public class AchievementsDialog extends BaseDialog {
                 for (Achievement ach : Achievement.all) {
                     ach.removeAchieve();
                 }
-                ui.arcInfo("已移除所有成就");
+                arcui.arcInfo("已移除所有成就");
                 rebuildBrowser();
             })).height(50f).width(200f);
             if (Core.settings.getBool("otherCheat"))
@@ -141,7 +143,7 @@ public class AchievementsDialog extends BaseDialog {
                     for (Achievement ach : Achievement.all) {
                         ach.complete();
                     }
-                    ui.arcInfo("已完成所有成就");
+                    arcui.arcInfo("已完成所有成就");
                     rebuildBrowser();
                 })).height(50f).width(200f);
         });

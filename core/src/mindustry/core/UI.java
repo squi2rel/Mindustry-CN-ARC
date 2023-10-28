@@ -20,12 +20,9 @@ import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ClientLauncher;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.ui.*;
-import mindustry.arcModule.ui.dialogs.*;
-import mindustry.arcModule.ui.window.*;
 import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -90,21 +87,8 @@ public class UI implements ApplicationListener, Loadable{
     public IntMap<Dialog> followUpMenus;
     public IntMap<Window> followUpWindowedMenus = new IntMap<>();
 
-    public Cursor drillCursor, unloadCursor, targetCursor, resizeHorizontalCursor, resizeVerticalCursor, resizeLeftCursor, resizeRightCursor;
-
-    public AboutCN_ARCDialog aboutcn_arc;
-    public UpdateDialog updatedialog;
-    public CustomRulesDialog customrules;
-    public AchievementsDialog achievements;
-    //public MindustryWikiDialog mindustrywiki;
-    public mindustry.arcModule.ui.dialogs.MessageDialog MessageDialog;
-
-    public mindustry.arcModule.ui.dialogs.MusicDialog MusicDialog;
-    public mindustry.arcModule.ui.window.WindowManager WindowManager;
-    public LabelController LabelController;
+    public Cursor drillCursor, unloadCursor, targetCursor;
     private @Nullable Element lastAnnouncement;
-
-    private @Nullable Element lastArcAnnouncement;
 
     public WidgetGroup squirrelGroup;
 
@@ -174,10 +158,7 @@ public class UI implements ApplicationListener, Loadable{
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
         targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
-        resizeHorizontalCursor = Core.graphics.newCursor("resizeHorizontal", Fonts.cursorScale());
-        resizeVerticalCursor = Core.graphics.newCursor("resizeVertical", Fonts.cursorScale());
-        resizeLeftCursor = Core.graphics.newCursor("resizeLeft", Fonts.cursorScale());
-        resizeRightCursor = Core.graphics.newCursor("resizeRight", Fonts.cursorScale());
+        ARCVars.arcui.load();
     }
 
     @Override
@@ -250,17 +231,8 @@ public class UI implements ApplicationListener, Loadable{
         schematics = new SchematicsDialog();
         logic = new LogicDialog();
         fullText = new FullTextDialog();
-        aboutcn_arc = new AboutCN_ARCDialog();
-        updatedialog = new UpdateDialog();
-        customrules = new CustomRulesDialog();
-        achievements = new AchievementsDialog();
-        //mindustrywiki = new MindustryWikiDialog();
-        MessageDialog = new MessageDialog();
         campaignComplete = new CampaignCompleteDialog();
-        MusicDialog = new MusicDialog();
         followUpMenus = new IntMap<>();
-        LabelController = new LabelController();
-        WindowManager = new WindowManager();
 
         Group group = Core.scene.root;
 
@@ -285,16 +257,9 @@ public class UI implements ApplicationListener, Loadable{
         listfrag.build(hudGroup);
         consolefrag.build(hudGroup);
         loadfrag.build(group);
-        if (ClientLauncher.YuanShenLoader) {
-            new YuanShenFragment().build();
-        } else {
-            new FadeInFragment().build(group);
-        }
-        Core.settings.put("yuanshen", ClientLauncher.YuanShenLoader);
         infoControl.build(squirrelGroup);
 
-        initArcWave();
-
+        ARCVars.arcui.init(group);
     }
 
     @Override
@@ -653,23 +618,6 @@ public class UI implements ApplicationListener, Loadable{
         t.act(0.1f);
         Core.scene.add(t);
         lastAnnouncement = t;
-    }
-
-    public void arcInfo(String text){
-        arcInfo(text, 3);
-    }
-
-    /** Display text in the upper of the screen, then fade out. */
-    public void arcInfo(String text, float duration){
-        Table t = new Table(Styles.black3);
-        t.touchable = Touchable.disabled;
-        t.margin(8f).add(text).style(Styles.outlineLabel).labelAlign(Align.center);
-        t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/4f, Align.center));
-        t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
-        t.pack();
-        t.act(0.1f);
-        Core.scene.add(t);
-        lastArcAnnouncement = t;
     }
 
     public void showOkText(String title, String text, Runnable confirmed){

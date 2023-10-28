@@ -15,6 +15,7 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Time;
 import arc.util.Tmp;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.content.StatusEffects;
 import mindustry.core.World;
@@ -28,6 +29,7 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.DrawUtilities.*;
 import static mindustry.arcModule.RFuncs.getPrefix;
 
@@ -139,7 +141,7 @@ public class District {
             t.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
             t.button("发布规划区!", () -> {
                 if (!Core.settings.getBool("cheating_mode") && (voidDistrict.districtA.x - voidDistrict.districtB.x > 100f || voidDistrict.districtA.y - voidDistrict.districtB.y > 100f)) {
-                    ui.arcInfo("请勿发布无意义巨大规划区");
+                    arcui.arcInfo("请勿发布无意义巨大规划区");
                 } else Call.sendChatMessage(voidDistrict.toString());
             }).fillX();
         });
@@ -198,7 +200,7 @@ public class District {
 
         districtList.add(new advDistrict(resolveDistrict));
         ARCVars.districtList = districtList;
-        ui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.district, text, resolveDistrict.center()));
+        arcui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.district, text, resolveDistrict.center()));
         return true;
     }
 

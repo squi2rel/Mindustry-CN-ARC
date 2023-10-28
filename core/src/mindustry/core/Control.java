@@ -40,6 +40,7 @@ import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.DrawUtilities.arcBuildEffect;
 
 /**
@@ -731,8 +732,8 @@ public class Control implements ApplicationListener, Loadable{
                 settings.put("musicvol", 0);
                 settings.put("sfxvol", 0);
                 settings.put("ambientvol", 0);
-                ui.MusicDialog.vol = 0;
-                ui.MusicDialog.player.setVolume(0);
+                arcui.MusicDialog.vol = 0;
+                arcui.MusicDialog.player.setVolume(0);
                 calcDialog.show();
                 mods.getScripts().runConsole(
                         """

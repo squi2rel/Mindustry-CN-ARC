@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.ai.types.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -32,6 +33,7 @@ import java.io.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.logic.LogicDialog.*;
 
 public class LogicBlock extends Block{
@@ -598,20 +600,20 @@ public class LogicBlock extends Block{
             settingTable.table(t -> {
                 t.button(Icon.copy, Styles.cleari, () -> {
                     Core.app.setClipboardText(code);
-                    ui.arcInfo("已复制逻辑");
+                    arcui.arcInfo("已复制逻辑");
                 }).size(40);
                 t.button(Icon.download, Styles.cleari, () -> {
                     updateCode(Core.app.getClipboardText().replace("\r\n", "\n"));
-                    ui.arcInfo("已导入逻辑(仅单机生效)");
+                    arcui.arcInfo("已导入逻辑(仅单机生效)");
                 }).size(40);
                 t.button(Icon.trash, Styles.cleari, () -> {
                     code = "";
                     updateCode(code);
-                    ui.arcInfo("已清除逻辑(仅单机生效)");
+                    arcui.arcInfo("已清除逻辑(仅单机生效)");
                 }).size(40);
                 t.button(Icon.chatSmall, Styles.cleari, () -> {
                     linkSimplify = !linkSimplify;
-                    ui.arcInfo(linkSimplify ? "仅显示linkindex" : "显示方块名和linkindex");
+                    arcui.arcInfo(linkSimplify ? "仅显示linkindex" : "显示方块名和linkindex");
                 }).size(40);
                 t.button(Icon.info, Styles.cleari, () -> {
                     showContent = !showContent;

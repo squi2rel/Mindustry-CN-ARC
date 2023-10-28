@@ -40,6 +40,7 @@ import mindustry.world.blocks.payloads.UnitPayload;
 import java.util.Objects;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.TimeControl.*;
 import static mindustry.content.UnitTypes.*;
 import static mindustry.ui.Styles.*;
@@ -325,7 +326,7 @@ public class AdvanceToolTable extends Table {
                 }).tooltip(Marker.markList.size == 0 ? "[red]未标记" : ("选择上个标记点：" + World.toTile(Marker.markList.peek().markPos.x) + "," + World.toTile(Marker.markList.peek().markPos.y))).height(50f);
             }).row();
             t.button("复制！", () -> {
-                ui.arcInfo("复制蓝图中...\n[orange]测试中功能，请等待后续完善");
+                arcui.arcInfo("复制蓝图中...\n[orange]测试中功能，请等待后续完善");
                 Vec2 left2 = new Vec2(Math.min(initA.x, initB.x), Math.min(initA.y, initB.y));
                 for (int x = 0; x <= Math.abs(initA.x - initB.x); x++) {
                     for (int y = 0; y <= Math.abs(initA.y - initB.y); y++) {
@@ -424,11 +425,11 @@ public class AdvanceToolTable extends Table {
                 table.row();
                 table.button("[orange] 生成！(/js)", Icon.modeAttack, () -> {
                     if (chatTime > 0f) {
-                        ui.arcInfo("为了防止因ddos被服务器ban，请勿太快操作", 5f);
+                        arcui.arcInfo("为了防止因ddos被服务器ban，请勿太快操作", 5f);
                         return;
                     }
                     chatTime = 1f;
-                    ui.arcInfo("已生成单个单位。\n[gray]请不要短时多次使用本功能，否则容易因ddos被服务器ban", 5f);
+                    arcui.arcInfo("已生成单个单位。\n[gray]请不要短时多次使用本功能，否则容易因ddos被服务器ban", 5f);
                     Tmp.v1.rnd(Mathf.random(unitRandDst)).add(unitLoc.x, unitLoc.y).scl(tilesize);
                     sendFormatChat("/js u = UnitTypes.@.create(Team.get(@))",
                             spawnUnit.type.name,

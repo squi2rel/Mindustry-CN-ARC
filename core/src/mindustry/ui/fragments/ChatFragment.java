@@ -24,6 +24,7 @@ import mindustry.ui.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 
 public class ChatFragment extends Table{
     private static final int messagesShown = 10;
@@ -306,13 +307,13 @@ public class ChatFragment extends Table{
     }
 
     public void addMessage(String message,Boolean resolve){
-        if(message != null && resolve) ui.MessageDialog.resolveMsg(message);
+        if(message != null && resolve) arcui.MessageDialog.resolveMsg(message);
         addMessage(message);
     }
 
     public void addMessage(String message,@Nullable Player playersender){
         try {
-            if (message != null) ui.MessageDialog.resolveMsg(message, playersender);
+            if (message != null) arcui.MessageDialog.resolveMsg(message, playersender);
             if (playersender != null && playersender.unit() != null)
                 message = playersender.unit().type.emoji() + " " + message;
             addMessage(message);

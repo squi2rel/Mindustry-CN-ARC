@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 
 /** Handles control of bleeding edge builds. */
 public class BeControl{
@@ -61,7 +62,7 @@ public class BeControl{
             if(u && Core.settings.getBool("showUpdateDialog", true)) {
                 Events.on(EventType.ClientLoadEvent.class, e -> {
                     ui.showConfirm("检测到新版学术!\n打开更新列表?", this::BeControlTable);
-                    Timer.schedule(() -> ui.LabelController.start("[violet]检测到新版学术!"), 5);
+                    Timer.schedule(() -> arcui.LabelController.start("[violet]检测到新版学术!"), 5);
                 });
             }
         });

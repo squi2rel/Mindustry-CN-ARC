@@ -20,6 +20,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import static mindustry.Vars.*;
 import static arc.Core.bundle;
 import static arc.Core.settings;
+import static mindustry.arcModule.ARCVars.arcui;
 
 public class HudSettingsTable extends ElementUtils.ToolTable {
     protected Seq<Setting> list = new Seq<>();
@@ -127,7 +128,7 @@ public class HudSettingsTable extends ElementUtils.ToolTable {
                 t.button("[violet]锁", textStyle, () -> {
                     Core.settings.put("removeLogicLock", !Core.settings.getBool("removeLogicLock"));
                     control.input.logicCutscene = false;
-                    ui.arcInfo("已移除逻辑视角锁定");
+                    arcui.arcInfo("已移除逻辑视角锁定");
                 }).checked(a -> Core.settings.getBool("removeLogicLock")).size(30, 30).tooltip("逻辑锁定");
                 t.button("[cyan]雾", textStyle, () -> {
                     if (!state.rules.pvp || player.team().id == 255) renderer.fogEnabled = !renderer.fogEnabled;

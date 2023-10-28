@@ -15,6 +15,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.dialogs.BlockSelectDialog;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -32,6 +33,7 @@ import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 
 public class PlacementFragment{
     private int rowWidth = Math.max(Core.settings.getInt("itemSelectionWidth"),4);
@@ -946,13 +948,13 @@ public class PlacementFragment{
             b.clicked(KeyCode.mouseLeft, () -> {
                 control.input.selectedUnits = control.input.selectedUnits.select(cons::get);
                 Events.fire(Trigger.unitCommandChange);
-                ui.arcInfo("[cyan]arc控制器\n[acid]选择" + info + "！");
+                arcui.arcInfo("[cyan]arc控制器\n[acid]选择" + info + "！");
             });
             //right click -> remove
             b.clicked(KeyCode.mouseRight, () -> {
                 control.input.selectedUnits.removeAll(cons::get);
                 Events.fire(Trigger.unitCommandChange);
-                ui.arcInfo("[cyan]arc控制器\n[orange]移除" + info + "！");
+                arcui.arcInfo("[cyan]arc控制器\n[orange]移除" + info + "！");
             });
 
             b.addListener(listener);

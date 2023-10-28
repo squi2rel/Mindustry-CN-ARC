@@ -36,6 +36,7 @@ import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.DrawUtilities.arcDrawText;
 import static mindustry.arcModule.RFuncs.*;
 
@@ -241,13 +242,13 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
 
     void searchBlock(){
         if (buildingSeq.size == 0){
-            ui.arcInfo("[violet]方块搜索\n[acid]未找到此方块");
+            arcui.arcInfo("[violet]方块搜索\n[acid]未找到此方块");
             return;
         }
         searchBuild = buildingSeq.get(searchBlockIndex);
 
         arcSetCamera(searchBuild);
-        ui.arcInfo("[violet]方块搜索\n[acid]找到方块[cyan]" + searchBlockIndex + "[acid]/[cyan]" + buildingSeq.size + "[white]" + searchBlock.emoji());
+        arcui.arcInfo("[violet]方块搜索\n[acid]找到方块[cyan]" + searchBlockIndex + "[acid]/[cyan]" + buildingSeq.size + "[white]" + searchBlock.emoji());
         searchBlockIndex = (searchBlockIndex + 1) % buildingSeq.size;
     }
 
