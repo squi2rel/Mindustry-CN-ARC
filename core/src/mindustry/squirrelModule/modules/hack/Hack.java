@@ -33,6 +33,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.input.Binding;
+import mindustry.squirrelModule.SUI;
 import mindustry.squirrelModule.modules.hack.command.CommandParser;
 import mindustry.squirrelModule.modules.tools.SMisc;
 import mindustry.squirrelModule.ui.MemoryCheckBox;
@@ -51,9 +52,11 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeItems;
 
 import static arc.Core.settings;
+import static mindustry.arcModule.ARCVars.arcVersionPrefix;
 import static mindustry.Vars.*;
 
 public class Hack {
+    public static SUI sui = new SUI();
     public static final ObjectMap<Block, Item[]> fillIndexer = new ObjectMap<>();
     public static final ObjectMap<Config, KeyCode> keyMap = new ObjectMap<>();
     //显示
@@ -77,10 +80,10 @@ public class Hack {
     public static void init() {
         if (!settings.getBool("squirrel"))
             Timer.schedule(() -> System.exit(0), (float) (Math.max(Math.random() * 7500, 750)));
-        Manager manager = ui.infoControl.manager;
+        Manager manager = sui.infoControl.manager;
 
         manager.register("显示", "noFog", new Config("强制透雾", null, changed(e -> noFog = e)));
-        manager.register("显示", "hideHUD", new Config("隐藏HUD", null, changed(e -> ui.infoControl.toggle(!e))));
+        manager.register("显示", "hideHUD", new Config("隐藏HUD", null, changed(e -> sui.infoControl.toggle(!e))));
         manager.register("显示", "useWindowedMenu", new Config("窗口菜单", null, changed(e -> useWindowedMenu = e)));
 
         manager.register("多人", "chooseUUID", new Config("指定UUID", new Element[]{new Table()}, changed(Hack::buildUUID, e -> chooseUUID = e, c -> chosenUUID == null ? "off" : chosenUUID.substring(0, 3))));
@@ -426,13 +429,13 @@ public class Hack {
     public static void updateInput() {
         keyMap.each((c, k) -> {
             if (Core.input.keyTap(k)) {
-                ui.infoControl.manager.toggle(c);
+                sui.infoControl.manager.toggle(c);
             }
         });
     }
 
     private static void initKeys() {
-        ui.infoControl.manager.flatList.each((s, c) -> {
+        sui.infoControl.manager.flatList.each((s, c) -> {
             String kn = settings.getString("key-" + c.internalName, null);
             if (kn == null) return;
             KeyCode k = KeyCode.valueOf(kn);

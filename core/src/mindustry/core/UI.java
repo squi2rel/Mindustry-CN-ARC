@@ -23,13 +23,14 @@ import arc.util.*;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.ui.*;
+import mindustry.arcModule.ui.window.Window;
+import mindustry.arcModule.ui.window.WindowEvents;
 import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.squirrelModule.modules.hack.Hack;
-import mindustry.squirrelModule.ui.InfoControl;
 import mindustry.squirrelModule.ui.WindowedMenu;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -38,6 +39,7 @@ import mindustry.ui.fragments.*;
 import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 import static mindustry.arcModule.toolpack.arcWaveSpawner.initArcWave;
+import static mindustry.squirrelModule.modules.hack.Hack.sui;
 
 public class UI implements ApplicationListener, Loadable{
     public static String billions, millions, thousands;
@@ -52,7 +54,6 @@ public class UI implements ApplicationListener, Loadable{
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
     public HintsFragment hints;
-    public InfoControl infoControl;
 
     public WidgetGroup menuGroup, hudGroup;
 
@@ -89,8 +90,6 @@ public class UI implements ApplicationListener, Loadable{
 
     public Cursor drillCursor, unloadCursor, targetCursor;
     private @Nullable Element lastAnnouncement;
-
-    public WidgetGroup squirrelGroup;
 
     public UI(){
         Fonts.loadFonts();
@@ -193,7 +192,6 @@ public class UI implements ApplicationListener, Loadable{
 
         menuGroup = new WidgetGroup();
         hudGroup = new WidgetGroup();
-        squirrelGroup = new WidgetGroup();
 
         menufrag = new MenuFragment();
         hudfrag = new HudFragment();
@@ -203,7 +201,6 @@ public class UI implements ApplicationListener, Loadable{
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
         consolefrag = new ConsoleFragment();
-        infoControl = new InfoControl();
 
         picker = new ColorPicker();
         effects = new EffectsDialog();
@@ -242,13 +239,9 @@ public class UI implements ApplicationListener, Loadable{
         hudGroup.setFillParent(true);
         hudGroup.touchable = Touchable.childrenOnly;
         hudGroup.visible(() -> state.isGame());
-        squirrelGroup.setFillParent(true);
-        squirrelGroup.touchable = Touchable.childrenOnly;
-        squirrelGroup.update(() -> squirrelGroup.toFront());
 
         Core.scene.add(menuGroup);
         Core.scene.add(hudGroup);
-        Core.scene.add(squirrelGroup);
 
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
@@ -257,9 +250,9 @@ public class UI implements ApplicationListener, Loadable{
         listfrag.build(hudGroup);
         consolefrag.build(hudGroup);
         loadfrag.build(group);
-        infoControl.build(squirrelGroup);
 
         ARCVars.arcui.init(group);
+        sui.init();
     }
 
     @Override

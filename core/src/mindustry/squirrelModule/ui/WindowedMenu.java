@@ -6,12 +6,13 @@ import arc.scene.ui.Dialog;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import mindustry.Vars;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.window.Window;
 import mindustry.ui.Styles;
 
 public class WindowedMenu {
     public static Window newMenu(String title, String message, String[][] options, Cons2<Integer, Window> buttonListener) {
-        Window w = Vars.ui.WindowManager.createWindow();
+        Window w = ARCVars.arcui.WindowManager.createWindow();
         w.setTitle(title);
         w.setBody(buildMenu(message, options, i -> buttonListener.get(i, w)));
         return w;

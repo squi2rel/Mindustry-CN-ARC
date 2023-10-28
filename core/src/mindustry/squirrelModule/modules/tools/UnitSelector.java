@@ -18,6 +18,7 @@ import arc.util.Interval;
 import arc.util.Scaling;
 import arc.util.Structs;
 import mindustry.Vars;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.window.Window;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -33,7 +34,7 @@ public class UnitSelector extends Selector{
     Seq<Unit> units = new Seq<>();
     private final Interval timer = new Interval();
     public void show(Cons<Entityc> cb) {
-        Window w = Vars.ui.WindowManager.createWindow();
+        Window w = ARCVars.arcui.WindowManager.createWindow();
         w.setTitle("单位选择器");
         Table t = new Table();
         w.setBody(t);

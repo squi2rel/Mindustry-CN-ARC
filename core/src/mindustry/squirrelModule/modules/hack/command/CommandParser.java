@@ -14,8 +14,9 @@ import mindustry.ui.dialogs.BaseDialog;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static mindustry.Vars.getThemeColor;
+import static mindustry.arcModule.ARCVars.getThemeColor;
 import static mindustry.Vars.ui;
+import static mindustry.squirrelModule.modules.hack.Hack.sui;
 import static mindustry.squirrelModule.modules.hack.Hack.keyMap;
 
 public class CommandParser {
@@ -76,14 +77,14 @@ public class CommandParser {
                     Command c = cmd.get(keys[i]);
                     sb.append("\n").append(keys[i]).append(" ").append(c.args).append(" -").append(c.desc);
                 }
-                ui.chatfrag.addMessage(SMisc.color(sb.toString(), 3, ui.infoControl.getColor()));
+                ui.chatfrag.addMessage(SMisc.color(sb.toString(), 3, sui.infoControl.getColor()));
             }
         });
         registerCmd(new Command("bind", "绑定功能到指定键位", "<func>", "<key>") {
             @Override
             public void get(String[] args) {
                 boolean[] found = {false};
-                ui.infoControl.manager.flatList.each((s, c) -> {
+                sui.infoControl.manager.flatList.each((s, c) -> {
                     if (s.equalsIgnoreCase(args[0]) || args[0].equalsIgnoreCase(c.displayName)) {
                         found[0] = true;
                         if (Objects.equals(args[1], "off") || Objects.equals(args[1], "none") || Objects.equals(args[1], "null")) {
@@ -112,13 +113,13 @@ public class CommandParser {
             @Override
             public void get(String[] args) {
                 BaseDialog b = new BaseDialog("键位绑定");
-                b.cont.table(t1 -> t1.pane(t2 -> ui.infoControl.manager.list.each((t, seq) -> {
+                b.cont.table(t1 -> t1.pane(t2 -> sui.infoControl.manager.list.each((t, seq) -> {
                     t2.table(t3 -> {
                         t3.table(t4 -> t4.add(t).color(getThemeColor())).row();
                         t3.image().height(4).growX().pad(2).color(getThemeColor());
                     }).growX().row();
                     seq.each(c -> t2.table(t3 -> {
-                        t3.table(t4 -> t4.label(() -> SMisc.packColor(ui.infoControl.getColor()) + c.displayName)).growX();
+                        t3.table(t4 -> t4.label(() -> SMisc.packColor(sui.infoControl.getColor()) + c.displayName)).growX();
                         t3.table(t4 -> t4.label(() -> {
                             KeyCode name = keyMap.get(c);
                             return name == null ? "无" : name.value;
