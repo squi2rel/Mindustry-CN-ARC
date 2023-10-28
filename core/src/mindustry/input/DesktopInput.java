@@ -326,8 +326,11 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.respawn)){
                 controlledType = null;
                 recentRespawnTimer = 1f;
-                //Call.unitClear(player);
-                player.checkSpawn();
+                if (Hack.immeRespawn) {
+                    Call.buildingControlSelect(player, player.bestCore());
+                } else {
+                    Call.unitClear(player);
+                }
             }
         }
 
