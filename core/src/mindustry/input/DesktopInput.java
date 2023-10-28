@@ -326,7 +326,8 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.respawn)){
                 controlledType = null;
                 recentRespawnTimer = 1f;
-                Call.unitClear(player);
+                //Call.unitClear(player);
+                player.checkSpawn();
             }
         }
 
