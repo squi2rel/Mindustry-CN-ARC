@@ -28,6 +28,7 @@ import mindustry.type.UnitType;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ControlBlock;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import static arc.Core.*;
 import static mindustry.Vars.net;
@@ -327,7 +328,12 @@ public class DesktopInput extends InputHandler{
                 controlledType = null;
                 recentRespawnTimer = 1f;
                 if (Hack.immeRespawn) {
-                    Call.buildingControlSelect(player, player.bestCore());
+                    CoreBlock.CoreBuild core = player.bestCore();
+                    if (core != null) {
+                        Call.buildingControlSelect(player, core);
+                    } else {
+                        Call.unitClear(player);
+                    }
                 } else {
                     Call.unitClear(player);
                 }
