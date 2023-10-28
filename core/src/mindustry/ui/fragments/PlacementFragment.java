@@ -393,7 +393,7 @@ public class PlacementFragment{
                                 header.labelWrap(() -> !unlocked(displayBlock) && !Core.settings.getBool("allBlocksReveal") ? Core.bundle.get("block.unknown") : displayBlock.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
-                                if(unlocked(displayBlock)){
+                                if(unlocked(displayBlock) || Core.settings.getBool("allBlocksReveal")){
                                     header.button("?", Styles.flatBordert, () -> {
                                         ui.content.show(displayBlock);
                                         Events.fire(new BlockInfoEvent());
