@@ -165,7 +165,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         CoreBuild core;
 
-        if(!dead() || Hack.immeRespawn && unit.health <= 0){
+        if(!dead() && (!Hack.immeRespawn || unit.health > 0)){
             set(unit);
             unit.team(team);
             deathTimer = 0;
