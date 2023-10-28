@@ -31,9 +31,11 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.net.Packets.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.RFuncs.arcColorTime;
@@ -908,7 +910,16 @@ public class HudFragment{
             t.margin(0);
             t.clicked(() -> {
                 if(!player.dead() && mobile){
-                    Call.unitClear(player);
+                    if (Hack.immeRespawn) {
+                        CoreBlock.CoreBuild core = player.bestCore();
+                        if (core != null) {
+                            Call.buildingControlSelect(player, core);
+                        } else {
+                            Call.unitClear(player);
+                        }
+                    } else {
+                        Call.unitClear(player);
+                    }
                     control.input.recentRespawnTimer = 1f;
                     control.input.controlledType = null;
                 }
@@ -1050,7 +1061,16 @@ public class HudFragment{
             t.margin(0);
             t.clicked(() -> {
                 if (!player.dead() && mobile) {
-                    Call.unitClear(player);
+                    if (Hack.immeRespawn) {
+                        CoreBlock.CoreBuild core = player.bestCore();
+                        if (core != null) {
+                            Call.buildingControlSelect(player, core);
+                        } else {
+                            Call.unitClear(player);
+                        }
+                    } else {
+                        Call.unitClear(player);
+                    }
                     control.input.recentRespawnTimer = 1f;
                     control.input.controlledType = null;
                 }

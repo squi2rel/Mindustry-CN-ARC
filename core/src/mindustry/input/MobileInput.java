@@ -20,6 +20,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -733,6 +734,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public void update(){
         super.update();
+        if (Core.settings.getBool("keyboard") && !scene.hasField() && !scene.hasDialog()) Hack.updateInput();
 
         boolean locked = locked();
 
@@ -777,6 +779,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(!player.dead() && !state.isPaused() && !locked){
             updateMovement(player.unit());
+        }
+
+        if (Hack.fastIn && unitTapped != null) {
+            Call.unitControl(player, unitTapped);
         }
 
         //reset state when not placing
@@ -969,16 +975,16 @@ public class MobileInput extends InputHandler implements GestureListener{
         targetPos.set(Core.camera.position);
         float attractDst = 15f;
 
-        float speed = unit.speed();
+        float speed = Hack.speed ? unit.speed() * Hack.speedMulti : unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
         boolean aimCursor = omni && player.shooting && type.hasWeapons() && !boosted && type.faceTarget;
 
         if(aimCursor){
-            unit.lookAt(mouseAngle);
+            if (!Hack.ignoreTurn) unit.lookAt(mouseAngle);
         }else{
-            unit.lookAt(unit.prefRotation());
+            if (!Hack.ignoreTurn) unit.lookAt(unit.prefRotation());
         }
 
         //validate payload, if it's a destroyed unit/building, remove it
@@ -1065,6 +1071,19 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         unit.controlWeapons(player.shooting && !boosted);
+        if (Hack.lockTurn && player.shooting) {
+            for (int i = 0, l = unit.mounts.length; i < l; i++) {
+                WeaponMount w = unit.mounts[i];
+                if (w.weapon.rotate && w.weapon.controllable) {
+                    unit.rotation += w.targetRotation;
+                    w.rotation = 0;
+                    break;
+                }
+                if (i == l - 1) {
+                    unit.rotation = Tmp.v1.set(input.mouse()).sub(unit.x, unit.y).angle();
+                }
+            }
+        }
     }
 
     public void arcClearPlans(){
