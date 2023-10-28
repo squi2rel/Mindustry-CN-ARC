@@ -12,6 +12,7 @@ import arc.scene.ui.layout.Table;
 import arc.util.*;
 import arc.util.serialization.Jval;
 import mindustry.Vars;
+import mindustry.arcModule.ARCVars;
 import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.gen.Icon;
@@ -94,8 +95,8 @@ public class BeControl{
             if(!mobile || Core.graphics.isPortrait()) {
                 t.table().width(20f);
                 t.pane(tt -> {
-                    tt.add("更新日志").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-                    tt.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+                    tt.add("更新日志").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+                    tt.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
                     commitLabel = tt.labelWrap("加载中...").width(500f).get();
                 });
             }
@@ -144,12 +145,12 @@ public class BeControl{
         beTable.clear();
 
         beTable.table(t->{
-            t.add(updateAvailable?("[violet]！！！发现了新版本：" + updateBuild +"，你的版本为：" + arcVersion) : ("你已是最新版本，不需要更新！版本号" + arcVersion));
+            t.add(updateAvailable?("[violet]！！！发现了新版本：" + updateBuild +"，你的版本为：" + ARCVars.arcVersion) : ("你已是最新版本，不需要更新！版本号" + ARCVars.arcVersion));
         });
 
         beTable.row();
-        beTable.add("镜像设置").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-        beTable.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+        beTable.add("镜像设置").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+        beTable.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
 
         beTable.table(t->{
             t.add("下载镜像站，留空表示直连github(通常需要梯子)\n你可选择自行输入或者直接点下面的可选按钮\n输入完成后需要点击刷新按钮以更新");
@@ -190,8 +191,8 @@ public class BeControl{
         });
         if(!mobile || !Core.graphics.isPortrait()) {
             beTable.row();
-            beTable.add("PC端").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-            beTable.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+            beTable.add("PC端").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+            beTable.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
 
             beTable.table(t -> {
                 t.table(tt -> {
@@ -242,8 +243,8 @@ public class BeControl{
             });
 
             beTable.row();
-            beTable.add("steam端").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-            beTable.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+            beTable.add("steam端").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+            beTable.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
 
             beTable.table(t -> {
                 t.table(tt -> {
@@ -264,8 +265,8 @@ public class BeControl{
             beTable.add("检测到手机竖屏状态，已隐藏更新日志及其他端下载链接。\n如需显示请横屏后重新打开本窗口");
         }
         beTable.row();
-        beTable.add("PE端").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-        beTable.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+        beTable.add("PE端").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+        beTable.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
 
         beTable.table(t->{
             t.table(tt->{

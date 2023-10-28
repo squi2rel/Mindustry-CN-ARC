@@ -18,7 +18,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 
 import static mindustry.Vars.*;
-import static mindustry.Vars.getThemeColor;
+import static mindustry.arcModule.ARCVars.getThemeColor;
 import static mindustry.arcModule.ai.ArcMinerAI.*;
 import static mindustry.arcModule.ui.RStyles.*;
 import static mindustry.content.UnitTypes.*;

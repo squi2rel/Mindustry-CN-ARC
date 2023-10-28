@@ -16,11 +16,11 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.TreeElement.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
 import static mindustry.gen.Tex.*;
-import static mindustry.Vars.*;
 
 @StyleDefaults
 public class Styles{
@@ -112,7 +112,7 @@ public class Styles{
         grayPanel = whiteui.tint(Pal.darkestGray);
         flatDown = createFlatDown();
         flatOver = whiteui.tint(Color.valueOf("454545"));
-        accentDrawable = whiteui.tint(getThemeColor());
+        accentDrawable = whiteui.tint(ARCVars.getThemeColor());
 
         defaultb = new ButtonStyle(){{
             down = buttonDown;

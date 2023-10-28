@@ -7,13 +7,11 @@ import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.scene.*;
 import arc.scene.event.*;
-import arc.scene.ui.Slider;
 import arc.scene.ui.layout.*;
 import arc.util.Tmp;
-import mindustry.arcModule.Marker;
+import mindustry.arcModule.ARCVars;
 import mindustry.gen.*;
 import mindustry.input.DesktopInput;
-import mindustry.input.InputHandler;
 
 import static mindustry.Vars.*;
 
@@ -114,8 +112,8 @@ public class Minimap extends Table{
 
         update(() -> {
 
-            if ((float)getMinimapSize() != size) {
-                size = (float)getMinimapSize();
+            if ((float) ARCVars.getMinimapSize() != size) {
+                size = (float) ARCVars.getMinimapSize();
                 clearChildren();
                 buildMap();
             }

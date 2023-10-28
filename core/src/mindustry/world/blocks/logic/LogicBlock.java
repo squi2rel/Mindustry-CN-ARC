@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.ai.types.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -97,7 +98,7 @@ public class LogicBlock extends Block{
 
     public boolean accessible(){
         //return !privileged || state.rules.editor|| state.playtestingMap != null;
-        return !privileged || state.rules.editor|| state.playtestingMap != null || arcInfoControl();
+        return !privileged || state.rules.editor|| state.playtestingMap != null || ARCVars.arcInfoControl();
     }
 
     @Override

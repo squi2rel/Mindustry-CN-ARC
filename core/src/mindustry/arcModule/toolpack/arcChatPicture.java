@@ -11,6 +11,7 @@ import arc.scene.event.InputEvent;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.util.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -110,9 +111,9 @@ public class arcChatPicture {
     private static void rebuildShare() {
         tTable.clear();
         tTable.table(t -> {
-            t.add("名称").color(getThemeColor()).padRight(25f).padBottom(10f);
+            t.add("名称").color(ARCVars.getThemeColor()).padRight(25f).padBottom(10f);
             t.add(figureFile.name()).padBottom(10f).row();
-            t.add("大小").color(getThemeColor()).padRight(25f);
+            t.add("大小").color(ARCVars.getThemeColor()).padRight(25f);
             t.add(oriImage.width + "\uE815" + oriImage.height);
         });
         tTable.row();

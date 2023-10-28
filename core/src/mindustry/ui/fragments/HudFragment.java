@@ -16,6 +16,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.Vars;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.Marker;
 import mindustry.arcModule.ui.*;
 import mindustry.arcModule.ui.auxilliary.*;
@@ -36,7 +37,6 @@ import mindustry.ui.dialogs.BaseDialog;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.RFuncs.arcColorTime;
-import static mindustry.arcModule.RFuncs.calWaveTimer;
 import static mindustry.gen.Tex.*;
 import static mindustry.ui.Styles.*;
 import static mindustry.arcModule.TimeControl.*;
@@ -401,7 +401,7 @@ public class HudFragment{
                 IntFormat mem = new IntFormat("memory");
                 IntFormat memnative = new IntFormat("memory2");
 
-                info.add("ARC~"+arcVersion).color(getThemeColor()).left();
+                info.add("ARC~"+ ARCVars.arcVersion).color(ARCVars.getThemeColor()).left();
                 info.row();
                 info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style(Styles.outlineLabel).name("fps");
                 info.row();

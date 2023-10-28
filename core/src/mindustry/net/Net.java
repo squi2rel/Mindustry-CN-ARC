@@ -5,7 +5,7 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.arcModule.ARCVars;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
@@ -265,7 +265,7 @@ public class Net{
     public void handleClientReceived(Packet object){
         try {
             object.handled();
-            replayController.writePacket(object);
+            ARCVars.replayController.writePacket(object);
         } catch (Exception e) {
             Log.err(e);
             return;

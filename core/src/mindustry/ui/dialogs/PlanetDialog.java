@@ -18,6 +18,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
@@ -923,8 +924,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(t.getChildren().any()){
             c.defaults().left();
-            c.add(name + "  ("+ viewInterval(viewInt) + ")").color(getThemeColor()).center().row();
-            c.image().color(getThemeColor()).fillX().row();
+            c.add(name + "  ("+ viewInterval(viewInt) + ")").color(ARCVars.getThemeColor()).center().row();
+            c.image().color(ARCVars.getThemeColor()).fillX().row();
             builder.get(c);
             c.add(t).padLeft(10f).row();
         }
@@ -951,8 +952,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             if(sector.save != null && sector.info.resources.any()){
-                c.add("资源").color(getThemeColor()).center().row();
-                c.image().color(getThemeColor()).fillX().row();
+                c.add("资源").color(ARCVars.getThemeColor()).center().row();
+                c.image().color(ARCVars.getThemeColor()).fillX().row();
                 c.table(t -> {
                     for(UnlockableContent uc : sector.info.resources){
                         if(uc == null) continue;
@@ -987,8 +988,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             //stored resources
             if(sector.hasBase() && items.total > 0){
 
-                c.add("存储").color(getThemeColor()).center().row();
-                c.image().color(getThemeColor()).fillX().row();
+                c.add("存储").color(ARCVars.getThemeColor()).center().row();
+                c.image().color(ARCVars.getThemeColor()).fillX().row();
                 c.table(t -> {
                     t.left();
 

@@ -11,6 +11,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -371,7 +372,7 @@ public class Turret extends ReloadTurret{
                 Draw.reset();
             }
             boolean canShoot = this instanceof PowerTurret.PowerTurretBuild ? efficiency > 0 : hasAmmo();
-            if (canShoot && arcInfoControl(team) ){
+            if (canShoot && ARCVars.arcInfoControl(team) ){
                 boolean canHitCommand = (control.input.block!=null && targetGround) || (control.input.commandMode && (control.input.selectedUnits.size>0));
                 boolean turretAlert = Core.settings.getInt("turretAlertRange") > 0f &&
                         ((!player.unit().isNull() && player.unit().targetable(team)) || canHitCommand);

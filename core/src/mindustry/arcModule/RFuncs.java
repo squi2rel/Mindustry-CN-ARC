@@ -209,7 +209,7 @@ public class RFuncs {
     public static StringBuilder getPrefix(String color, String type) {
         StringBuilder prefix = new StringBuilder();
         if (ui.chatfrag.mode == ChatFragment.ChatMode.team) prefix.append("/t ");
-        prefix.append(arcVersionPrefix);
+        prefix.append(ARCVars.arcVersionPrefix);
         prefix.append("[").append(color).append("]");
         prefix.append("<").append(type).append(">");
         prefix.append("[white]");
@@ -220,7 +220,7 @@ public class RFuncs {
         for (int i = 0; i < values.length; i++) {
             values[i] = values[i] instanceof Number n ? "[stat]" + Strings.autoFixed(n.floatValue(), 1) + "[]" : "[white]" + values[i] + "[]";
         }
-        return Strings.format("[lightgray]" + format.replace("~", "[#" + getThemeColor() + "]~[]"), values);
+        return Strings.format("[lightgray]" + format.replace("~", "[#" + ARCVars.getThemeColor() + "]~[]"), values);
     }
 
     public static void worldProcessor() {

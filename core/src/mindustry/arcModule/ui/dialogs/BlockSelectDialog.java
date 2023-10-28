@@ -5,14 +5,11 @@ import arc.func.Boolf;
 import arc.func.Cons;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
-import arc.struct.EnumSet;
 import arc.struct.Seq;
-import mindustry.game.Team;
-import mindustry.gen.Tex;
+import mindustry.arcModule.ARCVars;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
-import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.BlockGroup;
 
 import static mindustry.Vars.*;
@@ -48,7 +45,7 @@ public class BlockSelectDialog extends BaseDialog {
             blockGroups.each(blockGroup -> {
                 td.row();
                 td.add(blockGroup.toString()).row();
-                td.image().color(getThemeColor()).fillX().row();
+                td.image().color(ARCVars.getThemeColor()).fillX().row();
                 td.table(ttd -> blocks.select(block1 -> block1.group == blockGroup).each(block1 -> {
                     ttd.button(new TextureRegionDrawable(block1.uiIcon), Styles.cleari, iconSmall, () -> {
                         cons.get(block1);

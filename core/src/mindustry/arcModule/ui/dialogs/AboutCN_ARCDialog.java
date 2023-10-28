@@ -4,6 +4,7 @@ import arc.Core;
 import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import mindustry.arcModule.ARCVars;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static mindustry.Vars.*;
@@ -40,7 +41,7 @@ public class AboutCN_ARCDialog extends BaseDialog {
         cont.add("v3制作团队：[violet]Lucky_Clover[white]、blac8、[blue]xkldklp[white]、[yellow]miner");
         cont.row();
         cont.add("主负责人：[violet]Lucky_Clover").row();
-        cont.add("公开发行版本：" + arcVersion).row();
+        cont.add("公开发行版本：" + ARCVars.arcVersion).row();
         cont.add("提议更新或反馈bug，请加入[yellow]猫猫的数据库[white]").row();
         cont.add("讨论学术端更新|提议源码|共同编辑，请加入[yellow]mindustry PVP交流群[white]:931790051[orange]不欢迎萌新，仅限大佬加入").row();
         cont.row();
@@ -89,7 +90,7 @@ public class AboutCN_ARCDialog extends BaseDialog {
             if (!log.startsWith("[cyan]请仔细阅读学术端")) {
                 about.add(log).left();
             } else {
-                about.add(log + changeLogRead).left();
+                about.add(log + ARCVars.changeLogRead).left();
             }
             about.row();
         }

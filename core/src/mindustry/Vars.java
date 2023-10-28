@@ -39,23 +39,10 @@ import java.util.concurrent.*;
 import static arc.Core.*;
 
 public class Vars implements Loadable{
-    /** ARC */
-    public static String arcVersion = Version.arcBuild <= 0 ? "dev" : String.valueOf(Version.arcBuild);
-    public static String arcVersionPrefix = "<ARC~" + arcVersion + ">";
-    public static int changeLogRead = 18;
-    public static Seq<District.advDistrict> districtList = new Seq<>();
     public static String userContentURL = "https://ghps.cc/https://raw.github.com";
-    public static boolean replaying = false;
-    public static ReplayController replayController;
 
     /** 开始游玩时间 */
     public static Long startPlayTime = Time.millis();
-
-    /** 服务器远程控制允许或移除作弊功能 */
-    public static Boolean arcCheatServer = false;
-
-    /** pr-5921  Used in blocks with selection menus such sorters for how large the menu should be */
-    public static int blockSelectionRows = 5, blockSelectionColumns = 6;
     /** Whether the game failed to launch last time. */
     public static boolean failedToLaunch = false;
     /** Whether to load locales. */
@@ -66,8 +53,6 @@ public class Vars implements Loadable{
     public static boolean experimental = true;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
-    /**MI2: Minimap size.*/
-    public static final int minimapSize = 40;
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Default rule environment. */
@@ -358,9 +343,9 @@ public class Vars implements Loadable{
         maps.load();
 
         String uuid = Core.settings.getString("uuid", "o");
-        changeLogRead = Math.abs(Integer.parseInt(("" + uuid.hashCode()).substring(0, 2)));
+        ARCVars.changeLogRead = Math.abs(Integer.parseInt(("" + uuid.hashCode()).substring(0, 2)));
 
-        replayController = new ReplayController();
+        ARCVars.replayController = new ReplayController();
     }
 
     /** Checks if a launch failure occurred.
@@ -508,41 +493,5 @@ public class Vars implements Loadable{
             }
         }
     }
-    public static int getMaxSchematicSize(){
-        int s = Core.settings.getInt("maxSchematicSize");
-        return s == 501 ? Integer.MAX_VALUE : s;
-    }
 
-    public static int getMinimapSize(){
-        return settings.getInt("minimapSize",minimapSize);
-    }
-
-    public static String getThemeColorCode(){
-        return "[#" + getThemeColor() + "]";
-    }
-
-    public static Color getThemeColor(){
-        try {
-            return Color.valueOf(settings.getString("themeColor"));
-        }catch(Exception e){
-            return Color.valueOf("ffd37f");
-        }
-    }
-
-    public static Color getPlayerEffectColor(){
-        try {
-            return Color.valueOf(settings.getString("playerEffectColor"));
-        }catch(Exception e){
-            return Color.valueOf("ffd37f");
-        }
-    }
-
-    public static Boolean arcInfoControl(Team team){
-        return team == player.team() || arcInfoControl();
-    }
-
-    public static Boolean arcInfoControl(){
-        return   (!arcCheatServer && (Core.settings.getBool("showOtherTeamState") ||
-                        player.team().id == 255 || state.rules.mode() != Gamemode.pvp));
-    }
 }

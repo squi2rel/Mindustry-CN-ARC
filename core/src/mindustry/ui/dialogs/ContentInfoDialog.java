@@ -5,11 +5,10 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
-import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.world.meta.*;
 
@@ -51,7 +50,7 @@ public class ContentInfoDialog extends BaseDialog{
             var any = content.stats.toMap().size > 0;
 
             if(any){
-                table.add("@category.purpose").color(getThemeColor()).fillX().padTop(10);
+                table.add("@category.purpose").color(ARCVars.getThemeColor()).fillX().padTop(10);
                 table.row();
             }
 
@@ -59,7 +58,7 @@ public class ContentInfoDialog extends BaseDialog{
             table.row();
 
             if(!content.stats.useCategories && any){
-                table.add("@category.general").fillX().color(getThemeColor());
+                table.add("@category.general").fillX().color(ARCVars.getThemeColor());
                 table.row();
             }
         }
@@ -72,7 +71,7 @@ public class ContentInfoDialog extends BaseDialog{
             if(map.size == 0) continue;
 
             if(stats.useCategories){
-                table.add("@category." + cat.name).color(getThemeColor()).fillX();
+                table.add("@category." + cat.name).color(ARCVars.getThemeColor()).fillX();
                 table.row();
             }
 

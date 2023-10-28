@@ -3,7 +3,6 @@ package mindustry.editor;
 import arc.*;
 import arc.func.Intc;
 import arc.func.Intp;
-import arc.graphics.Color;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
@@ -16,6 +15,7 @@ import arc.util.*;
 import mindustry.ai.types.BuilderAI;
 import mindustry.ai.types.MinerAI;
 import mindustry.ai.types.RepairAI;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.toolpack.arcWaveSpawner;
 import mindustry.content.*;
 import mindustry.core.UI;
@@ -319,7 +319,7 @@ public class arcWaveInfoDialog extends BaseDialog {
                     initArcWave((int) (calWinWave() * waveMulti + 1));
                     p.table(Tex.button, t -> {
                         p.margin(0).defaults().pad(5).growX();
-                        t.add("\uE86D 为单位数量；\uE813 为单位血+盾；\uE810 为计算buff的血+盾；\uE86E 为预估DPS。在游戏中时会考虑地图出怪点数目").color(getThemeColor());
+                        t.add("\uE86D 为单位数量；\uE813 为单位血+盾；\uE810 为计算buff的血+盾；\uE86E 为预估DPS。在游戏中时会考虑地图出怪点数目").color(ARCVars.getThemeColor());
                     }).scrollX(false).growX().row();
                     for (int wave = 0; wave < calWinWave() * waveMulti; wave++) {
                         arcWaveSpawner.waveInfo thisWave = arcWave.get(wave);

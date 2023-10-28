@@ -9,6 +9,7 @@ import arc.math.Mathf;
 import arc.scene.ui.Dialog;
 import arc.util.Time;
 import arc.util.Tmp;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;
@@ -96,7 +97,7 @@ public class arcPlayerEffect {
     }
 
     public static void drawPlayerEffect(Unit unit) {
-        Color effectColor = unit.controller() == player ? getPlayerEffectColor() : unit.team.color;
+        Color effectColor = unit.controller() == player ? ARCVars.getPlayerEffectColor() : unit.team.color;
 
         boolean drawCircle = (unit.controller() == player && Core.settings.getInt("superUnitEffect") != 0) || (unit.controller() instanceof Player && Core.settings.getInt("superUnitEffect") == 2);
         if (drawCircle) {

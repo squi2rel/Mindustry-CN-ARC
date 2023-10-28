@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
@@ -2634,11 +2635,11 @@ public class Fx{
     }),
 
     arcIndexer = new Effect(120f, e -> {
-        color(getThemeColor());
+        color(ARCVars.getThemeColor());
         Lines.circle(e.x, e.y, 8f);
         for(int i = 0; i < 3; i++){
             float rot = i * 120f + 90f;
-            Drawf.simpleArrow(e.x, e.y,e.x  + Angles.trnsx(rot, 120f),e.y +  + Angles.trnsy(rot, 120f),100f - 80f * e.fin(),-4f, getThemeColor());
+            Drawf.simpleArrow(e.x, e.y,e.x  + Angles.trnsx(rot, 120f),e.y +  + Angles.trnsy(rot, 120f),100f - 80f * e.fin(),-4f, ARCVars.getThemeColor());
         }
     });
 }

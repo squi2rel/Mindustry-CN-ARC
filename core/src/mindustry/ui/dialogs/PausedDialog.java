@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -121,7 +122,7 @@ public class PausedDialog extends BaseDialog{
     }
 
     public void runExitSave(){
-        replayController.stopPlay();
+        ARCVars.replayController.stopPlay();
         wasClient = net.client();
         if(net.client()) netClient.disconnectQuietly();
 

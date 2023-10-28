@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -327,12 +328,12 @@ public class ChatFragment extends Table{
         }
         if (message.startsWith("!clear")) {
             clearMessages();
-            messages.insert(0, "[cyan][ARC" + arcVersion + "][pink]聊天记录已清空");
+            messages.insert(0, "[cyan][ARC" + ARCVars.arcVersion + "][pink]聊天记录已清空");
             return true;
         }
         if (message.startsWith("!log")) {
             copyMessage(message);
-            messages.insert(0, "[cyan][ARC" + arcVersion + "][pink]聊天记录已复制到粘贴板");
+            messages.insert(0, "[cyan][ARC" + ARCVars.arcVersion + "][pink]聊天记录已复制到粘贴板");
             return true;
         }
         return false;
@@ -346,7 +347,7 @@ public class ChatFragment extends Table{
         }
 
         StringBuilder messageHis = new StringBuilder();
-        messageHis.append("下面是[ARC").append(arcVersion).append("] 导出的游戏内聊天记录").append("\n");
+        messageHis.append("下面是[ARC").append(ARCVars.arcVersion).append("] 导出的游戏内聊天记录").append("\n");
         messageHis.append("*** 当前地图名称: ").append(state.map.name()).append("（模式：").append(state.rules.modeName).append("）\n");
         messageHis.append("*** 当前波次: ").append(state.wave).append("\n");
         messageHis.append("*** 导出模式: ").append(getValidType()).append("\n");
@@ -367,7 +368,7 @@ public class ChatFragment extends Table{
 
     private void helpMessage() {
         StringBuilder msg = new StringBuilder();
-        msg.append("[cyan][ARC").append(arcVersion).append("][violet]聊天辅助器").append("\n\n");
+        msg.append("[cyan][ARC").append(ARCVars.arcVersion).append("][violet]聊天辅助器").append("\n\n");
         msg.append("[acid]!help  [white]调出本帮助菜单").append("\n");
         msg.append("[acid]!clear  [white]清除聊天记录").append("\n");
         msg.append("[acid]!log  [white]复制聊天记录到粘贴板，默认导出20条").append("\n");

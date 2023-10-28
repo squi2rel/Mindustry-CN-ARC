@@ -25,7 +25,7 @@ import arc.scene.ui.layout.Table;
 import arc.scene.ui.layout.WidgetGroup;
 import arc.struct.Seq;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.RStyles;
 import mindustry.arcModule.ui.window.Window;
 import mindustry.core.Version;
@@ -246,7 +246,7 @@ public class MenuFragment{
                             Table content = new Table();
                             ScrollPane pane = new ScrollPane(content);
                             content.table(t2 -> {
-                                t2.image().color(Vars.getThemeColor()).height(3).growX().row();
+                                t2.image().color(ARCVars.getThemeColor()).height(3).growX().row();
                                 t2.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[id]))).align(Align.left).row();
                                 t2.table(t3 -> {
                                     String n = (idx == -1 ? news[id + 1] : news[id + 1].substring(idx + 1)).replace("\\n", "\n");
@@ -411,7 +411,7 @@ public class MenuFragment{
 
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
-            if(Core.settings.getInt("changelogreaded") == changeLogRead){
+            if(Core.settings.getInt("changelogreaded") == ARCVars.changeLogRead){
                 container.add(play);
                 container.add(join);
                 container.add(custom);
@@ -439,7 +439,7 @@ public class MenuFragment{
             if(!ios) container.add(exit);
         }else{
             container.marginTop(0f);
-            if(Core.settings.getInt("changelogreaded") == changeLogRead){
+            if(Core.settings.getInt("changelogreaded") == ARCVars.changeLogRead){
                 container.add(play);
                 container.add(maps);
                 container.row();
@@ -511,7 +511,7 @@ public class MenuFragment{
             t.defaults().width(width).height(70f);
             t.name = "buttons";
 
-            if(Core.settings.getInt("changelogreaded") != changeLogRead) {
+            if(Core.settings.getInt("changelogreaded") != ARCVars.changeLogRead) {
                 buttons(t,
                         new MenuButton("@database.button", Icon.menu,
                                 new MenuButton("@schematics", Icon.paste, ui.schematics::show),

@@ -7,8 +7,7 @@ import arc.graphics.g2d.TextureRegion;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import mindustry.game.Team;
-import mindustry.gen.*;
+import mindustry.arcModule.ARCVars;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.arcModule.NumberFormat;
@@ -127,7 +126,7 @@ public class OtherCoreItemDisplay extends Table {
         addTeamData(teamsTable, UnitTypes.gamma.uiIcon, team -> String.valueOf(team.players.size));
 
         if (showStat) {
-            teamsTable.image().color(getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
+            teamsTable.image().color(ARCVars.getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
             addTeamDataCheck(teamsTable, Blocks.siliconSmelter.uiIcon, team -> team.team.rules().cheat, false);
             addTeamDataCheck(teamsTable, Blocks.arc.uiIcon, team -> state.rules.blockDamage(team.team));
             addTeamDataCheck(teamsTable, Blocks.titaniumWall.uiIcon, team -> state.rules.blockHealth(team.team));
@@ -141,7 +140,7 @@ public class OtherCoreItemDisplay extends Table {
         }
 
         if (showItem) {
-            teamsTable.image().color(getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
+            teamsTable.image().color(ARCVars.getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
             for (Item item : content.items()) {
                 boolean show = false;
                 for (Teams.TeamData team : teams) {
@@ -155,7 +154,7 @@ public class OtherCoreItemDisplay extends Table {
         }
 
         if (showUnit) {
-            teamsTable.image().color(getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
+            teamsTable.image().color(ARCVars.getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
             for (UnitType unit : content.units()) {
                 boolean show = false;
                 for (Teams.TeamData team : teams) {
@@ -211,7 +210,7 @@ public class OtherCoreItemDisplay extends Table {
     private void addTeamData(Table table, TextureRegion icon, String value) {
         /** 只显示一个数值 */
         table.image(icon).size(15, 15).left();
-        table.label(() -> getThemeColorCode() + value).fillX().get().setFontScale(fontScl);
+        table.label(() -> ARCVars.getThemeColorCode() + value).fillX().get().setFontScale(fontScl);
         table.row();
     }
 

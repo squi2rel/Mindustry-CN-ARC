@@ -11,7 +11,6 @@ import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.Marker;
 import mindustry.content.Items;
@@ -125,12 +124,12 @@ public class DesktopInput extends InputHandler{
 
         //draw break selection
         if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.getMaxSchematicSize());
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : ARCVars.getMaxSchematicSize());
         }
 
         if(!Core.scene.hasKeyboard() && mode != breaking){
             if(Core.input.keyDown(Binding.schematic_select)){
-                drawSelection(schemX, schemY, cursorX, cursorY, Vars.getMaxSchematicSize());
+                drawSelection(schemX, schemY, cursorX, cursorY, ARCVars.getMaxSchematicSize());
             }else if(Core.input.keyDown(Binding.rebuild_select)){
                 drawRebuildSelection(schemX, schemY, cursorX, cursorY);
             }
@@ -692,7 +691,7 @@ public class DesktopInput extends InputHandler{
                 linePlans.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
-                removeSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.getMaxSchematicSize());
+                removeSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : ARCVars.getMaxSchematicSize());
                 if(lastSchematic != null){
                     useSchematic(lastSchematic);
                     lastSchematic = null;

@@ -21,6 +21,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ClientLauncher;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.ui.*;
 import mindustry.arcModule.ui.dialogs.*;
@@ -164,9 +165,9 @@ public class UI implements ApplicationListener, Loadable{
 
         ClickListener.clicked = () -> Sounds.press.play();
 
-        Colors.put("accent", getThemeColor());
+        Colors.put("accent", ARCVars.getThemeColor());
         Colors.put("unlaunched", Color.valueOf("8982ed"));
-        Colors.put("highlight", getThemeColor().cpy().lerp(Color.white, 0.3f));
+        Colors.put("highlight", ARCVars.getThemeColor().cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
         Colors.put("negstat", Pal.negativeStat);
 
@@ -553,7 +554,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showText(String titleText, String text, int align){
         new Dialog(titleText){{
             cont.row();
-            cont.image().width(400f).pad(2).colspan(2).height(4f).color(getThemeColor());
+            cont.image().width(400f).pad(2).colspan(2).height(4f).color(ARCVars.getThemeColor());
             cont.row();
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
@@ -574,7 +575,7 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(titleText){{
             cont.margin(10).add(text);
             titleTable.row();
-            titleTable.image().color(getThemeColor()).height(3f).growX().pad(2f);
+            titleTable.image().color(ARCVars.getThemeColor()).height(3f).growX().pad(2f);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
             closeOnBack();
         }}.show();
@@ -691,7 +692,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.add(titleTable).width(400f);
 
             cont.row();
-            cont.image().width(400f).pad(2).colspan(2).height(4f).color(getThemeColor()).bottom();
+            cont.image().width(400f).pad(2).colspan(2).height(4f).color(ARCVars.getThemeColor()).bottom();
             cont.row();
             cont.pane(table -> {
                 table.add(message).width(400f).wrap().get().setAlignment(Align.center);

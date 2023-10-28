@@ -76,7 +76,7 @@ public class DrawUtilities {
 
     private void arcFillTextMain(String text, float x1, float y1, float x2, float y2, float ratio) {
 
-        Color color = getThemeColor();
+        Color color = ARCVars.getThemeColor();
         Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
@@ -115,7 +115,7 @@ public class DrawUtilities {
 
     public static void arcDrawTextMain(String text, int x, int y) {
 
-        Color color = getThemeColor();
+        Color color = ARCVars.getThemeColor();
         Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();

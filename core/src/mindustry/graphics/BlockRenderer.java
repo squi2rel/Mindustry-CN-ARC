@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -456,11 +457,11 @@ public class BlockRenderer{
                             Draw.z(Layer.block);
                         }
                     }
-                    if(renderer.drawStatus && block.hasConsumers && arcInfoControl(build.team)){
+                    if(renderer.drawStatus && block.hasConsumers && ARCVars.arcInfoControl(build.team)){
                         build.drawStatus();
                     }
 
-                    if(Core.settings.getBool("blockdisabled") && arcInfoControl(build.team) && !build.enabled()){
+                    if(Core.settings.getBool("blockdisabled") && ARCVars.arcInfoControl(build.team) && !build.enabled()){
                         build.drawDisabled();
                     }
 

@@ -12,6 +12,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -306,7 +307,7 @@ public class Weapon implements Cloneable{
             if(mount.aimX !=0 && mount.aimY != 0  && Mathf.len(mount.aimX - wx, mount.aimY - wy) <= 1200f){
                 Lines.stroke(1f);
                 if (unit.controller() == player) {
-                    Draw.color(getPlayerEffectColor());
+                    Draw.color(ARCVars.getPlayerEffectColor());
                 } else {
                     Draw.color(unit.team.color);
                 }

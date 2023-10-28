@@ -10,10 +10,10 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -292,7 +292,7 @@ public class MenuRenderer implements Disposable{
 
             if(Core.settings.getBool("menuFlyersRange")){
                 float curStroke = (float)Core.settings.getInt("playerEffectCurStroke")/10f;
-                Color effectcolor = getThemeColor();
+                Color effectcolor = ARCVars.getThemeColor();
 
                 float sectorRad = 0.14f, rotateSpeed = 0.5f;
                 int sectors = 5;
@@ -350,7 +350,7 @@ public class MenuRenderer implements Disposable{
 
             if(Core.settings.getBool("menuFlyersRange")){
                 float curStroke = (float)Core.settings.getInt("playerEffectCurStroke")/10f;
-                Color effectcolor = getThemeColor();
+                Color effectcolor = ARCVars.getThemeColor();
 
                 float sectorRad = 0.14f, rotateSpeed = 0.5f;
                 int sectors = 5;

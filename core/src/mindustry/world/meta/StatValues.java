@@ -10,10 +10,10 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.abilities.Ability;
-import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
@@ -276,7 +276,7 @@ public class StatValues{
                 table.row();
                 table.table(at->{
                     at.background(Styles.grayPanel);
-                    at.add("[stat]" + drill.tier + "[lightgray]级[#" + getThemeColor() + "] ~ [stat]" +
+                    at.add("[stat]" + drill.tier + "[lightgray]级[#" + ARCVars.getThemeColor() + "] ~ [stat]" +
                             Strings.autoFixed(60f / drill.drillTime * drill.size * drill.size,2) + "[lightgray]物品/s");
                     at.row();
                     at.table(t -> {
@@ -302,7 +302,7 @@ public class StatValues{
             table.row();
             table.table(at->{
                 at.background(Styles.grayPanel);
-                at.add("[stat]" + drill.tier + "[lightgray]级[#" + getThemeColor() + "] ~ [stat]" +
+                at.add("[stat]" + drill.tier + "[lightgray]级[#" + ARCVars.getThemeColor() + "] ~ [stat]" +
                         Strings.autoFixed(60f / drill.drillTime * drill.size * drill.size,2) + "[lightgray]物品/s");
                 at.row();
                 at.table(t -> {

@@ -23,13 +23,13 @@ import arc.util.OS;
 import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.io.Streams;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.TechTree;
 import mindustry.content.TechTree.TechNode;
 import mindustry.core.GameState;
 import mindustry.core.Version;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType.Trigger;
-import mindustry.game.Schematics;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Shaders;
@@ -296,7 +296,7 @@ public class SettingsMenuDialog extends BaseDialog{
         float marg = 8f, isize = iconMed;
 
         menu.defaults().size(300f, 60f);
-        if(Core.settings.getInt("changelogreaded") == changeLogRead){
+        if(Core.settings.getInt("changelogreaded") == ARCVars.changeLogRead){
             menu.button("@settings.game", Icon.settings, style, isize, () -> visible(0)).marginLeft(marg).row();
             menu.row();
             menu.button("@settings.graphics", Icon.image, style, isize, () -> visible(1)).marginLeft(marg).row();
@@ -318,7 +318,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).marginLeft(marg).row();
 
-        int i = Core.settings.getInt("changelogreaded") == changeLogRead ? 7 : 1;
+        int i = Core.settings.getInt("changelogreaded") == ARCVars.changeLogRead ? 7 : 1;
         for(var cat : categories){
             int index = i;
             if(cat.icon == null){
@@ -339,7 +339,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
     void addSettings(){
 
-        if(Core.settings.getInt("changelogreaded") != changeLogRead){
+        if(Core.settings.getInt("changelogreaded") != ARCVars.changeLogRead){
             arc.sliderPref("changelogreaded", 0, 0, 150, 1, i -> i + "");
             arc.checkPref("changelogexplain", false);
         }else {
@@ -899,7 +899,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         Seq<Table> tables = new Seq<>();
 
-        if(Core.settings.getInt("changelogreaded") == changeLogRead){
+        if(Core.settings.getInt("changelogreaded") == ARCVars.changeLogRead){
             tables.addAll(game, graphics, sound, arc,forcehide,specmode, cheating);
         }
         else{
@@ -1148,8 +1148,8 @@ public class SettingsMenuDialog extends BaseDialog{
 
             @Override
             public void add(SettingsTable table) {
-                table.add(title).color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-                table.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+                table.add(title).color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+                table.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
             }
         }
 

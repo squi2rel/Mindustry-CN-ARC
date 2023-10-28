@@ -21,7 +21,6 @@ import mindustry.input.DesktopInput;
 
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
-import mindustry.ui.dialogs.SchematicsDialog;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import java.text.SimpleDateFormat;
@@ -354,7 +353,7 @@ public class MessageDialog extends BaseDialog {
 
     void exportMsg() {
         StringBuilder messageHis = new StringBuilder();
-        messageHis.append("下面是[ARC").append(arcVersion).append("] 导出的游戏内聊天记录").append("\n");
+        messageHis.append("下面是[ARC").append(ARCVars.arcVersion).append("] 导出的游戏内聊天记录").append("\n");
         messageHis.append("*** 当前地图名称: ").append(state.map.name()).append("（模式：").append(state.rules.modeName).append("）\n");
         messageHis.append("*** 当前波次: ").append(state.wave).append("\n");
 

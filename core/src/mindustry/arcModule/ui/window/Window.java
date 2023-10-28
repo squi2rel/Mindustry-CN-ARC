@@ -26,7 +26,7 @@ import arc.util.Tmp;
 import mindustry.gen.Icon;
 import mindustry.ui.Styles;
 
-import static mindustry.Vars.getThemeColor;
+import static mindustry.arcModule.ARCVars.getThemeColor;
 import static mindustry.Vars.ui;
 
 public class Window {

@@ -10,10 +10,10 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.dialogs.TeamSelectDialog;
 import mindustry.game.Team;
 import mindustry.input.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -178,7 +178,7 @@ public class PlayerListFragment{
 
                 button.add().grow();
 
-                button.button("[#" + getThemeColor() + "]♐", Styles.cleart, () -> {
+                button.button("[#" + ARCVars.getThemeColor() + "]♐", Styles.cleart, () -> {
                     String message = arcAtPlayer(user.name);
                     Call.sendChatMessage(message);
                 }).size(buttonSize);

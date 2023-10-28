@@ -6,6 +6,7 @@ import arc.graphics.Color;
 import arc.graphics.Colors;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.editor.*;
 import mindustry.gen.*;
@@ -57,8 +58,8 @@ public class MapInfoTable extends BaseToolsTable{
         table.clear();
 
         table.table(c -> {
-            c.add("地表矿").color(getThemeColor()).center().fillX().row();
-            c.image().color(getThemeColor()).fillX().row();
+            c.add("地表矿").color(ARCVars.getThemeColor()).center().fillX().row();
+            c.image().color(ARCVars.getThemeColor()).fillX().row();
             c.table(list -> {
                 int i = 0;
                 for(Block block : content.blocks().select(b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null)){
@@ -68,8 +69,8 @@ public class MapInfoTable extends BaseToolsTable{
                 }
             }).row();
 
-            c.add("墙矿").color(getThemeColor()).center().fillX().row();
-            c.image().color(getThemeColor()).fillX().row();
+            c.add("墙矿").color(ARCVars.getThemeColor()).center().fillX().row();
+            c.image().color(ARCVars.getThemeColor()).fillX().row();
             c.table(list -> {
                 int i = 0;
                 for(Block block : content.blocks().select(b -> ((b instanceof Floor f && f.wallOre) || b instanceof StaticWall) && b.itemDrop != null)){
@@ -79,8 +80,8 @@ public class MapInfoTable extends BaseToolsTable{
                 }
             }).row();
 
-            c.add("液体").color(getThemeColor()).center().fillX().row();
-            c.image().color(getThemeColor()).fillX().row();
+            c.add("液体").color(ARCVars.getThemeColor()).center().fillX().row();
+            c.image().color(ARCVars.getThemeColor()).fillX().row();
             c.table(list -> {
                 int i = 0;
                 for(Block block : content.blocks().select(b -> ((b instanceof Floor f && f.liquidDrop != null)))){
@@ -101,8 +102,8 @@ public class MapInfoTable extends BaseToolsTable{
         dialog.cont.row();
 
         dialog.cont.pane(c -> {
-            c.add("颜色").color(getThemeColor()).center().fillX().row();
-            c.image().color(getThemeColor()).fillX().row();
+            c.add("颜色").color(ARCVars.getThemeColor()).center().fillX().row();
+            c.image().color(ARCVars.getThemeColor()).fillX().row();
             c.table(ct->{
                 for(var colorEntry : Colors.getColors()){
                     Color value = colorEntry.value;
@@ -115,8 +116,8 @@ public class MapInfoTable extends BaseToolsTable{
                     if(uiRowIndex%15==0) ct.row();
                 }
             }).row();
-            c.add("物品").color(getThemeColor()).center().fillX().row();
-            c.image().color(getThemeColor()).fillX().row();
+            c.add("物品").color(ARCVars.getThemeColor()).center().fillX().row();
+            c.image().color(ARCVars.getThemeColor()).fillX().row();
             c.table(ct->{
                 uiRowIndex = 0;
                 stringIcons.copy().each((name,iconc)->{
@@ -128,8 +129,8 @@ public class MapInfoTable extends BaseToolsTable{
                     if(uiRowIndex%15==0) ct.row();
                 });
             }).row();
-            c.add("图标").color(getThemeColor()).center().fillX().row();
-            c.image().color(getThemeColor()).fillX().row();
+            c.add("图标").color(ARCVars.getThemeColor()).center().fillX().row();
+            c.image().color(ARCVars.getThemeColor()).fillX().row();
             c.table(ct->{
                 uiRowIndex = 0;
                 for(int i=0;i<Iconc.all.length();i++){

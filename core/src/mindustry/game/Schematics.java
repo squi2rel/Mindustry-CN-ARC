@@ -15,6 +15,7 @@ import arc.util.io.Streams.*;
 import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -96,7 +97,7 @@ public class Schematics implements Loadable{
         all.sort();
 
         if(shadowBuffer == null){
-            Core.app.post(() -> shadowBuffer = new FrameBuffer(getMaxSchematicSize() + padding + 8, getMaxSchematicSize() + padding + 8));
+            Core.app.post(() -> shadowBuffer = new FrameBuffer(ARCVars.getMaxSchematicSize() + padding + 8, ARCVars.getMaxSchematicSize() + padding + 8));
         }
     }
 
@@ -365,7 +366,7 @@ public class Schematics implements Loadable{
     /** Creates a schematic from a world selection. */
     public Schematic create(int x, int y, int x2, int y2){
         Team team = headless ? null : Vars.player.team();
-        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, getMaxSchematicSize());
+        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, ARCVars.getMaxSchematicSize());
         x = result.x;
         y = result.y;
         x2 = result.x2;

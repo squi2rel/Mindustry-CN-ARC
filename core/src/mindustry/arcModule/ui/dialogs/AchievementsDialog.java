@@ -1,23 +1,12 @@
 package mindustry.arcModule.ui.dialogs;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
-import arc.scene.style.*;
-import arc.scene.ui.TextButton.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
-import arc.util.serialization.*;
-import mindustry.*;
-import mindustry.core.*;
-import mindustry.ctype.*;
-import mindustry.game.EventType.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.service.Achievement;
@@ -25,11 +14,6 @@ import mindustry.service.SStat;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.BaseDialog;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
-
-import static arc.Core.bundle;
 import static mindustry.Vars.*;
 
 public class AchievementsDialog extends BaseDialog {
@@ -58,8 +42,8 @@ public class AchievementsDialog extends BaseDialog {
         SStatTable.clear();
         browserTable.clear();
 
-        SStatTable.add("统计").color(getThemeColor()).pad(cols / 2).center().row();
-        SStatTable.image().color(getThemeColor()).fillX().row();
+        SStatTable.add("统计").color(ARCVars.getThemeColor()).pad(cols / 2).center().row();
+        SStatTable.image().color(ARCVars.getThemeColor()).fillX().row();
         SStatTable.table(t -> {
             for (SStat stat : SStat.values()) {
                 String name = Core.bundle.get("sstat." + stat.name() + ".name");
@@ -71,8 +55,8 @@ public class AchievementsDialog extends BaseDialog {
         });
 
         browserTable.row();
-        browserTable.add("成就").color(getThemeColor()).pad(cols / 2).center().row();
-        browserTable.image().color(getThemeColor()).fillX().row();
+        browserTable.add("成就").color(ARCVars.getThemeColor()).pad(cols / 2).center().row();
+        browserTable.image().color(ARCVars.getThemeColor()).fillX().row();
         browserTable.table(t -> {
             int i = 0;
             float s = 64f;

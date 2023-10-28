@@ -17,7 +17,7 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.arcModule.District;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.DrawUtilities;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -1455,7 +1455,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build.block.commandable && commandMode){
             //TODO handled in tap.
             consumed = true;
-        }else if(build.block.configurable && arcInfoControl(build.team)) { //check if tapped block is configurable
+        }else if(build.block.configurable && ARCVars.arcInfoControl(build.team)) { //check if tapped block is configurable
             consumed = true;
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles

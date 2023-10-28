@@ -11,6 +11,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -378,7 +379,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public void drawTop(){
         if(mode == schematicSelect){
-            drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, getMaxSchematicSize());
+            drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, ARCVars.getMaxSchematicSize());
         }else if(mode == rebuildSelect){
             drawRebuildSelection(lineStartX, lineStartY, lastLineX, lastLineY);
         }

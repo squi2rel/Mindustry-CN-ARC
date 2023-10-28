@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,7 +18,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.arcModule.RFuncs.colorizeContent;
 
@@ -62,9 +62,9 @@ public class DatabaseDialog extends BaseDialog{
 
             if(array.size == 0) continue;
 
-            all.add("@content." + type.name() + ".name").growX().left().color(getThemeColor());
+            all.add("@content." + type.name() + ".name").growX().left().color(ARCVars.getThemeColor());
             all.row();
-            all.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(getThemeColor());
+            all.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(ARCVars.getThemeColor());
             all.row();
             all.table(list -> {
                 list.left();

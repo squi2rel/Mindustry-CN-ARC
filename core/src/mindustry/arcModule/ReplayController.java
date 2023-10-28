@@ -68,7 +68,7 @@ public class ReplayController {
                     } catch (Exception e) {
                         reads = null;
                         net.disconnect();
-                        replaying = false;
+                        ARCVars.replaying = false;
                         Core.app.post(() -> logic.reset());
                     }
                 }
@@ -80,7 +80,7 @@ public class ReplayController {
         g.addChild(controller);
         g.setFillParent(true);
         g.touchable = Touchable.childrenOnly;
-        g.visible(() -> replaying);
+        g.visible(() -> ARCVars.replaying);
         controller.setFillParent(true);
         Events.on(EventType.ClientLoadEvent.class, e -> {
             Core.scene.add(g);
@@ -123,7 +123,7 @@ public class ReplayController {
             synchronized (this) {
                 if (state.getState() == GameState.State.menu && !netClient.isConnecting()) {
                     reads = null;
-                    replaying = false;
+                    ARCVars.replaying = false;
                     stopPlay();
                 }
             }
@@ -252,7 +252,7 @@ public class ReplayController {
         r.skip(12);
         r.str();
         r.str();
-        replaying = true;
+        ARCVars.replaying = true;
         reads = r;
         logic.reset();
         net.reset();
@@ -281,7 +281,7 @@ public class ReplayController {
 
     public void stopPlay() {
         reads = null;
-        replaying = false;
+        ARCVars.replaying = false;
     }
 
 

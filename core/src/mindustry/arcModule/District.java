@@ -15,7 +15,6 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Time;
 import arc.util.Tmp;
-import mindustry.*;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.content.StatusEffects;
 import mindustry.core.World;
@@ -61,8 +60,8 @@ public class District {
         disSet.cont.table(t -> {
             t.table(tt -> tt.add("区域规划器-用于单机|服务器在地图上设置、管理和交流某个区域的用途"));
             t.row();
-            t.add("坐标设置").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-            t.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+            t.add("坐标设置").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+            t.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
             t.labelWrap("自动填入上个划定的选择区（即复制蓝图的区域）").growX().center().row();
             t.table(tt -> {
                 tt.add("A点： ");
@@ -107,8 +106,8 @@ public class District {
 
             });
             t.row();
-            t.add("持续时间").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-            t.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+            t.add("持续时间").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+            t.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
             t.table(tt -> {
                 TextField sField = tt.field("" + 30, text -> {
                     voidDistrict.duration = Float.parseFloat(text);
@@ -125,8 +124,8 @@ public class District {
             });
 
             t.row();
-            t.add("规划项目").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-            t.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+            t.add("规划项目").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+            t.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
             t.table(tt -> {
                 //tt.add("图标：");
                 //tt.button(UnitTypes.gamma.emoji(),()->showNewIconTag(voidDistrict));
@@ -136,8 +135,8 @@ public class District {
                 }).tooltip("规划区的标签条").maxTextLength(10).width(300f);
             });
             t.row();
-            t.add("规划区设置").color(getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
-            t.image().color(getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
+            t.add("规划区设置").color(ARCVars.getThemeColor()).colspan(4).pad(10).padTop(15).padBottom(4).row();
+            t.image().color(ARCVars.getThemeColor()).fillX().height(3).colspan(4).padTop(0).padBottom(10).row();
             t.button("发布规划区!", () -> {
                 if (!Core.settings.getBool("cheating_mode") && (voidDistrict.districtA.x - voidDistrict.districtB.x > 100f || voidDistrict.districtA.y - voidDistrict.districtB.y > 100f)) {
                     ui.arcInfo("请勿发布无意义巨大规划区");
@@ -198,7 +197,7 @@ public class District {
         resolveDistrict.districtB = new Vec2(pos);
 
         districtList.add(new advDistrict(resolveDistrict));
-        Vars.districtList = districtList;
+        ARCVars.districtList = districtList;
         ui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.district, text, resolveDistrict.center()));
         return true;
     }

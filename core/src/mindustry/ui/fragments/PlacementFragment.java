@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.dialogs.BlockSelectDialog;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -495,7 +496,7 @@ public class PlacementFragment{
                 if (Core.settings.getBool("arcCommandTable")){
                     commandTable.touchable = Touchable.enabled;
                     commandTable.add("[accent]指挥模式").fill().center().labelAlign(Align.center).row();
-                    commandTable.image().color(getThemeColor()).growX().pad(20f).padTop(0f).padBottom(4f).row();
+                    commandTable.image().color(ARCVars.getThemeColor()).growX().pad(20f).padTop(0f).padBottom(4f).row();
                     commandTable.table(u -> {
                         u.left();
                         int[] curCount = {0};
@@ -601,7 +602,7 @@ public class PlacementFragment{
                                     }).fillX().padTop(4f).left();
                                 }
                             } else {
-                                u.add("[未选择单位]").color(getThemeColor()).growX().center().labelAlign(Align.center).pad(6);
+                                u.add("[未选择单位]").color(ARCVars.getThemeColor()).growX().center().labelAlign(Align.center).pad(6);
                             }
                             if (mobile) {
                                 u.row();
@@ -731,7 +732,7 @@ public class PlacementFragment{
                                         }).fillX().padTop(4f).left();
                                     }
                                 }else{
-                                    u.add("[未选择单位]").color(getThemeColor()).growX().center().labelAlign(Align.center).pad(6);
+                                    u.add("[未选择单位]").color(ARCVars.getThemeColor()).growX().center().labelAlign(Align.center).pad(6);
                                 }
                             };
 

@@ -16,6 +16,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -1426,7 +1427,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         table.row();
 
         //only display everything else if the team is the same LC modified
-        if(arcInfoControl(team) || Hack.noDisplayLimit){
+        if(ARCVars.arcInfoControl(team) || Hack.noDisplayLimit){
             table.table(bars -> {
                 bars.defaults().growX().height(18f).pad(4);
 

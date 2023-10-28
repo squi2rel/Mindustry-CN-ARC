@@ -12,7 +12,7 @@ import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.arcModule.ui.dialogs.MessageDialog;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.dialogs.USIDDialog;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
@@ -118,7 +118,7 @@ public class NetClient implements ApplicationListener{
                 return;
             }
 
-            replayController.createReplay(packet.addressTCP);
+            ARCVars.replayController.createReplay(packet.addressTCP);
             net.send(c, true);
 
             if(!Core.settings.getBool("arcAnonymity")){
@@ -126,9 +126,9 @@ public class NetClient implements ApplicationListener{
                 Timer timer=new Timer();
                 timer.schedule(new TimerTask(){
                     public void run(){
-                        Call.serverPacketReliable("ARC",arcVersion);
+                        Call.serverPacketReliable("ARC", ARCVars.arcVersion);
                         Call.serverPacketReliable("ARC-build",Version.arcBuild + "");
-                        Call.serverPacketReliable("CheatOverride",arcCheatServer + "");
+                        Call.serverPacketReliable("CheatOverride", ARCVars.arcCheatServer + "");
                     }},5000);
             }
         });
@@ -136,7 +136,7 @@ public class NetClient implements ApplicationListener{
         net.handleClient(Disconnect.class, packet -> {
             if(quietReset) return;
 
-            replayController.stop();
+            ARCVars.replayController.stop();
             connecting = false;
             logic.reset();
             platform.updateRPC();

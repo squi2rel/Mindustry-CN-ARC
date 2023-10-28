@@ -17,6 +17,7 @@ import mindustry.ai.*;
 import mindustry.ai.Pathfinder.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.NumberFormat;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -1292,7 +1293,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             unitTrans = 0f;
             DrawMinHealthBar = false;
         }
-        if (arcInfoControl(unit.team())) {
+        if (ARCVars.arcInfoControl(unit.team())) {
             //玩家操控的单位具有炫酷特效
             if (unit.controller() instanceof Player) {
                 unitTrans = 100f;
@@ -1320,7 +1321,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                 Lines.dashCircle(unit.x, unit.y, maxRange);
             }
 
-            if (!control.input.commandMode && Core.settings.getBool("alwaysShowUnitRTSAi") && unit.isCommandable() && unit.command().command != null && unit.command().command.name.equals("move") && arcInfoControl()) {
+            if (!control.input.commandMode && Core.settings.getBool("alwaysShowUnitRTSAi") && unit.isCommandable() && unit.command().command != null && unit.command().command.name.equals("move") && ARCVars.arcInfoControl()) {
                 Draw.z(Layer.effect);
                 CommandAI ai = unit.command();
                 //draw target line

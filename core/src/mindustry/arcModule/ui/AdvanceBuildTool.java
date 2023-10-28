@@ -4,7 +4,6 @@ import arc.Core;
 import arc.Events;
 import arc.func.Cons;
 import arc.func.Floatf;
-import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.geom.Rect;
@@ -12,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Tmp;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ElementUtils;
 import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.dialogs.BlockSelectDialog;
@@ -24,10 +24,8 @@ import mindustry.game.Team;
 import mindustry.game.Teams;
 import mindustry.gen.Building;
 import mindustry.gen.Call;
-import mindustry.gen.Iconc;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
@@ -40,9 +38,6 @@ import mindustry.world.blocks.storage.CoreBlock;
 import static mindustry.Vars.*;
 import static mindustry.arcModule.DrawUtilities.arcDrawText;
 import static mindustry.arcModule.RFuncs.*;
-import static mindustry.gen.Tex.*;
-import static mindustry.ui.Styles.flatDown;
-import static mindustry.ui.Styles.flatOver;
 
 public class AdvanceBuildTool extends ElementUtils.ToolTable {
     BuildRange placement = BuildRange.player;
@@ -164,14 +159,14 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
         BaseDialog dialog = new BaseDialog("方块替换器");
         dialog.cont.table(t -> {
             t.table(tt -> tt.label(() -> "当前选择：" + replaceBlockName())).row();
-            t.image().color(getThemeColor()).fillX().row();
+            t.image().color(ARCVars.getThemeColor()).fillX().row();
             t.table(tt -> {
                 replaceBlockGroup(dialog, tt, Blocks.conveyor, Blocks.titaniumConveyor);
                 replaceBlockGroup(dialog, tt, Blocks.conveyor, Blocks.duct);
                 replaceBlockGroup(dialog, tt, Blocks.conduit, Blocks.pulseConduit);
                 replaceBlockGroup(dialog, tt, Blocks.conduit, Blocks.reinforcedConduit);
             }).padTop(5f).row();
-            t.image().color(getThemeColor()).padTop(5f).fillX().row();
+            t.image().color(ARCVars.getThemeColor()).padTop(5f).fillX().row();
             t.table(tt -> {
                 tt.button("源方块", () -> new BlockSelectDialog(block -> block.replaceable, block -> original = block, block -> original == block).show()).width(100f).height(30f).row();
                 tt.button("新方块", () -> new BlockSelectDialog(block -> original.canReplace(block), block -> newBlock = block, block -> newBlock == block).show()).width(100f).height(30f).row();
