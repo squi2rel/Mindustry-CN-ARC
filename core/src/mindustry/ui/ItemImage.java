@@ -1,5 +1,6 @@
 package mindustry.ui;
 
+import arc.func.Intp;
 import arc.func.Prov;
 import arc.graphics.g2d.*;
 import arc.scene.Element;
@@ -12,7 +13,7 @@ import static mindustry.Vars.*;
 
 public class ItemImage extends Stack{
 
-    public ItemImage(TextureRegion region, int reqAmount, int curAmount){
+    public ItemImage(TextureRegion region, int reqAmount, Intp curAmount){
 
         add(new Table(o -> {
             o.left();
@@ -21,12 +22,12 @@ public class ItemImage extends Stack{
 
         add(new Table(t -> {
             t.left().bottom();
-            t.add(reqAmount + "").get().setFontScale(1f);
+            t.add(String.valueOf(reqAmount)).get().setFontScale(1f);
             t.pack();
         }));
         add(new Table(t -> {
             t.left().top();
-            t.add(curAmount + "").get().setFontScale(0.6f);
+            t.label(() -> String.valueOf(curAmount.get())).get().setFontScale(0.6f);
             t.pack();
         }));
     }

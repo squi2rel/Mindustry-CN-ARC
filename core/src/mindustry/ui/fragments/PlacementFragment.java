@@ -439,20 +439,21 @@ public class PlacementFragment{
                             hovered.display(topTable);
                             if(hovered2 != hovered && hovered2 != null){
                                 topTable.row();
-                                topTable.row();
                                 hovered2.display(topTable);
                             }}
 
                         //只要可行便绘制地板|建筑，移除了其他重复绘制
-                        if(hoveredTile!=null){
+                        if (hoveredTile != null) {
                             topTable.row();
                             topTable.row();
                             topTable.table(t -> {
                                 t.left();
                                 t.add(new Image(hoverTile.floor().uiIcon)).size(20f).left();
-                                t.add(" "+hoverTile.floor().localizedName).left();
-                                if(hoverTile.block()!=Blocks.air) t.add(" | " + hoverTile.block().emoji()   + (hoverTile.build!=null?"[#" + hoverTile.build.team.color + "]":"") + hoverTile.block().localizedName).left();
-                                if(hoverTile.overlay()!=Blocks.air) t.add(" | " + hoverTile.overlay().emoji() + hoverTile.overlay().localizedName).left();
+                                t.add(" " + hoverTile.floor().localizedName).left();
+                                if (hoverTile.block() != Blocks.air)
+                                    t.add(" | " + hoverTile.block().emoji() + (hoverTile.build != null ? "[#" + hoverTile.build.team.color + "]" : "") + hoverTile.block().localizedName).left();
+                                if (hoverTile.overlay() != Blocks.air)
+                                    t.add(" | " + hoverTile.overlay().emoji() + hoverTile.overlay().localizedName).left();
                             }).growX().left();
                         }
 
