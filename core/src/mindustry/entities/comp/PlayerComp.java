@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.Seq;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -26,6 +27,8 @@ import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+
+import java.util.Comparator;
 
 import static mindustry.Vars.*;
 
@@ -70,7 +73,20 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     /** @return largest/closest core, with largest cores getting priority */
     @Nullable
     public CoreBuild bestCore(){
-        return team.cores().min(Structs.comps(Structs.comparingInt(c -> -c.block.size), Structs.comparingFloat(c -> c.dst(x, y))));
+        //return team.cores().min(Structs.comps(Structs.comparingInt(c -> -c.block.size), Structs.comparingFloat(c -> c.dst(x, y))));
+        Seq<Comparator<CoreBuild>> comps = new Seq<>();
+        if (Hack.spawnOnBigger) {
+            comps.add(Structs.comparingInt(c -> -c.block.size));
+        }
+        if (Hack.spawnOnCursor) {
+            comps.add(Structs.comparingFloat(c -> c.dst(Core.input.mouseWorld())));
+        } else {
+            comps.add(Structs.comparingFloat(c -> c.dst(x, y)));
+        }
+        if (!Hack.spawnOnBigger) {
+            comps.add(Structs.comparingInt(c -> -c.block.size));
+        }
+        return team.cores().min(Structs.comps(comps.get(0), comps.get(1)));
     }
 
     public TextureRegion icon(){
@@ -158,7 +174,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             if(unit.type.canBoost){
                 unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() || boosting || (unit.isFlying() && !unit.canLand()) ? 1f : 0f, unit.type.riseSpeed);
             }
-        }else if((core = Hack.spawnOnCursor ? Hack.spawnOnBigger ? team.cores().min(Structs.comps(Structs.comparingInt(c -> -c.block.size), Structs.comparingFloat(c -> c.dst(mouseX, mouseY)))) : team.cores().min(Structs.comparingFloat(c -> c.dst(mouseX, mouseY))) : bestCore()) != null){
+        }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
