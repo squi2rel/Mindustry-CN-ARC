@@ -66,7 +66,7 @@ public class Hack {
     public static boolean immediatelyTurn, ignoreTurn, noKB, noHitbox, noSpawnKB, infDrag, immediatelyMove, ignoreShield, voidWalk, speed, ignoreProcessor;
     public static float KBMulti, boundX, boundY, boundW, boundH, speedMulti;
     //交互
-    public static boolean lockTurn, forceControl, holdFill, autoFill, allowBlue, holdFillMode, holdFillMode2, immeRespawn, spawnOnCursor, spawnOnBigger;
+    public static boolean lockTurn, forceControl, holdFill, autoFill, allowBlue, holdFillMode, holdFillMode2, immeRespawn, spawnOnCursor, spawnOnBigger, noDisplayLimit;
     public static int holdFillInterval, holdFillMinItem, autoFillInterval, autoFillMaxCount;
     public static long lastFillTime, lastAutoFillTime;
     public static Item chosenItem = null;
@@ -115,6 +115,7 @@ public class Hack {
         manager.register("交互", "autoFill", new Config("自动装超速", new Element[]{new Label(""), slider("autoFill", 50f, 2000f, 1f, 100f, f -> autoFillInterval = Mathf.ceil(f), 0, f -> "检测间隔 " + autoFillInterval + "ms"), new Label(""), slider("autoFill2", 1f, 20f, 1f, 5f, f -> autoFillMaxCount = Mathf.ceil(f), 2, f -> "每次装 " + autoFillMaxCount + " 个超速")}, changed(e -> autoFill = e, c -> autoFillInterval + "ms")));
         manager.register("交互", "allowBlue", new Config("允许蓝图", null, changed(e -> allowBlue = e)));
         manager.register("交互", "immeRespawn", new Config("立即重生", new Element[]{check("immeRespawn", "准心优先(全局)", false, b -> spawnOnCursor = b), check("immeRespawn2", "大核优先(全局)", true, b -> spawnOnBigger = b)}, changed(e -> immeRespawn = e)));
+        manager.register("交互", "noLimit", new Config("偷看建筑", null, changed(e -> noDisplayLimit = e)));
         initFill();
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
