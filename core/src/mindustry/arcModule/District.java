@@ -200,7 +200,7 @@ public class District {
 
         districtList.add(new advDistrict(resolveDistrict));
         ARCVars.districtList = districtList;
-        arcui.MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.district, text, resolveDistrict.center()));
+        MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.district, text, resolveDistrict.center()));
         return true;
     }
 

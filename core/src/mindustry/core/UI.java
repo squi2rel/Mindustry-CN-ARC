@@ -38,7 +38,6 @@ import mindustry.ui.fragments.*;
 
 import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
-import static mindustry.arcModule.toolpack.arcWaveSpawner.initArcWave;
 import static mindustry.squirrelModule.modules.hack.Hack.sui;
 
 public class UI implements ApplicationListener, Loadable{
@@ -233,6 +232,9 @@ public class UI implements ApplicationListener, Loadable{
 
         Group group = Core.scene.root;
 
+        ARCVars.arcui.init(group);
+        sui.init();
+
         menuGroup.setFillParent(true);
         menuGroup.touchable = Touchable.childrenOnly;
         menuGroup.visible(() -> state.isMenu());
@@ -250,9 +252,6 @@ public class UI implements ApplicationListener, Loadable{
         listfrag.build(hudGroup);
         consolefrag.build(hudGroup);
         loadfrag.build(group);
-
-        ARCVars.arcui.init(group);
-        sui.init();
     }
 
     @Override

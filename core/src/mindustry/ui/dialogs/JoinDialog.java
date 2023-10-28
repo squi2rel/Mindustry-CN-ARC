@@ -631,6 +631,7 @@ public class JoinDialog extends BaseDialog{
 
         //get servers
         Http.get(url)
+        .timeout(5000)
         .error(t -> Log.err("Failed to fetch community servers", t))
         .submit(result -> {
             Jval val = Jval.read(result.getResultAsString());

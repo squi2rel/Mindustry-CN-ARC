@@ -171,6 +171,7 @@ public class MenuFragment{
             textLabel.setText(text);
         });
         Events.on(EventType.ClientLoadEvent.class, event -> Core.app.post(() -> Http.get("https://cn-arc.github.io/labels?t=" + Time.millis())
+                .timeout(5000)
                 .error(e -> {
                     Log.err("获取最新主页标语失败!加载本地标语", e);
                     labels = Core.files.internal("labels").readString("UTF-8").replace("\r", "").replace("\\n", "\n").replace("/n", "\n").split("\n");
@@ -207,18 +208,21 @@ public class MenuFragment{
     }
 
     public static void fetchArcNews() {
-        Http.get("https://cn-arc.github.io/news?t=" + Time.millis(), result -> {
-            try {
-                String s = result.getResultAsString();
-                long last = Long.parseLong(s.substring(0, s.indexOf('\n')));
-                if (arcNewsLastUpdate < last) {
-                    arcNewsLastUpdate = last;
-                    haveNewerNews = true;
-                    if (Core.settings.getBool("autoArcNews", false)) Core.app.post(MenuFragment::showArcNews);
-                }
-            } catch (Exception ignored) {
-            }
-        }, e -> {});
+        Http.get("https://cn-arc.github.io/news?t=" + Time.millis())
+                .timeout(5000)
+                .error(e -> {})
+                .submit(result -> {
+                    try {
+                        String s = result.getResultAsString();
+                        long last = Long.parseLong(s.substring(0, s.indexOf('\n')));
+                        if (arcNewsLastUpdate < last) {
+                            arcNewsLastUpdate = last;
+                            haveNewerNews = true;
+                            if (Core.settings.getBool("autoArcNews", false)) Core.app.post(MenuFragment::showArcNews);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                });
     }
 
     public static void showArcNews() {
