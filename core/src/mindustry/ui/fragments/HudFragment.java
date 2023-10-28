@@ -19,6 +19,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.arcModule.Marker;
 import mindustry.arcModule.ui.*;
 import mindustry.arcModule.ui.auxilliary.*;
+import mindustry.arcModule.ui.quickTool.QuickToolTable;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
@@ -52,8 +53,7 @@ public class HudFragment{
     public OtherCoreItemDisplay otherCoreItemDisplay = new OtherCoreItemDisplay();
     private AuxilliaryTable auxilliaryTable;
     private AdvanceToolTable advanceToolTable = new AdvanceToolTable();
-    public HudSettingsTable hudSettingsTable = new HudSettingsTable();
-    public AdvanceBuildTool advanceBuildTool = new AdvanceBuildTool();
+    public QuickToolTable quickToolTable = new QuickToolTable();
 
     private Boolean arcShowObjectives = false, hideObjectives = true;
 
@@ -514,12 +514,8 @@ public class HudFragment{
         });
 
         parent.fill(t -> {
-            t.right().add(hudSettingsTable);
-            t.visible(() -> Core.settings.getBool("showFloatingSettings") && shown);
-        });
-        parent.fill(t -> {
-            t.right().add(advanceBuildTool).padTop(100f);
-            t.visible(() -> Core.settings.getBool("showAdvanceBuildTool") && shown);
+            t.right().add(quickToolTable);
+            t.visible(() -> Core.settings.getBool("showQuickToolTable") && shown);
         });
 
         //spawner warning

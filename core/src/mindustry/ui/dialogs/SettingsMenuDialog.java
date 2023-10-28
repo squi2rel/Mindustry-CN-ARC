@@ -543,8 +543,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 }
             });
             arc.sliderPref("arcCoreItemsCol", 5, 4, 15, 1, i -> i + "列");
-            arc.checkPref("showFloatingSettings", false);
-            arc.checkPref("showAdvanceBuildTool", false);
+            arc.checkPref("showQuickToolTable", settings.getBool("showFloatingSettings"));
             arc.sliderPref("arcDetailInfo", 1, 0, 1, 1, s -> {
                 if (s == 0) {
                     return "详细模式";

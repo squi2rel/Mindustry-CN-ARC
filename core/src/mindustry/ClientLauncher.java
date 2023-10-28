@@ -10,6 +10,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.TimeControl;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -26,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
+import static mindustry.arcModule.ARCVars.*;
 
 public abstract class ClientLauncher extends ApplicationCore implements Platform{
     private static final int loadingFPS = 20;
@@ -145,6 +147,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadSystemCursors();
 
         assets.load(new Vars());
+        assets.load(new ARCVars());
         loadSettings();
         Fonts.loadDefaultFont();
 

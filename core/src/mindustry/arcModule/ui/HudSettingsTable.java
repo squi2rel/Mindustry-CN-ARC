@@ -1,5 +1,6 @@
 package mindustry.arcModule.ui;
 
+import arc.Events;
 import arc.struct.Seq;
 import arc.Core;
 import arc.func.Boolc;
@@ -8,207 +9,169 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.scene.event.*;
 
-import arc.*;
-import arc.graphics.*;
+import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ElementUtils;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
 import mindustry.gen.*;
-import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static mindustry.Vars.*;
 import static arc.Core.bundle;
 import static arc.Core.settings;
-import static mindustry.gen.Tex.*;
-import static mindustry.ui.Styles.flatDown;
-import static mindustry.ui.Styles.flatOver;
 
-public class HudSettingsTable extends Table {
+public class HudSettingsTable extends ElementUtils.ToolTable {
     protected Seq<Setting> list = new Seq<>();
-    private boolean expandList = false;
     private int unitTransparency = Core.settings.getInt("unitTransparency");
-    public Boolean unitHide = false;
-
-    private TextButton.TextButtonStyle textStyle, NCtextStyle;
-
     public HudSettingsTable() {
-        textStyle = new TextButton.TextButtonStyle() {{
-            down = flatOver;
-            up = pane;
-            over = flatDownBase;
-            font = Fonts.def;
-            fontColor = Color.white;
-            disabledFontColor = Color.gray;
-            checked = flatDown;
-        }};
-
-        NCtextStyle = new TextButton.TextButtonStyle() {{
-            down = flatOver;
-            up = pane;
-            over = flatDownBase;
-            font = Fonts.def;
-            fontColor = Color.white;
-            disabledFontColor = Color.gray;
-        }};
+        icon = String.valueOf(Iconc.settings);
+        rebuild();
         Events.on(EventType.WorldLoadEvent.class, e -> {
             Core.settings.put("removeLogicLock", false);
         });
-        rebuild();
-        right();
     }
 
-    void rebuild() {
-
-        clearChildren();
-
-        if (expandList) {
-
-            list.clear();
-
-            Table sets = new Table();
-            sliderPref("turretShowRange", 0, 0, 3, 1, s -> {
-                if (s == 0) {
-                    return "关闭";
-                } else if (s == 1) {
-                    return "仅对地";
-                } else if (s == 2) {
-                    return "仅对空";
-                } else if (s == 3) {
-                    return "全部";
-                } else {
-                    return s + "";
-                }
-            });
-            sliderPref("chatValidType", 0, 0, 3, 1, s -> {
-                if (s == 0) {
-                    return "原版模式";
-                } else if (s == 1) {
-                    return "纯净聊天";
-                } else if (s == 2) {
-                    return "服务器记录";
-                } else if (s == 3) {
-                    return "全部记录";
-                } else {
-                    return s + "";
-                }
-            });
-            checkPref("unitHealthBar", false);
-            sliderPref("unitTransparency", 100, 0, 100, 5, i -> i > 0 ? i + "%" : "关闭");
-            sliderPref("minhealth_unitshown", 0, 0, 2500, 50, i -> i + "[red]HP");
-            sliderPref("minhealth_unithealthbarshown", 0, 0, 2500, 100, i -> i + "[red]HP");
-            sliderPref("unitweapon_range", 0, 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
-
-            checkPref("alwaysShowUnitRTSAi", false);
-            checkPref("unitLogicMoveLine", true);
-            checkPref("unitWeaponTargetLine", true);
-
-            checkPref("blockWeaponTargetLine", true);
-            checkPref("unitbuildplan", false);
-
-
-            for (Setting setting : list) {
-                setting.add(sets);
+    @Override
+    protected void buildTable(){
+        list.clear();
+        Table sets = new Table();
+        sliderPref("turretShowRange", 0, 0, 3, 1, s -> {
+            if (s == 0) {
+                return "关闭";
+            } else if (s == 1) {
+                return "仅对地";
+            } else if (s == 2) {
+                return "仅对空";
+            } else if (s == 3) {
+                return "全部";
+            } else {
+                return s + "";
             }
+        });
+        sliderPref("chatValidType", 0, 0, 3, 1, s -> {
+            if (s == 0) {
+                return "原版模式";
+            } else if (s == 1) {
+                return "纯净聊天";
+            } else if (s == 2) {
+                return "服务器记录";
+            } else if (s == 3) {
+                return "全部记录";
+            } else {
+                return s + "";
+            }
+        });
+        checkPref("unitHealthBar", false);
+        sliderPref("unitTransparency", 100, 0, 100, 5, i -> i > 0 ? i + "%" : "关闭");
+        sliderPref("minhealth_unitshown", 0, 0, 2500, 50, i -> i + "[red]HP");
+        sliderPref("minhealth_unithealthbarshown", 0, 0, 2500, 100, i -> i + "[red]HP");
+        sliderPref("unitweapon_range", 0, 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
 
-            ScrollPane pane = pane(sp -> {
-                sp.background(Styles.black6);
-                sp.table(t -> {
-                    t.button("[cyan]S", NCtextStyle, () -> Call.sendChatMessage("/sync")).size(30).tooltip("同步一波");
-                    t.button("[cyan]观", NCtextStyle, () -> Call.sendChatMessage("/ob")).size(30).tooltip("观察者模式");
-                    t.button("[cyan]技", NCtextStyle, () -> Call.sendChatMessage("/skill")).size(30).tooltip("技能！");
-                    t.button("[cyan]版", NCtextStyle, () -> Call.sendChatMessage("/broad")).size(30).tooltip("服务器信息版");
-                    t.button("[red]版", textStyle, () -> {
-                        settings.put("ShowInfoPopup", !Core.settings.getBool("ShowInfoPopup"));
-                    }).checked(a -> Core.settings.getBool("ShowInfoPopup")).size(30, 30).tooltip("关闭所有信息版");
-                    t.button("[white]法", NCtextStyle, () -> {
-                        ui.showConfirm("受不了，直接投降？", () -> Call.sendChatMessage("/vote gameover"));
-                    }).size(30, 30).tooltip("法国军礼");
-                    if (settings.getInt("arcQuickMsg", 0) == 0)
-                        t.button("\uE87C", NCtextStyle, this::arcQuickMsgTable).size(30, 30).tooltip("快捷消息");
-                }).left();
-                sp.row();
-                if (settings.getInt("arcQuickMsg") > 0) {
-                    sp.table(t -> {
-                        for (int i = 0; i < settings.getInt("arcQuickMsg"); i++) {
-                            if (i % settings.getInt("arcQuickMsgKey", 8) == 0) t.row();
-                            int finalI = i;
-                            t.button(settings.getString(getArcQuickMsgShortName(i)), NCtextStyle, () ->{
-                                if (settings.getBool(getArcQuickMsgJs(finalI))) mods.getScripts().runConsole(settings.getString(getArcQuickMsgName(finalI)));
-                                else Call.sendChatMessage(settings.getString(getArcQuickMsgName(finalI)));
-                            }
-                            ).size(30);
-                        }
-                        t.button("\uE87C", NCtextStyle, this::arcQuickMsgTable).size(30, 30).tooltip("快捷消息");
-                    }).left();
-                    sp.row();
-                }
-                sp.table(t -> {
-                    t.button("[cyan]块", textStyle, () -> {
-                        int blockRenderLevel = Core.settings.getInt("blockRenderLevel");
-                        Core.settings.put("blockRenderLevel", (blockRenderLevel + 1) % 3);
-                    }).size(30, 30).tooltip("建筑显示");
-                    t.button("[cyan]兵", textStyle, this::forceHideUnit).checked(a -> !unitHide).size(30, 30).tooltip("兵种显示");
-                    t.button("[cyan]箱", textStyle, () -> {
-                        Core.settings.put("unithitbox", !Core.settings.getBool("unithitbox"));
-                    }).checked(a -> Core.settings.getBool("unithitbox")).size(30, 30).tooltip("碰撞箱显示");
-                    t.button("[cyan]弹", textStyle, () -> {
-                        Core.settings.put("bulletShow", !Core.settings.getBool("bulletShow"));
-                    }).checked(a -> Core.settings.getBool("bulletShow")).size(30, 30).tooltip("子弹显示");
-                    t.button("[violet]锁", textStyle, () -> {
-                        Core.settings.put("removeLogicLock", !Core.settings.getBool("removeLogicLock"));
-                        control.input.logicCutscene = false;
-                        ui.arcInfo("已移除逻辑视角锁定");
-                    }).checked(a -> Core.settings.getBool("removeLogicLock")).size(30, 30).tooltip("逻辑锁定");
-                    t.button("[cyan]雾", textStyle, () -> {
-                        if (!state.rules.pvp || player.team().id == 255) renderer.fogEnabled = !renderer.fogEnabled;
-                    }).checked(a -> renderer.fogEnabled).size(30, 30).tooltip("战争迷雾").visible(() -> !state.rules.pvp || player.team().id == 255);
-                }).left();
-                sp.row();
-                sp.table(t -> {
-                    t.button("[red]灯", textStyle, () -> {
-                        settings.put("drawlight", !settings.getBool("drawlight"));
-                    }).checked(a -> state.rules.lighting).size(30, 30).name("灯光").tooltip("[cyan]开灯啊！");
-                    t.button("[acid]效", textStyle, () -> {
-                        Core.settings.put("effects", !Core.settings.getBool("effects"));
-                    }).checked(a -> Core.settings.getBool("effects")).size(30, 30).tooltip("特效显示");
-                    t.button("[acid]光", textStyle, () -> {
-                        Core.settings.put("bloom", !Core.settings.getBool("bloom"));
-                    }).checked(a -> Core.settings.getBool("bloom")).size(30, 30).tooltip("光效显示");
-                    t.button("[acid]墙", textStyle, () -> {
-                        Core.settings.put("forceEnableDarkness", !Core.settings.getBool("forceEnableDarkness"));
-                    }).checked(a -> Core.settings.getBool("forceEnableDarkness")).size(30, 30).tooltip("墙体阴影显示");
-                    t.button("[acid]天", textStyle, () -> {
-                        Core.settings.put("showweather", !Core.settings.getBool("showweather"));
-                    }).checked(a -> Core.settings.getBool("showweather")).size(30, 30).tooltip("天气显示");
-                    if (settings.getBool("developMode"))
-                        t.button(StatusEffects.burning.emoji(), textStyle, () -> {
-                            state.rules.fire = !state.rules.fire;
-                        }).checked(a -> state.rules.fire).size(30, 30).tooltip("太燃了");
-                    t.button("[cyan]扫", textStyle, () -> {
-                        control.input.arcScanMode = !control.input.arcScanMode;
-                    }).checked(a -> control.input.arcScanMode).size(30, 30).tooltip("扫描模式");
+        checkPref("alwaysShowUnitRTSAi", false);
+        checkPref("unitLogicMoveLine", true);
+        checkPref("unitWeaponTargetLine", true);
 
-                }).left();
-                sp.row();
-                sp.add(sets);
-                return;
-            }).maxSize(800f, 300f).get();
+        checkPref("blockWeaponTargetLine", true);
+        checkPref("unitbuildplan", false);
 
-            pane.update(() -> {
-                Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                if (e != null && e.isDescendantOf(pane)) {
-                    pane.requestScroll();
-                } else if (pane.hasScroll()) {
-                    Core.scene.setScrollFocus(null);
-                }
-            });
+
+        for (Setting setting : list) {
+            setting.add(sets);
         }
 
-        button("[cyan]控", textStyle, () -> {
-            expandList = !expandList;
-            rebuild();
-        }).width(32f).fillY();
+        ScrollPane pane = pane(sp -> {
+            sp.background(Styles.black6);
+            sp.table(t -> {
+                t.button("[cyan]S", NCtextStyle, () -> Call.sendChatMessage("/sync")).size(30).tooltip("同步一波");
+                t.button("[cyan]观", NCtextStyle, () -> Call.sendChatMessage("/ob")).size(30).tooltip("观察者模式");
+                t.button("[cyan]技", NCtextStyle, () -> Call.sendChatMessage("/skill")).size(30).tooltip("技能！");
+                t.button("[cyan]版", NCtextStyle, () -> Call.sendChatMessage("/broad")).size(30).tooltip("服务器信息版");
+                t.button("[red]版", textStyle, () -> {
+                    settings.put("ShowInfoPopup", !Core.settings.getBool("ShowInfoPopup"));
+                }).checked(a -> Core.settings.getBool("ShowInfoPopup")).size(30, 30).tooltip("关闭所有信息版");
+                t.button("[white]法", NCtextStyle, () -> {
+                    ui.showConfirm("受不了，直接投降？", () -> Call.sendChatMessage("/vote gameover"));
+                }).size(30, 30).tooltip("法国军礼");
+                if (settings.getInt("arcQuickMsg", 0) == 0)
+                    t.button("\uE87C", NCtextStyle, this::arcQuickMsgTable).size(30, 30).tooltip("快捷消息");
+            }).left();
+            sp.row();
+            if (settings.getInt("arcQuickMsg") > 0) {
+                sp.table(t -> {
+                    for (int i = 0; i < settings.getInt("arcQuickMsg"); i++) {
+                        if (i % settings.getInt("arcQuickMsgKey", 8) == 0) t.row();
+                        int finalI = i;
+                        t.button(settings.getString(getArcQuickMsgShortName(i)), NCtextStyle, () ->{
+                                    if (settings.getBool(getArcQuickMsgJs(finalI))) mods.getScripts().runConsole(settings.getString(getArcQuickMsgName(finalI)));
+                                    else Call.sendChatMessage(settings.getString(getArcQuickMsgName(finalI)));
+                                }
+                        ).size(30);
+                    }
+                    t.button("\uE87C", NCtextStyle, this::arcQuickMsgTable).size(30, 30).tooltip("快捷消息");
+                }).left();
+                sp.row();
+            }
+            sp.table(t -> {
+                t.button("[cyan]块", textStyle, () -> {
+                    int blockRenderLevel = Core.settings.getInt("blockRenderLevel");
+                    Core.settings.put("blockRenderLevel", (blockRenderLevel + 1) % 3);
+                }).size(30, 30).tooltip("建筑显示");
+                t.button("[cyan]兵", textStyle, this::forceHideUnit).checked(a -> !ARCVars.unitHide).size(30, 30).tooltip("兵种显示");
+                t.button("[cyan]箱", textStyle, () -> {
+                    Core.settings.put("unithitbox", !Core.settings.getBool("unithitbox"));
+                }).checked(a -> Core.settings.getBool("unithitbox")).size(30, 30).tooltip("碰撞箱显示");
+                t.button("[cyan]弹", textStyle, () -> {
+                    Core.settings.put("bulletShow", !Core.settings.getBool("bulletShow"));
+                }).checked(a -> Core.settings.getBool("bulletShow")).size(30, 30).tooltip("子弹显示");
+                t.button("[violet]锁", textStyle, () -> {
+                    Core.settings.put("removeLogicLock", !Core.settings.getBool("removeLogicLock"));
+                    control.input.logicCutscene = false;
+                    ui.arcInfo("已移除逻辑视角锁定");
+                }).checked(a -> Core.settings.getBool("removeLogicLock")).size(30, 30).tooltip("逻辑锁定");
+                t.button("[cyan]雾", textStyle, () -> {
+                    if (!state.rules.pvp || player.team().id == 255) renderer.fogEnabled = !renderer.fogEnabled;
+                }).checked(a -> renderer.fogEnabled).size(30, 30).tooltip("战争迷雾").visible(() -> !state.rules.pvp || player.team().id == 255);
+            }).left();
+            sp.row();
+            sp.table(t -> {
+                t.button("[red]灯", textStyle, () -> {
+                    settings.put("drawlight", !settings.getBool("drawlight"));
+                }).checked(a -> state.rules.lighting).size(30, 30).name("灯光").tooltip("[cyan]开灯啊！");
+                t.button("[acid]效", textStyle, () -> {
+                    Core.settings.put("effects", !Core.settings.getBool("effects"));
+                }).checked(a -> Core.settings.getBool("effects")).size(30, 30).tooltip("特效显示");
+                t.button("[acid]光", textStyle, () -> {
+                    Core.settings.put("bloom", !Core.settings.getBool("bloom"));
+                }).checked(a -> Core.settings.getBool("bloom")).size(30, 30).tooltip("光效显示");
+                t.button("[acid]墙", textStyle, () -> {
+                    Core.settings.put("forceEnableDarkness", !Core.settings.getBool("forceEnableDarkness"));
+                }).checked(a -> Core.settings.getBool("forceEnableDarkness")).size(30, 30).tooltip("墙体阴影显示");
+                t.button("[acid]天", textStyle, () -> {
+                    Core.settings.put("showweather", !Core.settings.getBool("showweather"));
+                }).checked(a -> Core.settings.getBool("showweather")).size(30, 30).tooltip("天气显示");
+                if (settings.getBool("developMode"))
+                    t.button(StatusEffects.burning.emoji(), textStyle, () -> {
+                        state.rules.fire = !state.rules.fire;
+                    }).checked(a -> state.rules.fire).size(30, 30).tooltip("太燃了");
+                t.button("[cyan]扫", textStyle, () -> {
+                    control.input.arcScanMode = !control.input.arcScanMode;
+                }).checked(a -> control.input.arcScanMode).size(30, 30).tooltip("扫描模式");
+
+            }).left();
+            sp.row();
+            sp.add(sets);
+            return;
+        }).maxSize(800f, 300f).get();
+
+        pane.update(() -> {
+            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+            if (e != null && e.isDescendantOf(pane)) {
+                pane.requestScroll();
+            } else if (pane.hasScroll()) {
+                Core.scene.setScrollFocus(null);
+            }
+        });
     }
 
     private void arcQuickMsgTable() {
@@ -256,9 +219,9 @@ public class HudSettingsTable extends Table {
     }
 
     public void forceHideUnit() {
-        unitTransparency = unitHide ? unitTransparency : Core.settings.getInt("unitTransparency");
-        unitHide = !unitHide;
-        Core.settings.put("unitTransparency", unitHide ? 0 : unitTransparency);
+        unitTransparency = ARCVars.unitHide ? unitTransparency : Core.settings.getInt("unitTransparency");
+        ARCVars.unitHide = !ARCVars.unitHide;
+        Core.settings.put("unitTransparency", ARCVars.unitHide ? 0 : unitTransparency);
     }
 
     private String getArcQuickMsgShortName(int i) {

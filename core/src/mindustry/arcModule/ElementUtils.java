@@ -2,12 +2,19 @@ package mindustry.arcModule;
 
 import arc.Core;
 import arc.func.*;
+import arc.graphics.Color;
 import arc.scene.*;
 import arc.scene.event.Touchable;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
+import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
+
+import static mindustry.gen.Tex.flatDownBase;
+import static mindustry.gen.Tex.pane;
+import static mindustry.ui.Styles.flatDown;
+import static mindustry.ui.Styles.flatOver;
 
 public class ElementUtils {
 
@@ -89,6 +96,43 @@ public class ElementUtils {
 
     public interface StringProInt {
         String get(int i);
+    }
+
+    public static abstract class ToolTable extends Table {
+        public String icon = "";
+        public boolean expand = false;
+
+        public TextButton.TextButtonStyle textStyle = new TextButton.TextButtonStyle() {{
+                    down = flatOver;
+                    up = pane;
+                    over = flatDownBase;
+                    font = Fonts.def;
+                    fontColor = Color.white;
+                    disabledFontColor = Color.gray;
+                    checked = flatDown;
+                }},
+                NCtextStyle = new TextButton.TextButtonStyle() {{
+                    down = flatOver;
+                    up = pane;
+                    over = flatDownBase;
+                    font = Fonts.def;
+                    fontColor = Color.white;
+                    disabledFontColor = Color.gray;
+                }};
+
+        public void rebuild(){
+            clear();
+            table().growX().left();
+            if (expand) {
+                buildTable();
+            }
+            button((expand ? "":"[lightgray]") + icon, textStyle, () -> {
+                expand = !expand;
+                rebuild();
+            }).right().width(40f).minHeight(40f).fillY();
+        }
+
+        protected abstract void buildTable();
     }
 
 }
