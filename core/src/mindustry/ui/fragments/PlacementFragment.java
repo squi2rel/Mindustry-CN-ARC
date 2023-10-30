@@ -15,7 +15,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
+import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.dialogs.BlockSelectDialog;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -31,6 +31,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.ConstructBlock.*;
+
+import java.util.Arrays;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.ARCVars.arcui;
@@ -251,6 +253,8 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.category_prev)){
+            //TODO 临时修复
+            if (!RFuncs.has(categoryEmpty, false)) return true;
             do{
                 currentCategory = currentCategory.prev();
             }while(categoryEmpty[currentCategory.ordinal()]);
@@ -259,6 +263,8 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.category_next)){
+            //TODO 临时修复
+            if (!RFuncs.has(categoryEmpty, false)) return true;
             do{
                 currentCategory = currentCategory.next();
             }while(categoryEmpty[currentCategory.ordinal()]);

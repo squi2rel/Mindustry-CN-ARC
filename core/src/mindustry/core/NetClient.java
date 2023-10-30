@@ -250,7 +250,7 @@ public class NetClient implements ApplicationListener{
     @Remote(called = Loc.server, targets = Loc.server)
     public static void sendMessage(String message){
         if(Vars.ui != null){
-            Vars.ui.chatfrag.addMessage(message);
+            Vars.ui.chatfrag.addMessage(message, true);
             Sounds.chatMessage.play();
         }
     }

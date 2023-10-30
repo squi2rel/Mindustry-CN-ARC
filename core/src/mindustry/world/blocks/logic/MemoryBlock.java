@@ -7,7 +7,6 @@ import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import arc.util.io.*;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.gen.*;
 import mindustry.ui.Styles;
 import mindustry.world.*;

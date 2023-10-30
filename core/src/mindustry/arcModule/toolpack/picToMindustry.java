@@ -12,7 +12,6 @@ import arc.struct.StringMap;
 import arc.util.Strings;
 import mindustry.Vars;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.Blocks;
 import mindustry.game.Schematic;
 import mindustry.ui.Styles;

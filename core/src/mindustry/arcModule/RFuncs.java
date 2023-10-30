@@ -236,4 +236,11 @@ public class RFuncs {
         Log.info("地图共有@个世处，总共@行指令，@个字符", data[0], data[1], data[2]);
         ui.announce(Strings.format("地图共有@个世处，总共@行指令，@个字符", data[0], data[1], data[2]), 10);
     }
+
+    public static boolean has(boolean[] arr, boolean val) {
+        for (boolean cur : arr) {
+            if (cur == val) return true;
+        }
+        return false;
+    }
 }

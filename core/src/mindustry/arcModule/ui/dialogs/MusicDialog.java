@@ -25,7 +25,6 @@ import arc.util.serialization.Base64Coder;
 import arc.util.serialization.JsonReader;
 import arc.util.serialization.JsonValue;
 import mindustry.Vars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.RStyles;
 import mindustry.game.EventType;
 import mindustry.gen.Call;

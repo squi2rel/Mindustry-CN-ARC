@@ -18,7 +18,6 @@ import arc.util.*;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.toolpack.picToMindustry;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.content.Blocks;
 import mindustry.content.Planets;

@@ -10,7 +10,6 @@ import arc.scene.ui.Dialog;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;

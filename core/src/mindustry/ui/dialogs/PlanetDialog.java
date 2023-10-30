@@ -19,7 +19,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;

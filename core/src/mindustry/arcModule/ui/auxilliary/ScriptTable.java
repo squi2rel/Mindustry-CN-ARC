@@ -9,7 +9,6 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.arcModule.*;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.input.DesktopInput;

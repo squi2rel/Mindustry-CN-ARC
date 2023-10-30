@@ -209,7 +209,7 @@ public class ChatFragment extends Table{
         //avoid sending prefix-empty messages
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 
-        if (arcMessage(message)) return;
+        //if (arcMessage(message)) return;
 
         history.insert(1, message);
 

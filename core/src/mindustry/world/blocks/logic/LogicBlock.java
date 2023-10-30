@@ -15,7 +15,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.ai.types.*;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;

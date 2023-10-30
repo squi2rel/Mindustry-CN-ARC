@@ -15,7 +15,6 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Time;
 import arc.util.Tmp;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.content.StatusEffects;
 import mindustry.core.World;

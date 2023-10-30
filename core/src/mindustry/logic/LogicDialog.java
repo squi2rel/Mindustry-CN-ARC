@@ -15,7 +15,6 @@ import arc.util.Log;
 import arc.util.Nullable;
 import arc.util.Strings;
 import arc.util.Time;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.core.GameState.State;
 import mindustry.ctype.Content;
 import mindustry.game.Team;

@@ -12,7 +12,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.util.*;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
 import mindustry.gen.Call;
 import mindustry.gen.Player;

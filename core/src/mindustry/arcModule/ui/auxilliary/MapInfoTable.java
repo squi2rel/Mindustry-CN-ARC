@@ -7,7 +7,6 @@ import arc.graphics.Colors;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.*;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.content.*;
 import mindustry.editor.*;
 import mindustry.gen.*;

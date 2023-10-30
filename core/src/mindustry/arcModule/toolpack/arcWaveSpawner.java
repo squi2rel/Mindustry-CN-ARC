@@ -232,7 +232,7 @@ public class arcWaveSpawner {
             this.waveIndex = waveIndex;
             this.group = group;
             this.amount = group.getSpawned(waveIndex);
-            this.shield = group.getShield(waveIndex) * amount;   //盾
+            this.shield = group.getShield(waveIndex);   //盾
             this.health = (group.type.health + shield) * amount;   //盾+血
             this.dps = group.type.estimateDps() * amount;
             this.effHealth = health;

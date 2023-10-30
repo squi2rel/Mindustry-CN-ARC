@@ -7,7 +7,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.service.Achievement;

@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.arcModule.ui.ARCUI;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LStatements.*;
