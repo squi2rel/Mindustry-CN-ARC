@@ -33,47 +33,46 @@ import static mindustry.arcModule.TimeControl.*;
 
 public class ReplayController {
     public static final int version = 2;
-    Writes writes;
-    Reads reads;
-    long startTime, allTime;
-    long lastTime, nextTime;
-    long length, skip = 0;
-    Thread thread;
-    Fi dir = Vars.dataDirectory.child("replays");
-    DeflaterOutputStream dos;
-    ByteBuffer tmpBuf = ByteBuffer.allocate(32768);
-    Writes tmpWr = new Writes(new ByteBufferOutput(tmpBuf));
-    boolean recording = false, recordEnabled = false;
-    Table controller = new Table();
-    IntMap<Integer> map = new IntMap<>();
-    ReplayData now = null;
-    BaseDialog dialog = null;
+    private Writes writes;
+    private Reads reads;
+    private long startTime, allTime;
+    private long lastTime, nextTime;
+    private long length, skip = 0;
+    private final Thread thread = new Thread(() -> {
+        while (true) {
+            if (reads == null) {
+                try {
+                    synchronized (this) {
+                        this.wait();
+                    }
+                } catch (InterruptedException ignored) {
+                }
+            }
+            synchronized (this) {
+                try {
+                    readNextPacket();
+                } catch (Exception e) {
+                    closeReads();
+                    reads = null;
+                    net.disconnect();
+                    ARCVars.replaying = false;
+                    Core.app.post(() -> logic.reset());
+                }
+            }
+        }
+    }, "Replay Controller");
+    private final Fi dir = Vars.dataDirectory.child("replays");
+    private final ByteBuffer tmpBuf = ByteBuffer.allocate(32768);
+    private final Writes tmpWr = new Writes(new ByteBufferOutput(tmpBuf));
+    private boolean recording = false, recordEnabled = false;
+    private final Table controller = new Table();
+    private final IntMap<Integer> map = new IntMap<>();
+    private ReplayData now = null;
+    private BaseDialog dialog = null;
     public boolean writing = false;
 
     public ReplayController() {
         dir.mkdirs();
-        thread = new Thread(() -> {
-            while (true) {
-                if (reads == null) {
-                    try {
-                        synchronized (thread) {
-                            thread.wait();
-                        }
-                    } catch (InterruptedException ignored) {
-                    }
-                }
-                synchronized (this) {
-                    try {
-                        readNextPacket();
-                    } catch (Exception e) {
-                        reads = null;
-                        net.disconnect();
-                        ARCVars.replaying = false;
-                        Core.app.post(() -> logic.reset());
-                    }
-                }
-            }
-        }, "ReplayController");
         thread.setPriority(3);
         thread.start();
         WidgetGroup g = new WidgetGroup();
@@ -120,14 +119,20 @@ public class ReplayController {
             controller.add().grow();
         });
         Events.run(EventType.Trigger.update, () -> {
-            synchronized (this) {
-                if (state.getState() == GameState.State.menu && !netClient.isConnecting()) {
-                    reads = null;
-                    ARCVars.replaying = false;
-                    stopPlay();
-                }
+            if (state.getState() == GameState.State.menu && !netClient.isConnecting()) {
+                closeReads();
+                reads = null;
+                ARCVars.replaying = false;
+                stopPlay();
             }
         });
+    }
+
+    private void closeReads() {
+        try {
+            reads.close();
+        } catch (Exception ignored) {
+        }
     }
 
     private static class ReplayData {
@@ -147,11 +152,12 @@ public class ReplayController {
         if (!recordEnabled) return;
         stop();
         try {
-            writes = new Writes(new DataOutputStream(dos = new DeflaterOutputStream(new FileOutputStream(dir.child(new Date().getTime() + ".mrep").file()))));
-        } catch (FileNotFoundException e) {
+            writes = new Writes(new DataOutputStream(new BufferedOutputStream(new DeflaterOutputStream(new FileOutputStream(dir.child(new Date().getTime() + ".mrep").file())))));
+        } catch (Exception e) {
             Log.err("创建回放出错!", e);
             return;
         }
+        boolean anonymous = Core.settings.getBoolOnce("anonymous");
         writes.i(version);
         writes.l(new Date().getTime());
         writes.str(ip);
@@ -163,12 +169,12 @@ public class ReplayController {
     public void stop() {
         recording = false;
         try {
-            dos.close();
+            writes.close();
         } catch (Exception ignored) {
         }
     }
 
-    synchronized public void writePacket(Packet p) {
+    public void writePacket(Packet p) {
         if (!recording || p instanceof Packets.WorldStream) return;
         try {
             byte id = Net.getPacketId(p);
@@ -197,7 +203,7 @@ public class ReplayController {
         return allTime;
     }
 
-    synchronized private void readNextPacket() {
+    private void readNextPacket() {
         long escaped = timeEscaped();
         if (escaped < nextTime && skip == 0) {
             Thread.yield();
@@ -220,9 +226,11 @@ public class ReplayController {
     }
 
     public Reads createReads(File input) {
+        closeReads();
         try {
-            return new Reads(new DataInputStream(new InflaterInputStream(new FileInputStream(input))));
-        } catch (Exception ignored) {
+            return new Reads(new DataInputStream(new BufferedInputStream(new InflaterInputStream(new FileInputStream(input)), 32768)));
+        } catch (Exception e) {
+            Core.app.post(() -> ui.showException("读取回放失败!", e));
         }
         return null;
     }

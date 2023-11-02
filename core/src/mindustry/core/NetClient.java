@@ -160,6 +160,7 @@ public class NetClient implements ApplicationListener{
 
         net.handleClient(WorldStream.class, data -> {
             Log.info("Received world data: @ bytes.", data.stream.available());
+            if (ARCVars.replaying) worldDataBegin();
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();

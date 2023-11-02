@@ -30,7 +30,7 @@ import static mindustry.Vars.*;
 import static mindustry.arcModule.ARCVars.*;
 
 public abstract class ClientLauncher extends ApplicationCore implements Platform{
-    private static final int loadingFPS = 20;
+    private static final int loadingFPS = 30;
 
     private long nextFrame;
     private long beginTime;
