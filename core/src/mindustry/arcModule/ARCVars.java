@@ -16,6 +16,8 @@ public class ARCVars implements Loadable {
     public static ARCUI arcui = new ARCUI();
     public static final int minimapSize = 40;
     public static boolean unitHide = false;
+    public static boolean limitUpdate = false;
+    public static int limitDst = 0;
 
     /** ARC */
     public static String arcVersion = Version.arcBuild <= 0 ? "dev" : String.valueOf(Version.arcBuild);

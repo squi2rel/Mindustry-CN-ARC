@@ -769,6 +769,24 @@ public class SettingsMenuDialog extends BaseDialog{
                 }
             });
 
+            ARCVars.limitUpdate = settings.getBool("limitupdate", false);
+            forcehide.checkPref("limitupdate", false, v -> {
+                settings.put("limitupdate", false);
+                if (ARCVars.limitUpdate) {
+                    ARCVars.limitUpdate = false;
+                    return;
+                }
+                ui.showConfirm("确认开启限制更新", "此功能可以大幅提升fps，但会导致视角外的一切停止更新\n在服务器里会造成不同步\n强烈不建议在单人开启\n\n[darkgray]在帧数和体验里二选一", () -> {
+                    ARCVars.limitUpdate = true;
+                    settings.put("limitupdate", true);
+                });
+            });
+            ARCVars.limitDst = settings.getInt("limitdst", 10);
+            forcehide.sliderPref("limitdst", 10, 0, 100, 1, s -> {
+                ARCVars.limitDst = s * 8;
+                return s + "格";
+            });
+
             //////////specmode
             specmode.addCategory("moreContent");
             specmode.checkPref("modMode", false);

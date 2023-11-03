@@ -71,7 +71,7 @@ public class NetClient implements ApplicationListener{
             if (ip.contains("/")) {
                 ip = ip.substring(ip.indexOf("/") + 1);
             }
-            if (USIDDialog.chooseUSID && Core.settings.getString("usid-" + ip, null) == null) {
+            if (USIDDialog.chooseUSID && Core.settings.getString("usid-" + ip, null) == null && !ARCVars.replaying) {
                 disconnectQuietly();
                 USIDDialog.showSet(ip);
                 return;
