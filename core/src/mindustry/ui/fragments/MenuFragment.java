@@ -25,6 +25,9 @@ import arc.scene.ui.layout.Table;
 import arc.scene.ui.layout.WidgetGroup;
 import arc.struct.Seq;
 import arc.util.*;
+import arc.util.serialization.JsonReader;
+import arc.util.serialization.JsonValue;
+import mindustry.Vars;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.RStyles;
 import mindustry.arcModule.ui.window.Window;
@@ -41,6 +44,8 @@ import mindustry.ui.MobileButton;
 import mindustry.ui.Styles;
 
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.ARCVars.arcui;
@@ -190,6 +195,40 @@ public class MenuFragment{
             t.background(Tex.buttonEdge4);
             t.button("学术日报", cleart, MenuFragment::showArcNews).left().update(b -> b.setColor(haveNewerNews ? Tmp.c1.set(Color.white).lerp(Color.cyan, Mathf.absin(5f, 1f)) : Color.white)).growX();
         }).left().width(100));
+
+        Core.app.post(() -> Http.get("https://cn-arc.github.io/classes.json?t=" + Time.millis()).timeout(10000).error(Log::err).submit(r -> {
+            try {
+                JsonValue j = new JsonReader().parse(r.getResultAsString());
+                if (j.getLong("lastUpdate", 0) > Core.settings.getLong("archotfixtime", 0)) {
+                    Http.get("https://cn-arc.github.io/classes.zip").timeout(20000).error(Log::err).submit(r2 -> {
+                        try {
+                            ZipInputStream zip = new ZipInputStream(r2.getResultAsStream());
+                            ZipEntry file;
+                            Fi root = dataDirectory.child("arcvars");
+                            root.emptyDirectory();
+                            byte[] buffer = new byte[1024];
+                            while ((file = zip.getNextEntry()) != null) {
+                                Fi f = root.child(file.getName());
+                                if (file.isDirectory()) {
+                                    f.mkdirs();
+                                } else {
+                                    f.parent().mkdirs();
+                                    int len;
+                                    while ((len = zip.read(buffer)) > 0) {
+                                        f.writeBytes(buffer, 0, len, true);
+                                    }
+                                }
+                            }
+                            Core.settings.put("archotfixtime", j.getLong("lastUpdate", 0));
+                        } catch (Exception e) {
+                            Log.err(e);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Log.err(e);
+            }
+        }));
     }
 
     private void nextBackGroundImg(){

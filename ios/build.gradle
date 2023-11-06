@@ -45,7 +45,7 @@ dependencies{
 sourceSets.main.java.srcDirs = ["src/"]
 
 ext{
-    mainClassName = "mindustry.ios.IOSLauncher"
+    mainClassName = "mindustry.ios.IOSLauncher0"
 }
 
 task copyAssets(){

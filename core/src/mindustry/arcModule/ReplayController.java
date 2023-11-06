@@ -73,6 +73,7 @@ public class ReplayController {
             }
         }, "Replay Controller");
         thread.setPriority(3);
+        thread.setDaemon(true);
         thread.start();
         WidgetGroup g = new WidgetGroup();
         g.addChild(controller);

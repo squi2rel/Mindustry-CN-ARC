@@ -16,3 +16,18 @@ jobs:
           git tag ${BNUM}
           git config --global user.name "Github Actions"
           git push https://Jackson11500:${{ secrets.API_TOKEN_GITHUB_2 }}@github.com/Jackson11500/Mindustry-CN-ARC-Builds ${BNUM}
+      - name: Update web
+        run: |
+          git clone --depth=1 https://github.com/CN-ARC/CN-ARC.github.io
+          git clone --depth=1 https://github.com/CN-ARC/Mindustry-CN-ARC
+          cp Mindustry-CN-ARC/core/assets/classes.zip CN-ARC.github.io/ -f
+          cp Mindustry-CN-ARC/core/assets/classes.json CN-ARC.github.io/ -f
+          cd CN-ARC.github.io
+          git config user.name "squi2rel"
+          git config user.email "501410836@qq.com"
+          git add classes.zip
+          git add classes.json
+          echo $(($GITHUB_RUN_NUMBER + 30000)) > number
+          git add number
+          git commit -m "auto update"
+          git push https://squi2rel:${{ secrets.API_TOKEN_WEB }}@github.com/CN-ARC/CN-ARC.github.io

@@ -16,6 +16,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import dalvik.system.*;
 import mindustry.*;
+import mindustry.arcModule.ARCClassLoader;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
 import mindustry.net.*;
