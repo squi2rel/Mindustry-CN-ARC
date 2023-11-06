@@ -196,7 +196,7 @@ public class MenuFragment{
             t.button("学术日报", cleart, MenuFragment::showArcNews).left().update(b -> b.setColor(haveNewerNews ? Tmp.c1.set(Color.white).lerp(Color.cyan, Mathf.absin(5f, 1f)) : Color.white)).growX();
         }).left().width(100));
 
-        Core.app.post(() -> Http.get("https://cn-arc.github.io/classes.json?t=" + Time.millis()).timeout(10000).error(Log::err).submit(r -> {
+        /*Core.app.post(() -> Http.get("https://cn-arc.github.io/classes.json?t=" + Time.millis()).timeout(10000).error(Log::err).submit(r -> {
             try {
                 JsonValue j = new JsonReader().parse(r.getResultAsString());
                 if (j.getLong("lastUpdate", 0) > Core.settings.getLong("archotfixtime", 0)) {
@@ -228,7 +228,7 @@ public class MenuFragment{
             } catch (Exception e) {
                 Log.err(e);
             }
-        }));
+        }));*/
     }
 
     private void nextBackGroundImg(){
