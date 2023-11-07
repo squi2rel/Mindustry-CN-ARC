@@ -1089,7 +1089,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             plan.y = World.toTile(wy - plan.block.offset) + oy;
             plan.rotation = plan.block.planRotation(Mathf.mod(plan.rotation + direction, 4));
 
-            if (plan.block instanceof CanvasBlock cb) {
+            if (Core.settings.getBool("rotateCanvas") && plan.block instanceof CanvasBlock cb) {
                 CanvasBlock.CanvasBuild temp = cb.new CanvasBuild();
                 Pixmap pix = cb.makePixmap((byte[]) plan.config), pix2 = new Pixmap(cb.canvasSize, cb.canvasSize);
                 pix.each((px,py) -> pix2.setRaw(
@@ -1133,7 +1133,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             //flip rotation
             plan.block.flipRotation(plan, x);
 
-            if (plan.block instanceof CanvasBlock cb) {
+            if (Core.settings.getBool("rotateCanvas") && plan.block instanceof CanvasBlock cb) {
                 CanvasBlock.CanvasBuild temp = cb.new CanvasBuild();
                 Pixmap pix = cb.makePixmap((byte[]) plan.config);
                 plan.config = temp.packPixmap(x ? pix.flipX() : pix.flipY());

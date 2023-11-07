@@ -821,6 +821,7 @@ public class SettingsMenuDialog extends BaseDialog{
             specmode.checkPref("researchViewer", false);
             specmode.checkPref("bossKeyValid",false);
             specmode.checkPref("arcShareMedia",true);
+            specmode.checkPref("rotateCanvas",false);
             specmode.checkPref("developMode", false);
             //////////cheating
             cheating.addCategory("arcWeakCheat");

@@ -35,7 +35,13 @@ public class ARCClassLoader extends ClassLoader {
         className = name.replace(".", "/") + ".class";
         if (clazz == null && (cur = dir.child(className)).exists()) {//用于覆盖的类
             byte[] bytes = cur.readBytes();
-            clazz = defineClass(null, bytes, 0, bytes.length);
+            try {
+                clazz = defineClass(name, bytes, 0, bytes.length);
+            } catch (Exception e) {
+                int index = name.lastIndexOf(".");
+                String name2 = name.substring(0, index + 1) + name.substring(index + 1, index + 2).toUpperCase() + name.substring(index + 2);
+                clazz = defineClass(name2, bytes, 0, bytes.length);
+            }
         }
 
         if (clazz == null) {//本地类
@@ -50,7 +56,13 @@ public class ARCClassLoader extends ClassLoader {
                     output.write(buffer, 0, length);
                 }
                 byte[] bytes = output.toByteArray();
-                clazz = defineClass(null, bytes, 0, bytes.length);
+                try {
+                    clazz = defineClass(name, bytes, 0, bytes.length);
+                } catch (Exception e) {
+                    int index = name.lastIndexOf(".");
+                    String name2 = name.substring(0, index + 1) + name.substring(index + 1, index + 2).toUpperCase() + name.substring(index + 2);
+                    clazz = defineClass(name2, bytes, 0, bytes.length);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -73,7 +85,7 @@ public class ARCClassLoader extends ClassLoader {
             for (Fi cl : f.list("class")) {
                 byte[] bytes = cl.readBytes();
                 try {
-                    Class<?> clazz = defineClass(null, bytes, 0, bytes.length);
+                    Class<?> clazz = defineClass(cl.nameWithoutExtension(), bytes, 0, bytes.length);
                     clazz.getDeclaredMethod("init").invoke(null);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -86,7 +98,7 @@ public class ARCClassLoader extends ClassLoader {
         for (Fi cl : dir.findAll(f -> Objects.equals(f.extension(), "class"))) {
             byte[] bytes = cl.readBytes();
             try {
-                defineClass(null, bytes, 0, bytes.length);
+                defineClass(cl.path().replace(dir.path(), "").replace("/", ".").substring(1).replace(".class", ""), bytes, 0, bytes.length);
             } catch (Exception ignored) {
             }
         }
