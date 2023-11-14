@@ -19,6 +19,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.RFuncs;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -57,9 +58,9 @@ public class Fonts{
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
     public static void loadSystemCursors(){
-        SystemCursor.arrow.set(Core.graphics.newCursor("cursor", cursorScale()));
-        SystemCursor.hand.set(Core.graphics.newCursor("hand", cursorScale()));
-        SystemCursor.ibeam.set(Core.graphics.newCursor("ibeam", cursorScale()));
+        SystemCursor.arrow.set(RFuncs.customCursor("cursor", cursorScale()));
+        SystemCursor.hand.set(RFuncs.customCursor("hand", cursorScale()));
+        SystemCursor.ibeam.set(RFuncs.customCursor("ibeam", cursorScale()));
 
         Core.graphics.restoreCursor();
     }

@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.Core;
 import arc.Events;
+import arc.Graphics;
 import arc.files.Fi;
 import arc.files.ZipFi;
 import arc.func.Boolc;
@@ -16,6 +17,7 @@ import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.TextButtonStyle;
 import arc.scene.ui.layout.Table;
+import arc.scene.utils.Elem;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Nullable;
@@ -24,6 +26,7 @@ import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.io.Streams;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.RFuncs;
 import mindustry.content.TechTree;
 import mindustry.content.TechTree.TechNode;
 import mindustry.core.GameState;
@@ -35,6 +38,7 @@ import mindustry.gen.Tex;
 import mindustry.graphics.Shaders;
 import mindustry.input.DesktopInput;
 import mindustry.input.MobileInput;
+import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 
 import java.io.IOException;
@@ -347,6 +351,8 @@ public class SettingsMenuDialog extends BaseDialog{
             sound.sliderPref("sfxvol", 100, 0, 100, 1, i -> i + "%");
             sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
 
+            game.addCategory("arcCNet");
+            game.stringInput("arcNetProxy", "");
             game.addCategory("arcCSave");
             game.checkPref("savecreate", true);
             game.checkPref("save_more_map", false);
@@ -809,6 +815,44 @@ public class SettingsMenuDialog extends BaseDialog{
             specmode.sliderPref("fontSize", 10, 5, 25, 1, i -> "x " + Strings.fixed(i * 0.1f, 1));
             specmode.stringInput("themeColor", "ffd37f");
             specmode.stringInput("arcBackgroundPath", "");
+            if (!OS.isAndroid && !OS.isIos) {
+                specmode.stringInput("arcCursorPath", "");
+                specmode.buttonInput("[cyan]查看当前指针样式", () -> new BaseDialog("指针样式") {{
+                    shown(() -> {
+                        addCloseButton();
+                        cont.add("[orange]将鼠标悬停在这些框框上面，预览指针样式 (这些名字就是自定义指针文件名)").row();
+                        cont.add("[cyan]图片中心是指针中心").row();
+                        cont.button("[orange]重载指针", () -> {
+                            RFuncs.cursorChecked = false;
+                            RFuncs.cachedCursor = null;
+                            ui.drillCursor = RFuncs.customCursor("drill", Fonts.cursorScale());
+                            ui.unloadCursor = RFuncs.customCursor("unload", Fonts.cursorScale());
+                            ui.targetCursor = RFuncs.customCursor("target", Fonts.cursorScale());
+                            ARCVars.arcui.resizeHorizontalCursor = RFuncs.customCursor("resizeHorizontal", Fonts.cursorScale());
+                            ARCVars.arcui.resizeVerticalCursor = RFuncs.customCursor("resizeVertical", Fonts.cursorScale());
+                            ARCVars.arcui.resizeLeftCursor = RFuncs.customCursor("resizeLeft", Fonts.cursorScale());
+                            ARCVars.arcui.resizeRightCursor = RFuncs.customCursor("resizeRight", Fonts.cursorScale());
+                            Fonts.loadSystemCursors();
+                        }).growX().row();
+                        cont.table(root -> {
+                            root.table(t -> t.add("cursor").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(Graphics.Cursor.SystemCursor.arrow));
+                            root.table(t -> t.add("hand").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(Graphics.Cursor.SystemCursor.hand));
+                            root.table(t -> t.add("ibeam").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(Graphics.Cursor.SystemCursor.ibeam));
+                        }).growX().row();
+                        cont.table(root -> {
+                            root.table(t -> t.add("drill").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(ui.drillCursor));
+                            root.table(t -> t.add("unload").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(ui.unloadCursor));
+                            root.table(t -> t.add("target").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(ui.targetCursor));
+                        }).growX().row();
+                        cont.table(root -> {
+                            root.table(t -> t.add("resizeHorizontal").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(ARCVars.arcui.resizeHorizontalCursor));
+                            root.table(t -> t.add("resizeVertical").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(ARCVars.arcui.resizeVerticalCursor));
+                            root.table(t -> t.add("resizeLeft").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(ARCVars.arcui.resizeLeftCursor));
+                            root.table(t -> t.add("resizeRight").pad(10)).height(80).growX().pad(10).touchable(Touchable.enabled).get().background(Styles.grayPanel).hovered(() -> Core.graphics.cursor(ARCVars.arcui.resizeRightCursor));
+                        }).growX();
+                    });
+                }}.show());
+            }
             specmode.checkPref("yuanshen", false, b -> {
                 if (b) {
                     dataDirectory.child("yuanshen").writeString("原神，启动！");
@@ -1023,6 +1067,11 @@ public class SettingsMenuDialog extends BaseDialog{
 
         public void addCategoryS(String name){
             list.add(new Divider(name, name));
+            rebuild();
+        }
+
+        public void buttonInput(String text, Runnable callback) {
+            list.add(new ButtonFakeSetting(text, callback));
             rebuild();
         }
 
@@ -1250,6 +1299,19 @@ public class SettingsMenuDialog extends BaseDialog{
                 addDesc(table.label(() -> title).left().padTop(3f).get());
                 table.row().add(area).left();
                 table.row();
+            }
+        }
+
+        public static class ButtonFakeSetting extends Setting {
+            Button button;
+            public ButtonFakeSetting(String text, Runnable callback) {
+                super("fake");
+                button = Elem.newButton(text, callback);
+            }
+
+            @Override
+            public void add(SettingsTable table) {
+                table.row().add(button).growX().height(48).row();
             }
         }
     }

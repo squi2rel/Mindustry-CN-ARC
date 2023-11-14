@@ -15,6 +15,7 @@ import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.toolpack.picToMindustry;
@@ -62,6 +63,8 @@ public class SchematicsDialog extends BaseDialog{
 
     public SchematicsDialog(){
         super("@schematics");
+
+        Vars.netClient.addPacketHandler("arcNetSchematic", url -> Http.get(url, r -> readShare(r.getResultAsString().replace(" ", "+"), null)));
 
         Events.on(EventType.WorldLoadEvent.class, event -> {
             if(state.rules.env == Planets.serpulo.defaultEnv){
@@ -457,21 +460,22 @@ public class SchematicsDialog extends BaseDialog{
             return false;
         }
         int start = msg.indexOf(' ', msg.indexOf(ShareType) + ShareType.length());
-        Http.get("https://pastebin.com/raw/" + msg.substring(start + 1), r -> {
-            String base64 = r.getResultAsString().replace(" ", "+");
-            Core.app.post(() -> {
-                try {
-                    Schematic s = Schematics.readBase64(base64);
-                    s.removeSteamID();
-                    if (sender != null) s.tags.put("name", "来自" + sender.plainName() + "的蓝图");
-                    fromShare = true;
-                    SchematicsDialog.this.showInfo(s);
-                } catch(Throwable e) {
-                    ui.showException(e);
-                }
-            });
-        });
+        Http.get("https://pastebin.com/raw/" + msg.substring(start + 1), r -> readShare(r.getResultAsString().replace(" ", "+"), player));
         return true;
+    }
+
+    private void readShare(String base64, @Nullable Player sender) {
+        Core.app.post(() -> {
+            try {
+                Schematic s = Schematics.readBase64(base64);
+                s.removeSteamID();
+                s.tags.put("name", sender == null ? "来自服务器的蓝图" : "来自" + sender.plainName() + "的蓝图");
+                fromShare = true;
+                SchematicsDialog.this.showInfo(s);
+            } catch(Throwable e) {
+                ui.showException(e);
+            }
+        });
     }
 
     private String arcSchematicsInfo(Schematic schem, boolean description){

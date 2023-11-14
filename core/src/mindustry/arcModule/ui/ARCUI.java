@@ -9,6 +9,7 @@ import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import mindustry.ClientLauncher;
+import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.dialogs.AboutCN_ARCDialog;
 import mindustry.arcModule.ui.dialogs.AchievementsDialog;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
@@ -56,10 +57,10 @@ public class ARCUI {
     }
 
     public void load() {
-        resizeHorizontalCursor = Core.graphics.newCursor("resizeHorizontal", Fonts.cursorScale());
-        resizeVerticalCursor = Core.graphics.newCursor("resizeVertical", Fonts.cursorScale());
-        resizeLeftCursor = Core.graphics.newCursor("resizeLeft", Fonts.cursorScale());
-        resizeRightCursor = Core.graphics.newCursor("resizeRight", Fonts.cursorScale());
+        resizeHorizontalCursor = RFuncs.customCursor("resizeHorizontal", Fonts.cursorScale());
+        resizeVerticalCursor = RFuncs.customCursor("resizeVertical", Fonts.cursorScale());
+        resizeLeftCursor = RFuncs.customCursor("resizeLeft", Fonts.cursorScale());
+        resizeRightCursor = RFuncs.customCursor("resizeRight", Fonts.cursorScale());
     }
 
     public void init(Group group) {

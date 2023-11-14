@@ -1142,10 +1142,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                             int i = 1;
-                            for(var key : defaultIcons){
-                                var value = Icon.icons.get(key);
+                            for(var entry : Icon.icons.entries()){
+                                if(entry.key.endsWith("Small") || entry.key.contains("none")) continue;
+                                String key = entry.key;
 
-                                t.button(value, Styles.squareTogglei, () -> {
+                                t.button(entry.value, Styles.squareTogglei, () -> {
                                     sector.info.icon = key;
                                     sector.info.contentIcon = null;
                                     refresh.run();

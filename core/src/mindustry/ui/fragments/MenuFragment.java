@@ -95,9 +95,13 @@ public class MenuFragment{
         if (arcBackgroundPath != null && Core.files.absolute(arcBackgroundPath).exists() && Core.files.absolute(arcBackgroundPath).list().length >=1){
             arcBackgroundIndex = (int) (Math.random() * Core.files.absolute(arcBackgroundPath).list().length);
             nextBackGroundImg();
-            group.addChild(img);
-            img.setFillParent(true);
-        }else{
+            if (arcBGList.size == 0) {
+                parent.fill((x, y, w, h) -> renderer.render());
+            } else {
+                group.addChild(img);
+                img.setFillParent(true);
+            }
+        } else {
             parent.fill((x, y, w, h) -> renderer.render());
         }
 
@@ -136,7 +140,7 @@ public class MenuFragment{
         parent.fill(c -> c.bottom().left().table(t -> {
             t.background(Tex.buttonEdge3);
             t.button("\uE83D", cleart, this::nextBackGroundImg).width(50f);
-        }).visible(() -> Core.settings.has("arcBackgroundPath")).left().width(100));
+        }).visible(() -> !Core.settings.getString("arcBackgroundPath").isEmpty()).left().width(100));
 
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[cyan]") + Version.combined();
         String arcversionText = "\n[cyan]ARC version:" + Version.arcBuild;
@@ -233,6 +237,7 @@ public class MenuFragment{
 
     private void nextBackGroundImg(){
         arcBGList = Core.files.absolute(arcBackgroundPath).findAll(f -> !f.isDirectory() && (f.extEquals("png") || f.extEquals("jpg") || f.extEquals("jpeg")));
+        if (arcBGList.size == 0) return;
         arcBackgroundPath = Core.settings.getString("arcBackgroundPath");
         arcBackgroundIndex += 1;
         arcBackgroundIndex = arcBackgroundIndex % arcBGList.size;

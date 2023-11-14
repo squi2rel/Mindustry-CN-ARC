@@ -303,7 +303,7 @@ public class BeControl{
                 updateUrl = url;
 
                 Jval steamAsset = val.get("assets").asArray().find(v -> v.getString("name", "").startsWith("Mindustry-CN-ARC-Steam"));
-                directSteamURL = asset.getString("browser_download_url", "");
+                directSteamURL = steamAsset.getString("browser_download_url", "");
                 steamUrl = gitDownloadURL + "/" + asset.getString("browser_download_url", "");
 
                 Jval mobileAsset = val.get("assets").asArray().find(v -> v.getString("name", "").startsWith("Mindustry-CN-ARC-Android"));

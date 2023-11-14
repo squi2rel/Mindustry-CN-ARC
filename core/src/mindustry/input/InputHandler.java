@@ -1501,7 +1501,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Tries to select the player to drop off items, returns true if successful. */
     boolean tryTapPlayer(float x, float y){
-        if(canTapPlayer(x, y)){
+        if(canTapPlayer(x, y) && !settings.getBool("blockDrop", false)){
             droppingItem = true;
             return true;
         }
@@ -1729,7 +1729,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void tryDropItems(@Nullable Building build, float x, float y){
-        if(!droppingItem || player.unit().stack.amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
+        if(!droppingItem || player.unit().stack.amount <= 0 || canTapPlayer(x, y) || state.isPaused() || settings.getBool("blockDrop", false)){
             droppingItem = false;
             return;
         }

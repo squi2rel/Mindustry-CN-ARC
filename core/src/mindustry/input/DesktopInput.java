@@ -430,7 +430,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = SystemCursor.hand;
             }
 
-            if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y)){
+            if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !settings.getBool("blockDrop", false)){
                 cursorType = ui.unloadCursor;
             }
 

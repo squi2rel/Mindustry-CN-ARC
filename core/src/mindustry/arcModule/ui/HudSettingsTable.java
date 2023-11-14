@@ -130,6 +130,11 @@ public class HudSettingsTable extends ElementUtils.ToolTable {
                     control.input.logicCutscene = false;
                     arcui.arcInfo("已移除逻辑视角锁定");
                 }).checked(a -> Core.settings.getBool("removeLogicLock")).size(30, 30).tooltip("逻辑锁定");
+                t.button("[violet]丢", textStyle, () -> {
+                    boolean block = Core.settings.getBool("blockDrop");
+                    Core.settings.put("blockDrop", !block);
+                    arcui.arcInfo("已" + (block ? "开启" : "关闭") + "丢弃物品");
+                }).checked(a -> !Core.settings.getBool("blockDrop")).size(30, 30).tooltip("允许丢弃物品");
                 t.button("[cyan]雾", textStyle, () -> {
                     if (!state.rules.pvp || player.team().id == 255) renderer.fogEnabled = !renderer.fogEnabled;
                 }).checked(a -> renderer.fogEnabled).size(30, 30).tooltip("战争迷雾").visible(() -> !state.rules.pvp || player.team().id == 255);

@@ -151,11 +151,25 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         mods = new Mods();
         schematics = new Schematics();
 
-        Fonts.loadSystemCursors();
-
         assets.load(new Vars());
         assets.load(new ARCVars());
         loadSettings();
+
+        Fonts.loadSystemCursors();
+
+        String proxy = settings.getString("arcNetProxy", "");
+        if (!proxy.isEmpty()) {
+            try {
+                String[] parts = proxy.split(":");
+                if (parts.length != 2) throw new IllegalArgumentException("无效格式！格式应为ip:port，当前代理: " + proxy);
+                System.setProperty("http.proxyHost", parts[0]);
+                System.setProperty("http.proxyPort", parts[1]);
+            } catch (Exception err) {
+                Log.err("无效代理设置: " + proxy);
+                Events.on(ClientLoadEvent.class, e -> ui.showException("无效代理设置", err));
+            }
+        }
+
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
