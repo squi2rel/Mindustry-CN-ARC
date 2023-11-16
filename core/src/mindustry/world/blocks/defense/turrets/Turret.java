@@ -11,7 +11,6 @@ import arc.scene.ui.layout.Table;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.arcModule.ARCVars;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -358,82 +357,6 @@ public class Turret extends ReloadTurret{
         @Override
         public void draw(){
             drawer.draw(this);
-            Draw.z(Layer.turret);
-
-            if (Core.settings.getBool("turretForceShowRange")){
-                int turretShowRange = Core.settings.getInt("turretShowRange");
-                if (turretShowRange==3 || (turretShowRange==2 && targetAir) || (turretShowRange==1 && targetGround)){
-                    Draw.z(Layer.turret-0.8f);
-                    Draw.color(team.color,0.05f);
-                    Fill.circle(x, y, range());
-                    Draw.color(team.color,0.3f);
-                    Lines.circle(x, y, range());
-                }
-                Draw.reset();
-            }
-            boolean canShoot = this instanceof PowerTurret.PowerTurretBuild ? efficiency > 0 : hasAmmo();
-            if (canShoot && ARCVars.arcInfoControl(team) ){
-                boolean canHitCommand = (control.input.block!=null && targetGround) || (control.input.commandMode && (control.input.selectedUnits.size>0));
-                boolean turretAlert = Core.settings.getInt("turretAlertRange") > 0f &&
-                        ((!player.unit().isNull() && player.unit().targetable(team)) || canHitCommand);
-                if (turretAlert){
-                    boolean canHitPlayer = player.unit().isFlying() ? targetAir : targetGround;
-                    boolean showHitPlayer = team != player.team() && canHitPlayer && (player.unit().dst(x,y) <= (range()+ (float)Core.settings.getInt("turretAlertRange") * tilesize));
-                    boolean showHitCommand = team != player.team() && canHitCommand &&
-                            Core.input.mouseWorld().dst(x,y) <= (range()+ (float)Core.settings.getInt("turretAlertRange") * tilesize);
-
-                    if (showHitPlayer || showHitCommand){
-                        Draw.color(team.color, 0.8f);
-                        Lines.circle(x, y, range());
-                    }
-                    int turretShowRange = Core.settings.getInt("turretShowRange");
-                    if (turretShowRange==3 || (turretShowRange==2 && targetAir) || (turretShowRange==1 && targetGround)){
-                        Draw.z(Layer.turret-0.8f);
-                        Draw.color(team.color,0.05f);
-                        Fill.circle(x, y, range());
-                        Draw.color(team.color,0.3f);
-                        Lines.circle(x, y, range());
-                    }
-                    Draw.reset();
-                }
-                if(Core.settings.getBool("showTurretAmmo") && this instanceof ItemTurret.ItemTurretBuild && ammo.any()){
-                    //lc参考miner代码
-                    ItemTurret.ItemEntry entry = (ItemTurret.ItemEntry)ammo.peek();
-                    Item lastAmmo= entry.item;
-
-                    Draw.z(Layer.turret + 0.1f);
-
-                    float size = Math.max(4f, block.size * tilesize / 2.5f);
-                    float ammoX = x - (block.size * tilesize / 2.0F) + (size / 2);
-                    float ammoY = y - (block.size * tilesize / 2.0F) + (size / 2);
-
-                    Draw.rect(lastAmmo.uiIcon, ammoX, ammoY, size, size);
-
-                    float leftAmmo = Mathf.lerp(0,1,Math.min(1f, (float)entry.amount / maxAmmo));
-                    if (leftAmmo<0.75f && Core.settings.getBool("showTurretAmmoAmount")){
-                        Draw.alpha(0.5f);
-                        Draw.color(lastAmmo.color);
-                        Lines.stroke(Lines.getStroke() * block.size * 0.5f);
-                        Lines.arc(ammoX, ammoY, size * 0.5f, leftAmmo);
-                    }
-
-                    Draw.reset();
-                }
-                if(targetPos.x !=0 && targetPos.y != 0 && Core.settings.getBool("blockWeaponTargetLine") && Mathf.len(targetPos.x - x, targetPos.y - y) <= 1500f){
-                    if(isShooting() || isControlled()){
-                        Draw.color(1f, 0.2f, 0.2f, 0.8f);
-                        Lines.stroke(1.5f);
-                        Lines.line(x, y, targetPos.x, targetPos.y);
-                        Lines.dashCircle(targetPos.x, targetPos.y, 8);
-                    } else if(Core.settings.getBool("blockWeaponTargetLineWhenIdle")){
-                        Draw.color(1f, 1f, 1f, 0.3f);
-                        Lines.stroke(1.5f);
-                        Lines.line(x, y, targetPos.x, targetPos.y);
-                        Lines.dashCircle(targetPos.x, targetPos.y, 8);
-                    }
-                }
-
-            }
         }
 
         @Override

@@ -567,6 +567,8 @@ public class JoinDialog extends BaseDialog{
             netClient.disconnectQuietly();
         });
 
+        if (net.client()) netClient.disconnectQuietly();
+
         Time.runTask(2f, () -> {
             logic.reset();
             net.reset();

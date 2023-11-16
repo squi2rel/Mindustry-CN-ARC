@@ -29,6 +29,7 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -385,6 +386,7 @@ public class Block extends UnlockableContent implements Senseable{
         //delegates to entity unless it is null
         if(tile.build != null){
             tile.build.draw();
+            if (tile.block instanceof BaseTurret t) t.drawRange((BaseTurret.BaseTurretBuild) tile.build);
         }else{
             Draw.rect(
                     variants == 0 ? region :
