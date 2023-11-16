@@ -734,6 +734,7 @@ public class Control implements ApplicationListener, Loadable{
                 settings.put("ambientvol", 0);
                 arcui.MusicDialog.vol = 0;
                 arcui.MusicDialog.player.setVolume(0);
+                arcui.MusicDialog.sounds.setVolume(0);
                 calcDialog.show();
                 mods.getScripts().runConsole(
                         """

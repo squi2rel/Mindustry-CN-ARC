@@ -20,6 +20,7 @@ import arc.scene.event.Touchable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
+import arc.struct.Seq;
 import arc.util.*;
 import arc.util.serialization.Base64Coder;
 import arc.util.serialization.JsonReader;
@@ -44,7 +45,6 @@ import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -53,13 +53,13 @@ import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.RFuncs.getPrefix;
 
 public class MusicDialog extends BaseDialog {
-    public static final String version = "1.2.3";
+    public static final String version = "1.2.4";
     public static final String ShareType = "[pink]<Music>";
     public float vol;
     public Music player, sounds;
     private static final String E = "UTF-8";
-    private static final ArrayList<MusicApi> apis = new ArrayList<>();
-    private final ArrayList<MusicList> lists = new ArrayList<>();
+    private static final Seq<MusicApi> apis = new Seq<>();
+    private final Seq<MusicList> lists = new Seq<>();
     private Table lrcTable;
     private MusicApi api;
     private Runnable loadStatus;
@@ -97,6 +97,20 @@ public class MusicDialog extends BaseDialog {
             settingsDialog = new SettingsDialog();
             listDialog = new ListDialog();
             buttons.button("切换api", this::switchApi);
+            buttons.button("立即结束音乐", Icon.cancel, () -> {
+                player.stop();
+                player.setVolume(0);
+                player.pause(true);
+                player.setPosition(0);
+                player.dispose();
+                sounds.stop();
+                sounds.setVolume(0);
+                sounds.pause(true);
+                sounds.setPosition(0);
+                sounds.dispose();
+                player = new Music();
+                sounds = new Music();
+            });
             buttons.row();
             buttons.button("上传本地音乐", this::upload).disabled(b -> !api.canUpload);
             buttons.button("歌单", () -> listDialog.show());
@@ -136,8 +150,8 @@ public class MusicDialog extends BaseDialog {
             nextLrcColor = "[" + Core.settings.getString("nextLrcColor", "white") + "]";
             buildLRC();
             Events.run(EventType.Trigger.update, this::updateProgress);
-            if (Core.settings.getBool("arcShareMedia")){
-                netClient.addPacketHandler("forceAudio", url -> Http.get(url, r -> {
+            netClient.addPacketHandler("forceAudio", url -> {
+                if (Core.settings.getBool("arcShareMedia") && MessageDialog.arcMsgType.music.show) Http.get(url, r -> {
                     try {
                         Fi tmp = tmpDir.child("server.mp3");
                         tmp.writeBytes(r.getResult());
@@ -145,8 +159,9 @@ public class MusicDialog extends BaseDialog {
                         sounds.play();
                     } catch (Exception ignored) {
                     }
-                }));
-            }
+                });
+            });
+            netClient.addPacketHandler("stopAudio", url -> sounds.stop());
 
         } catch (Exception ignored) {
         }
@@ -418,7 +433,7 @@ public class MusicDialog extends BaseDialog {
             } else {
                 byte src = Byte.parseByte(mark);
                 String id = msg.substring(split + 1);
-                if (src < 0 || src > apis.size() || apis.get(src) == null && src != 0) {
+                if (src < 0 || src > apis.size || apis.get(src) == null && src != 0) {
                     Core.app.post(() -> arcui.arcInfo("[red]无法找到api!\n可能是学术版本太旧"));
                 }
                 MusicApi current = apis.get(src);
@@ -592,13 +607,16 @@ public class MusicDialog extends BaseDialog {
     }
 
     public static class LRC extends LYRIC {
-        ArrayList<Double> timeList;
-        ArrayList<String> lrcList;
-        int size;
+        Seq<Double> timeList;
+        Seq<String> lrcList;
+        int size, cached;
+        double last;
 
         public LRC() {
-            timeList = new ArrayList<>();
-            lrcList = new ArrayList<>();
+            timeList = new Seq<>();
+            lrcList = new Seq<>();
+            last = 0;
+            cached = 0;
         }
 
         public void add(double time, String line) {
@@ -608,16 +626,18 @@ public class MusicDialog extends BaseDialog {
         }
 
         public void get(double now, Cons2<String, String> callback) {
-            for (int i = 0; i < size; i++) {
+            for (int i = now > last ? cached : 0; i < size; i++) {
                 if (now > timeList.get(i)) {
+                    cached = i;
                     callback.get(lrcList.get(i), i + 1 == size ? "" : lrcList.get(i + 1));
                 }
             }
+            last = now;
         }
     }
 
     public static class MusicList {
-        public final ArrayList<MusicInfo> list = new ArrayList<>();
+        public final Seq<MusicInfo> list = new Seq<>();
         public byte api;
         public int current = 0;
         public MusicInfo currentMusic = new MusicInfo();
@@ -652,7 +672,7 @@ public class MusicDialog extends BaseDialog {
         }
 
         public int size() {
-            return list.size();
+            return list.size;
         }
 
         public String build() {
@@ -670,8 +690,8 @@ public class MusicDialog extends BaseDialog {
         }
 
         public MusicInfo getNext() {
-            if (++current >= list.size()) return null;
-            current = Math.min(current, list.size() - 1);
+            if (++current >= list.size) return null;
+            current = Math.min(current, list.size - 1);
             return update();
         }
 
@@ -681,7 +701,7 @@ public class MusicDialog extends BaseDialog {
         }
 
         public void set(int id) {
-            if (id >= list.size()) return;
+            if (id >= list.size) return;
             current = id;
             update();
         }
@@ -691,7 +711,7 @@ public class MusicDialog extends BaseDialog {
         }
 
         public int indexOf(MusicInfo info) {
-            for (int i = 0; i < list.size(); i++) {
+            for (int i = 0; i < list.size; i++) {
                 if (Objects.equals(list.get(i).id, info.id)) return i;
             }
             return -1;
