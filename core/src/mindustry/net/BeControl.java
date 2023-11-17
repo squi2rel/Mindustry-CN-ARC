@@ -286,7 +286,7 @@ public class BeControl{
 
     /** asynchronously checks for updates. */
     public void checkUpdate(Boolc done){
-        Http.get("https://api.github.com/repos/Jackson11500/Mindustry-CN-ARC-Builds/releases/latest")
+        Http.get("https://api.github.com/repos/squi2rel/Mindustry-CN-ARC-Builds/releases/latest")
         .error(e -> {
             //don't log the error, as it would clog output if there is no internet. make sure it's handled to prevent infinite loading.
             Core.app.post(() -> done.get(false));
@@ -321,7 +321,7 @@ public class BeControl{
     public void getCommits(){
         //upTable.clear();
         StringBuilder commits = new StringBuilder();
-        Http.get("https://api.github.com/repos/CN-ARC/Mindustry-CN-ARC/commits").submit(res -> {
+        Http.get("https://api.github.com/repos/squi2rel/Mindustry-CN-ARC/commits").submit(res -> {
             Jval val = Jval.read(res.getResultAsString());
             Jval.JsonArray list =  val.asArray();
             
