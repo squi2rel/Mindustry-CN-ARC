@@ -860,6 +860,7 @@ public class SettingsMenuDialog extends BaseDialog{
                     dataDirectory.child("yuanshen").delete();
                 }
             });
+            specmode.checkPref("xibaoOnKick", false);
             specmode.addCategory("specGameMode");
             specmode.checkPref("autoSelSchematic", false);
             specmode.checkPref("researchViewer", false);

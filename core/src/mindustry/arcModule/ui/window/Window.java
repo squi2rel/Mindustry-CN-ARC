@@ -387,7 +387,7 @@ public class Window {
 
                 @Override
                 public boolean mouseMoved(InputEvent event, float x, float y) {
-                    if (fillParent || minSized) return true;
+                    if (fillParent || minSized || !resizable) return true;
                     if (x < 7 && y < 7 || x > getWidth() - 7 && y > getHeight() - 7) {
                         Core.graphics.cursor(arcui.resizeRightCursor);
                     } else if (x > getWidth() - 7 && y < 7 || x < 7 && y > getHeight() - 7) {

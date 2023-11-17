@@ -13,6 +13,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.XiBao;
 import mindustry.arcModule.ui.dialogs.USIDDialog;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
@@ -346,6 +347,24 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one, priority = PacketPriority.high)
     public static void kick(KickReason reason){
+        if (Core.settings.getBool("xibaoOnKick")) {
+            ui.loadfrag.hide();
+            if (!reason.quiet) {
+                if (reason.extraText() != null) {
+                    new XiBao().show(reason.toString(), reason.extraText(), () -> {
+                        netClient.disconnectQuietly();
+                        logic.reset();
+                    });
+                } else{
+                    new XiBao().show("@disconnect", reason.toString(), () -> {
+                        netClient.disconnectQuietly();
+                        logic.reset();
+                    });
+                }
+            }
+            return;
+        }
+
         netClient.disconnectQuietly();
         logic.reset();
 
@@ -366,6 +385,14 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one, priority = PacketPriority.high)
     public static void kick(String reason){
+        if (Core.settings.getBool("xibaoOnKick")) {
+            new XiBao().show("@disconnect", reason, () -> {
+                netClient.disconnectQuietly();
+                logic.reset();
+            });
+            return;
+        }
+
         netClient.disconnectQuietly();
         logic.reset();
         ui.showText("@disconnect", reason, Align.left);

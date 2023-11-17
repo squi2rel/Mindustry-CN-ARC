@@ -25,37 +25,17 @@ public class ARCClassLoader extends ClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class<?> clazz = findLoadedClass(name);//加载过的类
+        synchronized (this) {
+            Class<?> clazz = findLoadedClass(name);//加载过的类
 
-        try {//java内部类
-            clazz = sys.loadClass(name);
-        } catch (Exception ignored) {
-        }
-
-        className = name.replace(".", "/") + ".class";
-        if (clazz == null && (cur = dir.child(className)).exists()) {//用于覆盖的类
-            byte[] bytes = cur.readBytes();
-            try {
-                clazz = defineClass(name, bytes, 0, bytes.length);
-            } catch (Exception e) {
-                int index = name.lastIndexOf(".");
-                String name2 = name.substring(0, index + 1) + name.substring(index + 1, index + 2).toUpperCase() + name.substring(index + 2);
-                clazz = defineClass(name2, bytes, 0, bytes.length);
+            try {//java内部类
+                clazz = sys.loadClass(name);
+            } catch (Exception ignored) {
             }
-        }
 
-        if (clazz == null) {//本地类
-            try (InputStream in = loader.getResourceAsStream(className)) {
-                if (in == null) {
-                    throw new ClassNotFoundException();
-                }
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = in.read(buffer)) != -1) {
-                    output.write(buffer, 0, length);
-                }
-                byte[] bytes = output.toByteArray();
+            className = name.replace(".", "/") + ".class";
+            if (clazz == null && (cur = dir.child(className)).exists()) {//用于覆盖的类
+                byte[] bytes = cur.readBytes();
                 try {
                     clazz = defineClass(name, bytes, 0, bytes.length);
                 } catch (Exception e) {
@@ -63,43 +43,69 @@ public class ARCClassLoader extends ClassLoader {
                     String name2 = name.substring(0, index + 1) + name.substring(index + 1, index + 2).toUpperCase() + name.substring(index + 2);
                     clazz = defineClass(name2, bytes, 0, bytes.length);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
-        }
 
-        if (clazz == null) {
-            throw new ClassNotFoundException();
-        }
+            if (clazz == null) {//本地类
+                try (InputStream in = loader.getResourceAsStream(className)) {
+                    if (in == null) {
+                        throw new ClassNotFoundException();
+                    }
+                    ByteArrayOutputStream output = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = in.read(buffer)) != -1) {
+                        output.write(buffer, 0, length);
+                    }
+                    byte[] bytes = output.toByteArray();
+                    try {
+                        clazz = defineClass(name, bytes, 0, bytes.length);
+                    } catch (Exception e) {
+                        int index = name.lastIndexOf(".");
+                        String name2 = name.substring(0, index + 1) + name.substring(index + 1, index + 2).toUpperCase() + name.substring(index + 2);
+                        clazz = defineClass(name2, bytes, 0, bytes.length);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
-        if (resolve) {
-            resolveClass(clazz);
-        }
+            if (clazz == null) {
+                throw new ClassNotFoundException();
+            }
 
-        return clazz;
+            if (resolve) {
+                resolveClass(clazz);
+            }
+
+            return clazz;
+        }
     }
 
     public void loadExtra() {
-        Fi f;
-        if ((f = dir.child("extra")).exists() && f.isDirectory()) {//附加模块必须有入口点public static init()
-            for (Fi cl : f.list("class")) {
-                byte[] bytes = cl.readBytes();
-                try {
-                    Class<?> clazz = defineClass(cl.nameWithoutExtension(), bytes, 0, bytes.length);
-                    clazz.getDeclaredMethod("init").invoke(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        synchronized (this) {
+            Fi f;
+            if ((f = dir.child("extra")).exists() && f.isDirectory()) {//附加模块必须有入口点public static init()
+                for (Fi cl : f.list("class")) {
+                    byte[] bytes = cl.readBytes();
+                    try {
+                        Class<?> clazz = defineClass(cl.nameWithoutExtension(), bytes, 0, bytes.length);
+                        clazz.getDeclaredMethod("init").invoke(null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
     }
 
     public void fallbackLoad() {
-        for (Fi cl : dir.findAll(f -> Objects.equals(f.extension(), "class"))) {
-            byte[] bytes = cl.readBytes();
-            try {
-                defineClass(cl.path().replace(dir.path(), "").replace("/", ".").substring(1).replace(".class", ""), bytes, 0, bytes.length);
-            } catch (Exception ignored) {
+        synchronized (this) {
+            for (Fi cl : dir.findAll(f -> Objects.equals(f.extension(), "class"))) {
+                byte[] bytes = cl.readBytes();
+                try {
+                    defineClass(cl.path().replace(dir.path(), "").replace("/", ".").substring(1).replace(".class", ""), bytes, 0, bytes.length);
+                } catch (Exception ignored) {
+                }
             }
         }
     }
