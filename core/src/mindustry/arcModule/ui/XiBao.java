@@ -15,6 +15,7 @@ import arc.scene.ui.layout.Table;
 import arc.scene.ui.layout.WidgetGroup;
 import arc.util.Log;
 import arc.util.Scaling;
+import mindustry.Vars;
 import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 
@@ -46,6 +47,9 @@ public class XiBao {
                     trans.update(() -> music.setVolume(trans.color.a));
                     trans.actions(Actions.alpha(0, 0.6f), Actions.run(music::stop), Actions.remove());
                 }).size(110, 50).pad(4);
+
+                t2.row();
+                t2.button("重进", () -> Vars.ui.join.reconnect()).fillX();
             }).pad(10).get().pack();
             t.marginTop(20f);
         }));

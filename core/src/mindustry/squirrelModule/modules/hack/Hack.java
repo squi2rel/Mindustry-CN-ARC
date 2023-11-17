@@ -3,6 +3,7 @@ package mindustry.squirrelModule.modules.hack;
 import arc.Core;
 import arc.Events;
 import arc.func.Cons;
+import arc.func.Cons2;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -13,15 +14,14 @@ import arc.scene.Element;
 import arc.scene.event.ChangeListener;
 import arc.scene.style.Drawable;
 import arc.scene.ui.Button;
+import arc.scene.ui.Dialog;
 import arc.scene.ui.Label;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.scene.utils.Elem;
 import arc.struct.ObjectMap;
-import arc.util.Nullable;
-import arc.util.Time;
-import arc.util.Timer;
-import arc.util.Tmp;
+import arc.util.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.core.GameState;
@@ -91,6 +91,7 @@ public class Hack {
         manager.register("多人", "simMobile", new Config("伪装手机", null, changed(e -> simMobile = e)));
         manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 0, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
         manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
+        manager.register("杂项", "reJoin", new Config("重进", null, changed((e, c) -> reconnect(c))));
 
         manager.register("移动", "immediatelyTurn", new Config("瞬间转向", null, changed(e -> immediatelyTurn = e)));
         manager.register("移动", "ignoreTurn", new Config("无视旋转", null, changed(e -> ignoreTurn = e)));
@@ -122,6 +123,7 @@ public class Hack {
         initFill();
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
+        manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
         manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), field("customPoke", "戳了{name}[white]一下，并提醒你留意对话框", s -> customPokeText = s)}, changed(e -> customPoke = e)));
         manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), field("customPrefix", "S~{ver}", s -> arcVersionPrefix = "<ARC" + s.replace("{ver}", Version.arcBuild <= 0 ? "Dev" : String.valueOf(Version.arcBuild)) + ">")}, changed(e -> arcVersionPrefix = e ? arcVersionPrefix : "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">")));
 
@@ -134,6 +136,15 @@ public class Hack {
             @Override
             public void onChanged(boolean enabled) {
                 func.get(enabled);
+            }
+        };
+    }
+
+    public static HackFunc changed(Cons2<Boolean, Config> func) {
+        return new HackFunc() {
+            @Override
+            public void onChanged(boolean enabled) {
+                func.get(enabled, config);
             }
         };
     }
@@ -424,6 +435,11 @@ public class Hack {
                 t1.button("取" + (i + 1), () -> chosenUUID = settings.getString("uuid-" + id, null)).growX();
             }
         });
+    }
+
+    private static void reconnect(Config c) {
+        ui.join.reconnect();
+        sui.infoControl.manager.disable(c);
     }
 
     public static void updateInput() {
