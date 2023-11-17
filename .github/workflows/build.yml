@@ -1,0 +1,61 @@
+name: Build Artifacts
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 16
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
+      - name: Set env
+        run: |
+         echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+         echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}"
+         echo "RELEASE_VERSION=${GITHUB_REF#refs}"
+         echo "RELEASE_VERSION=${GITHUB_REF_NAME}"
+      - name: Set up keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" > keystore.txt
+          base64 --decode --ignore-garbage keystore.txt > bekeystore.jks
+      - name: Create artifacts
+        env:
+          keystore_password: ${{ secrets.KEYSTORE_PASSWORD_SECRET }}
+          keystore_alias_password: ${{ secrets.KEYSTORE_PASSWORD_SECRET }}
+          keystore_alias: squirrel
+        run: |
+          git clone --depth=1 --branch=master https://github.com/squi2rel/Mindustry-CN-ARC Mindustry
+          cd Mindustry
+          ./gradlew pack
+          ./gradlew desktop:dist -Pbuildversion=${RELEASE_VERSION}
+          ./gradlew android:assembleRelease -Pbuildversion=${RELEASE_VERSION}
+          mv desktop/build/libs/Mindustry.jar desktop/build/libs/Mindustry-VAPE-Desktop-${RELEASE_VERSION}.jar
+          mv android/build/outputs/apk/release/android-release.apk android/build/outputs/apk/release/Mindustry-VAPE-Android-${RELEASE_VERSION}.apk
+          ./gradlew desktop:dist -Pbuildversion=${RELEASE_VERSION} -PversionModifier=steam
+          mv desktop/build/libs/Mindustry.jar desktop/build/libs/Mindustry-VAPE-Steam-${RELEASE_VERSION}.jar
+      - name: Upload desktop artifacts
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: Mindustry/desktop/build/libs/Mindustry-VAPE-Desktop-${{env.RELEASE_VERSION}}.jar
+          tag: ${{ github.ref }}
+      - name: Upload Android artifacts
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: Mindustry/android/build/outputs/apk/release/Mindustry-VAPE-Android-${{env.RELEASE_VERSION}}.apk
+          tag: ${{ github.ref }}
+      - name: Upload Steam artifacts
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: Mindustry/desktop/build/libs/Mindustry-VAPE-Steam-${{env.RELEASE_VERSION}}.jar
+          tag: ${{ github.ref }}
