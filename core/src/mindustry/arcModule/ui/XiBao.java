@@ -16,14 +16,19 @@ import arc.scene.ui.layout.WidgetGroup;
 import arc.util.Log;
 import arc.util.Scaling;
 import mindustry.Vars;
+import mindustry.core.GameState;
 import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
+
+import static mindustry.Vars.*;
 
 public class XiBao {
     static Music music = new Music();
     static boolean hasMusic = false;
     static TextureRegionDrawable cached;
-    public void show(String tt, String text, Runnable afterFill) {
+    public void show(String tt, String text) {
+        net.reset();
+        state.set(GameState.State.paused);
         music.stop();
         Group root = Core.scene.root;
         Group trans = new WidgetGroup();
@@ -34,7 +39,7 @@ public class XiBao {
         trans.addChild(label = new Label("你被踢出了服务器！", new Label.LabelStyle(Fonts.outline, Color.gold)));
         label.update(() -> {
             label.setPosition((trans.getWidth() - label.getPrefWidth()) / 2, (trans.getHeight() - label.getPrefHeight()) * 0.77f);
-            label.setFontScale(trans.getHeight() * 0.006f);
+            label.setFontScale(Math.max(trans.getHeight() * 0.006f, 0.00001f));
         });
         trans.addChild(new Table(t -> {
             t.setFillParent(true);
@@ -43,13 +48,19 @@ public class XiBao {
                 t2.table(t3 -> t3.add(tt).left()).row();
                 t2.table(t3 -> t3.add(text)).left().minWidth(200).row();
                 t2.button("@ok", () -> {
+                    logic.reset();
                     trans.touchable = Touchable.disabled;
                     trans.update(() -> music.setVolume(trans.color.a));
                     trans.actions(Actions.alpha(0, 0.6f), Actions.run(music::stop), Actions.remove());
                 }).size(110, 50).pad(4);
-
                 t2.row();
-                t2.button("重进", () -> Vars.ui.join.reconnect()).fillX();
+                t2.button("重进", () -> {
+                    logic.reset();
+                    Vars.ui.join.reconnect();
+                    trans.touchable = Touchable.disabled;
+                    trans.update(() -> music.setVolume(trans.color.a));
+                    trans.actions(Actions.alpha(0, 0.6f), Actions.run(music::stop), Actions.remove());
+                }).fillX();
             }).pad(10).get().pack();
             t.marginTop(20f);
         }));
@@ -62,7 +73,6 @@ public class XiBao {
             trans.setPosition(Core.graphics.getWidth() / 2f * scale, Core.graphics.getHeight() / 2f * scale);
             if (scale == 0) {
                 trans.update(null);
-                afterFill.run();
             }
         });
         if (hasMusic) {

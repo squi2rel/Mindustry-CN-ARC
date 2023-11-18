@@ -351,15 +351,9 @@ public class NetClient implements ApplicationListener{
             ui.loadfrag.hide();
             if (!reason.quiet) {
                 if (reason.extraText() != null) {
-                    new XiBao().show(reason.toString(), reason.extraText(), () -> {
-                        netClient.disconnectQuietly();
-                        logic.reset();
-                    });
+                    new XiBao().show(reason.toString(), reason.extraText());
                 } else{
-                    new XiBao().show("@disconnect", reason.toString(), () -> {
-                        netClient.disconnectQuietly();
-                        logic.reset();
-                    });
+                    new XiBao().show("@disconnect", reason.toString());
                 }
             }
             return;
@@ -386,10 +380,8 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.one, priority = PacketPriority.high)
     public static void kick(String reason){
         if (Core.settings.getBool("xibaoOnKick")) {
-            new XiBao().show("@disconnect", reason, () -> {
-                netClient.disconnectQuietly();
-                logic.reset();
-            });
+            ui.loadfrag.hide();
+            new XiBao().show("@disconnect", reason);
             return;
         }
 
