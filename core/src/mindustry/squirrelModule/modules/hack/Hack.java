@@ -123,7 +123,6 @@ public class Hack {
         initFill();
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
-        manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
         manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), field("customPoke", "戳了{name}[white]一下，并提醒你留意对话框", s -> customPokeText = s)}, changed(e -> customPoke = e)));
         manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), field("customPrefix", "S~{ver}", s -> arcVersionPrefix = "<ARC" + s.replace("{ver}", Version.arcBuild <= 0 ? "Dev" : String.valueOf(Version.arcBuild)) + ">")}, changed(e -> arcVersionPrefix = e ? arcVersionPrefix : "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">")));
 
