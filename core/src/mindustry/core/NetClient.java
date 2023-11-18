@@ -106,7 +106,7 @@ public class NetClient implements ApplicationListener{
             c.name = player.name;
             c.locale = locale;
             c.mods = mods.getModStrings();
-            c.mobile = mobile || Hack.simMobile;
+            c.mobile = Hack.simDevice != mobile;
             c.versionType = Version.type;
             c.color = player.color.rgba();
             c.usid = Hack.randomUSID ? SMisc.randomBase64(8) : getUsid(packet.addressTCP);

@@ -73,8 +73,9 @@ public class ControlTable extends Table {
 
                         @Override
                         public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                            dragged = true;
                             Vec2 v = localToParentCoordinates(Tmp.v1.set(x, y));
+                            if (!dragged && Tmp.v2.set(v).sub(Tmp.v3.set(lastX, lastY)).len() < 5) return;
+                            dragged = true;
                             ClickHUD.this.x += v.x - lastX;
                             ClickHUD.this.y += v.y - lastY;
                             lastX = v.x;
@@ -84,6 +85,7 @@ public class ControlTable extends Table {
                         @Override
                         public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button) {
                             if (!dragged) expand = !expand;
+                            dragged = false;
                             Core.settings.put(title + "x", ClickHUD.this.x);
                             Core.settings.put(title + "y", ClickHUD.this.y);
                             Core.settings.put(title + "e", expand);

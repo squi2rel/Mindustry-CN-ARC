@@ -11,19 +11,21 @@ import mindustry.squirrelModule.ui.ControlTable;
 import mindustry.ui.Styles;
 
 public class Manager {
-    public WidgetGroup controlGroup = new WidgetGroup();
+    public WidgetGroup controlGroup = new WidgetGroup(), hack = new WidgetGroup();
     ControlTable control;
     public ObjectMap<String, Seq<Config>> list = new ObjectMap<>();
     public ObjectMap<String, Config> flatList = new ObjectMap<>();
 
     public Manager(Group root) {
+        hack.setFillParent(true);
+        controlGroup.addChild(hack);
         control = new ControlTable(list);
         root.addChild(control);
         Core.scene.add(controlGroup);
         controlGroup.setFillParent(true);
-        controlGroup.touchable = Touchable.childrenOnly;
-        controlGroup.visible = false;
-        controlGroup.addChild(new Table(t -> {
+        controlGroup.touchable = hack.touchable = Touchable.childrenOnly;
+        hack.visible = false;
+        hack.addChild(new Table(t -> {
             t.setFillParent(true);
             t.setBackground(Styles.black3);
             t.update(t::toBack);
@@ -72,6 +74,6 @@ public class Manager {
     }
 
     public void buildClickHUD() {
-        control.buildClickHUD(controlGroup);
+        control.buildClickHUD(hack);
     }
 }
