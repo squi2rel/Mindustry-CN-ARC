@@ -67,6 +67,9 @@ public class NetClient implements ApplicationListener{
     public NetClient(){
 
         net.handleClient(Connect.class, packet -> {
+            player.name = Core.settings.getString("name");
+            player.color.set(Core.settings.getInt("color-0"));
+
             Log.info("Connecting to server: @", packet.addressTCP);
             String ip = packet.addressTCP;
             if (ip.contains("/")) {
