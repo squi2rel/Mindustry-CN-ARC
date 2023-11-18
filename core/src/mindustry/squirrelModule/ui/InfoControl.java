@@ -40,7 +40,7 @@ public class InfoControl {
     }
 
     private void update() {
-        if (Core.input.keyTap(Binding.hack)) manager.controlGroup.visible = !manager.controlGroup.visible;
+        if (Core.input.keyTap(Binding.hack)) manager.hack.visible = !manager.hack.visible;
         final float[] thisColor = {color};
         if (table.visible) {
             table.clear();
