@@ -48,9 +48,9 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
     private Block autoBuild = Blocks.turbineCondenser;
 
     private Block searchBlock = Blocks.itemSource;
-    private Building searchBuild;
-    private Seq<Building> buildingSeq = new Seq<>();
-    private int searchBlockIndex = 0;
+    private Building searchBuild = null;
+    public Seq<Building> buildingSeq = new Seq<>();
+    private int searchBlockIndex = -1;
 
     public BuildTiles buildTiles = new BuildTiles();
 
@@ -122,21 +122,38 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
                 });
             }).fillX().row();
             t.table(tt -> {
-                tt.button("S", NCtextStyle, this::searchBlock).tooltip("[cyan]搜索方块").growX().height(30f).update(button -> {
+                tt.button("S", NCtextStyle, this::searchBlock).update(button -> {
+
                     buildingSeq = player.team().data().buildings.select(building1 -> building1.block == searchBlock);
-                    if (searchBlock == Blocks.worldProcessor){
+                    if (searchBlock.privileged){
                         for(Team team : Team.all) {
                             if (team == player.team()) continue;
                             buildingSeq.add(team.data().buildings.select(building1 -> building1.block == searchBlock));
                         }
                     }
-                    if (buildingSeq.size == 0) button.setText("[lightgray]\uE88A");
-                    else button.setText("\uE88A " + searchBlockIndex + "/" + buildingSeq.size);
-                });
+
+                    if (buildingSeq.contains(searchBuild)) {
+                        searchBlockIndex = buildingSeq.indexOf(searchBuild);
+                    } else {
+                        searchBuild = null;
+                        searchBlockIndex = -1;
+                    }
+
+                    if (buildingSeq.isEmpty() || searchBlockIndex == -1) button.setText("[lightgray]\uE88A");
+                    else button.setText("\uE88A" + (searchBlockIndex + 1) + "/" + buildingSeq.size);
+                }).tooltip("[cyan]搜索方块").growX().height(30f);
+
                 tt.button(searchBlock.emoji(), NCtextStyle, ()->{
                     new BlockSelectDialog(Block::isPlaceable, block -> searchBlock = block, block -> searchBlock == block).show().hidden(this::rebuild);
                     searchBlockIndex = 0;
                 }).tooltip("[acid]搜索替换").width(30f).height(30f);
+
+                tt.update(() -> {
+                    if (control.input.selectedBlock()) {
+                        searchBlock = control.input.block;
+                        rebuild();
+                    }
+                });
             }).fillX().row();
             t.table(tt -> {
                 tt.button(Blocks.worldMessage.emoji(), textStyle, () -> {
@@ -245,11 +262,11 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
             arcui.arcInfo("[violet]方块搜索\n[acid]未找到此方块");
             return;
         }
+        searchBlockIndex = (searchBlockIndex + 1) % buildingSeq.size;
         searchBuild = buildingSeq.get(searchBlockIndex);
 
         arcSetCamera(searchBuild);
-        arcui.arcInfo("[violet]方块搜索\n[acid]找到方块[cyan]" + searchBlockIndex + "[acid]/[cyan]" + buildingSeq.size + "[white]" + searchBlock.emoji());
-        searchBlockIndex = (searchBlockIndex + 1) % buildingSeq.size;
+        arcui.arcInfo("[violet]方块搜索\n[acid]找到方块[cyan]" + (searchBlockIndex + 1) + "[acid]/[cyan]" + buildingSeq.size + "[white]" + searchBlock.emoji());
     }
 
     enum BuildRange {

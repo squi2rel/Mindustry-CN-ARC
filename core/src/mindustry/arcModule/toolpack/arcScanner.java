@@ -15,10 +15,7 @@ import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.Marker;
 import mindustry.game.EventType;
 import mindustry.game.Team;
-import mindustry.gen.Groups;
-import mindustry.gen.Icon;
-import mindustry.gen.Player;
-import mindustry.gen.Unit;
+import mindustry.gen.*;
 import mindustry.input.Binding;
 import mindustry.ui.Styles;
 import mindustry.world.Tile;
@@ -200,6 +197,12 @@ public class arcScanner {
                 Draw.rect(core.block.fullIcon, transX(core.tile.worldx()), transY(core.tile.worldy()), 4 * expandRate, 4 * expandRate);
 
             }
+        }
+        //绘制搜索的方块
+        for (Building build : ui.hudfrag.quickToolTable.advanceBuildTool.buildingSeq) {
+            if (scanRate < 1f && Mathf.dst(build.x - player.x, build.y - player.y) > curScanRange) continue;
+            Draw.color(build.team.color, 1f);
+            Draw.rect(build.block.fullIcon, transX(build.tile.worldx()), transY(build.tile.worldy()), 4 * expandRate, 4 * expandRate);
         }
         //绘制单位
         for (Unit unit : Groups.unit) {

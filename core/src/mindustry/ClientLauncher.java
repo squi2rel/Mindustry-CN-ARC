@@ -158,12 +158,14 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadSystemCursors();
 
         String proxy = settings.getString("arcNetProxy", "");
-        if (!proxy.isEmpty()) {
+        if (proxy != "") {
             try {
                 String[] parts = proxy.split(":");
                 if (parts.length != 2) throw new IllegalArgumentException("无效格式！格式应为ip:port，当前代理: " + proxy);
                 System.setProperty("http.proxyHost", parts[0]);
                 System.setProperty("http.proxyPort", parts[1]);
+                System.setProperty("https.proxyHost", parts[0]);
+                System.setProperty("https.proxyPort", parts[1]);
             } catch (Exception err) {
                 Log.err("无效代理设置: " + proxy);
                 Events.on(ClientLoadEvent.class, e -> ui.showException("无效代理设置", err));
