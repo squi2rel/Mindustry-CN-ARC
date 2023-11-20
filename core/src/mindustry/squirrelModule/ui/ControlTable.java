@@ -16,6 +16,7 @@ import arc.scene.event.Touchable;
 import arc.scene.style.Drawable;
 import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Cell;
+import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
@@ -128,8 +129,9 @@ public class ControlTable extends Table {
                                     super.drawBackground(x, y);
                                     return;
                                 }
+                                float offset = 40 * Scl.scl();
                                 for (float i = 0; i <= height; i++) {
-                                    Draw.color(SMisc.color((((Time.globalTime / rotateDiv) % PI20) + id * lineAdd * 40 + (40 - i) * lineAdd) % PI20));
+                                    Draw.color(SMisc.color((((Time.globalTime / rotateDiv) % PI20) + id * lineAdd * offset + (offset - i) * lineAdd) % PI20));
                                     Lines.line(x, y + i, x + width, y + i);
                                 }
                             }

@@ -431,13 +431,12 @@ public class Hack {
                 int id = i;
                 t1.button("取" + (i + 1), () -> chosenUUID = settings.getString("uuid-" + id, null)).growX();
             }
-        });
+        }).growX();
     }
 
     private static void reconnect(boolean e, Config c) {
-        if (!e) return;
-        ui.join.reconnect();
         sui.infoControl.manager.disable(c);
+        if (e) ui.join.reconnect();
     }
 
     public static void updateInput() {
