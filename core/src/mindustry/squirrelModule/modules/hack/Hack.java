@@ -20,9 +20,12 @@ import arc.scene.ui.layout.Table;
 import arc.scene.utils.Elem;
 import arc.struct.ObjectMap;
 import arc.util.*;
+import mindustry.Vars;
+import mindustry.arcModule.ARCVars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.core.GameState;
+import mindustry.core.NetClient;
 import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.game.Team;
@@ -60,7 +63,7 @@ public class Hack {
     //显示
     public static boolean noFog, useWindowedMenu;
     //多人
-    public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn;
+    public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn, privateMsg;
     public static String chosenUUID = null;
     public static int autoGGDelay;
     //移动
@@ -90,6 +93,7 @@ public class Hack {
         manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 0, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
         manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
         manager.register("多人", "rejoin", new Config("重进", null, changed(Hack::reconnect)));
+        manager.register("多人", "privateMsg", new Config("VAPE聊天", null, changed(e -> privateMsg = e)));
 
         manager.register("移动", "immediatelyTurn", new Config("瞬间转向", null, changed(e -> immediatelyTurn = e)));
         manager.register("移动", "ignoreTurn", new Config("无视旋转", null, changed(e -> ignoreTurn = e)));
@@ -125,6 +129,7 @@ public class Hack {
         manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), field("customPrefix", "S~{ver}", s -> arcVersionPrefix = "<ARC" + s.replace("{ver}", Version.arcBuild <= 0 ? "Dev" : String.valueOf(Version.arcBuild)) + ">")}, changed(e -> arcVersionPrefix = e ? arcVersionPrefix : "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">")));
 
         initKeys();
+        initHandler();
         CommandParser.initCommands();
     }
 
@@ -453,6 +458,13 @@ public class Hack {
             if (kn == null) return;
             KeyCode k = KeyCode.valueOf(kn);
             keyMap.put(c, k);
+        });
+    }
+
+    private static void initHandler() {
+        ARCVars.arcClient.addHandler("VAPEMSG", (p, d) -> {
+            String s = new String(d);
+            NetClient.sendMessage("[acid]<VAPE> [white][[" + p.name + "[white]]: " + s, s, p);
         });
     }
 

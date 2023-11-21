@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.arcModule.ARCClient;
 import mindustry.arcModule.ARCVars;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -214,6 +215,11 @@ public class ChatFragment extends Table{
         history.insert(1, message);
 
         Events.fire(new ClientChatEvent(message));
+
+        if (Hack.privateMsg) {
+            ARCClient.send("VAPEMSG", message.getBytes());
+            return;
+        }
 
         Call.sendChatMessage(message);
     }
