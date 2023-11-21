@@ -28,6 +28,7 @@ public class ARCVars implements Loadable {
     public static Boolean arcCheatServer = false;
     public static boolean replaying = false;
     public static ReplayController replayController;
+    public static ARCClient arcClient = new ARCClient();
 
     public static int getMaxSchematicSize(){
         int s = Core.settings.getInt("maxSchematicSize");

@@ -271,6 +271,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void setUnitCommand(Player player, int[] unitIds, UnitCommand command){
+        ARCVars.arcClient.handle(player, unitIds);
         if(player == null || unitIds == null || command == null) return;
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
