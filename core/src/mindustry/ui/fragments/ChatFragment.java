@@ -217,7 +217,7 @@ public class ChatFragment extends Table{
         Events.fire(new ClientChatEvent(message));
 
         if (Hack.privateMsg) {
-            ARCClient.send("VAPEMSG", message.getBytes());
+            ARCClient.send("VAPEMSG", message);
             return;
         }
 

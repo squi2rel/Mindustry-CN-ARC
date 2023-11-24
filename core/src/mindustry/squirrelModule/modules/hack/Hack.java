@@ -462,8 +462,7 @@ public class Hack {
     }
 
     private static void initHandler() {
-        ARCVars.arcClient.addHandler("VAPEMSG", (p, d) -> {
-            String s = new String(d);
+        ARCVars.arcClient.addHandlerString("VAPEMSG", (p, s) -> {
             NetClient.sendMessage("[acid]<VAPE> [white][[" + p.name + "[white]]: " + s, s, p);
         });
     }

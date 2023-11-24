@@ -55,16 +55,16 @@ public class Manager {
 
     public void enable(Config conf) {
         if (conf.enabled) return;
+        conf.enabled = true;
         conf.func.onEnable();
         conf.func.onChanged(true);
-        conf.enabled = true;
     }
 
     public void disable(Config conf) {
         if (!conf.enabled) return;
+        conf.enabled = false;
         conf.func.onDisable();
         conf.func.onChanged(false);
-        conf.enabled = false;
     }
 
     public void toggle(Config conf) {
