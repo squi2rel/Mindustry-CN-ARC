@@ -294,7 +294,7 @@ public class RFuncs {
         uploadToWebID(f, l -> result.get("http://124.220.46.174/api/get?id=" + l));
     }
 
-    public static void uploadToWebID(Fi f, Cons<Long> result) {
+    public static void uploadToWebID(Fi f, Cons<String> result) {
         arcui.arcInfo("上传中，请等待...");
         Http.HttpRequest post = Http.post("http://124.220.46.174/api/upload");
         post.contentStream = f.read();
@@ -303,6 +303,6 @@ public class RFuncs {
         post.header("token", "3ab6950d5970c57f938673911f42fd32");
         post.timeout = 10000;
         post.error(e -> Core.app.post(() -> arcui.arcInfo("发生了一个错误:" + e.toString())));
-        post.submit(r -> result.get(Long.parseLong(r.getResultAsString())));
+        post.submit(r -> result.get(r.getResultAsString()));
     }
 }

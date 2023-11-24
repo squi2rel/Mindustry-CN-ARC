@@ -15,6 +15,8 @@ import arc.scene.actions.Actions;
 import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.scene.event.Touchable;
+import arc.scene.style.Drawable;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.Image;
 import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
@@ -35,7 +37,7 @@ public class Window {
     WindowManager manager;
     String title;
     Table cont;
-    TextureRegion icon;
+    Drawable icon;
     public Image iconImage;
     boolean removed = false, added = false, minSized = false, resizable = true, maxSizable = true, minSizable = true, closable = true;
     boolean cursorRestored = true, closeToRemove = true;
@@ -56,10 +58,10 @@ public class Window {
     }
 
     public Window(String title, float width, float height, WindowManager manager) {
-        this(title, width, height, new TextureRegion((Texture) Core.atlas.getDrawable("error")), manager);
+        this(title, width, height, Core.atlas.getDrawable("error"), manager);
     }
 
-    public Window(String title, float width, float height, TextureRegion icon, WindowManager manager) {
+    public Window(String title, float width, float height, Drawable icon, WindowManager manager) {
         iconImage = new Image(icon);
         iconImage.setScaling(Scaling.fit);
         this.manager = manager;

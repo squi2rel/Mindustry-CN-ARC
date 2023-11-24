@@ -559,11 +559,11 @@ public class MusicDialog extends BaseDialog {
 
         @Override
         public void upload(Fi file, Cons<MusicInfo> callback) {
-            RFuncs.uploadToWeb(file, s -> {
+            RFuncs.uploadToWebID(file, s -> {
                 Core.app.post(() -> ui.announce("上传成功"));
                 callback.get(new MusicInfo() {{
                     src = thisId;
-                    id = s;
+                    id = String.valueOf(s);
                 }});
             });
         }

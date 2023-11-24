@@ -291,7 +291,7 @@ public class MenuFragment{
                             b.add().grow();
                             b.add(formatTimeElapsed(Time.millis() - Long.parseLong(news[id]))).padRight(5);
                         }, RStyles.flatt, () -> {
-                            Window w = new Window(idx == -1 ? news[id + 1] : news[id + 1].substring(0, idx), 600, 400, Icon.book.getRegion(), arcui.WindowManager);
+                            Window w = new Window(idx == -1 ? news[id + 1] : news[id + 1].substring(0, idx), 600, 400, Icon.book, arcui.WindowManager);
                             Table content = new Table();
                             ScrollPane pane = new ScrollPane(content);
                             content.table(t2 -> {
@@ -386,7 +386,7 @@ public class MenuFragment{
                     if (!haveNews) {
                         t.add("这里什么都没有");
                     }
-                    Window w = new Window("学术日报", 600, 400, Icon.book.getRegion(), arcui.WindowManager);
+                    Window w = new Window("学术日报", 600, 400, Icon.book, arcui.WindowManager);
                     w.setBody(new Table(t2 -> t2.add(p).grow()) {{
                         setBackground(Styles.black3);
                     }});

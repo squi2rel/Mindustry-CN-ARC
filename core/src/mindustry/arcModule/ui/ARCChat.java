@@ -99,7 +99,7 @@ public class ARCChat {
         });
         Events.on(ARCEvents.Connect.class, e -> buildButton(null));
         Events.on(ARCEvents.Disconnected.class, e -> reset());
-        chat = new Window("学术聊天", 800, 600, Icon.chat.getRegion(), arcui.WindowManager);
+        chat = new Window("学术聊天", 800, 600, Icon.chat, arcui.WindowManager);
         chat.closeToRemove(false);
         bs = new TextButton.TextButtonStyle() {{
             over = RFuncs.tint(1204353279);
