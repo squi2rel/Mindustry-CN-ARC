@@ -26,6 +26,7 @@ import arc.util.serialization.Base64Coder;
 import arc.util.serialization.JsonReader;
 import arc.util.serialization.JsonValue;
 import mindustry.Vars;
+import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.RStyles;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -558,18 +559,11 @@ public class MusicDialog extends BaseDialog {
 
         @Override
         public void upload(Fi file, Cons<MusicInfo> callback) {
-            Http.HttpRequest post = Http.post("http://124.220.46.174/api/upload");
-            post.contentStream = file.read();
-            post.header("filename", file.name());
-            post.header("size", String.valueOf(file.length()));
-            post.header("token", "3ab6950d5970c57f938673911f42fd32");
-            post.timeout = 10000;
-            post.error(e -> Core.app.post(() -> ui.showException("上传失败", e)));
-            post.submit(r -> {
+            RFuncs.uploadToWeb(file, s -> {
                 Core.app.post(() -> ui.announce("上传成功"));
                 callback.get(new MusicInfo() {{
                     src = thisId;
-                    id = r.getResultAsString();
+                    id = s;
                 }});
             });
         }

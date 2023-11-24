@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCEvents;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -126,6 +127,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit.isNull() ? 20 : unit.type.hitSize * 2f;
     }
 
+
+    @Override
+    public void add() {
+        Events.fire(new ARCEvents.PlayerJoin(self()));
+    }
+
     @Override
     public void afterSync(){
         //fix rubberbanding:
@@ -202,6 +209,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         if(!unit.isNull()){
             clearUnit();
         }
+        Events.fire(new ARCEvents.PlayerLeave(self()));
     }
 
     public void team(Team team){

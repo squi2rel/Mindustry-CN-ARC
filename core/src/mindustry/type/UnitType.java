@@ -531,28 +531,35 @@ public class UnitType extends UnlockableContent implements Senseable{
         unitStatus.clear();
         displayStatusEffect(unit,unitStatus);
 
-        String statusText = getStatustext(unit);
-        if(statusText.length()>0){
+        Table statusText = getStatustext(unit.healthMultiplier(), unit.damageMultiplier(), unit.reloadMultiplier(), unit.speedMultiplier());
+        if(statusText != null){
             unitStatus.row();
             unitStatus.add(statusText).growX().wrap().left();
         }
     }
 
-    private String getStatustext(Unit unit){
-        StringBuilder statusText = new StringBuilder(">>");
-        if(unit.damageMultiplier() != 1f){
-            statusText.append(" [red]伤[white]: ").append(Strings.autoFixed(unit.damageMultiplier(),2)).append(" |");
+    public static Table getStatustext(float healthMultiplier, float damageMultiplier, float reloadMultiplier, float speedMultiplier){
+        Seq<String> statusText = new Seq<>();
+        if(healthMultiplier != 1f){
+            statusText.add(NumberFormat.formatFloat(healthMultiplier, " [acid]血量[white]: @@"));
         }
-        if(unit.reloadMultiplier() != 1f){
-            statusText.append(" [violet]攻速[white]: ").append(Strings.autoFixed(unit.reloadMultiplier(),2)).append(" |");
+        if(damageMultiplier != 1f){
+            statusText.add(NumberFormat.formatFloat(damageMultiplier, " [red]伤害[white]: @@"));
         }
-        if(unit.speedMultiplier() != 1f){
-            statusText.append(" [cyan]移[white]: ").append(Strings.autoFixed(unit.speedMultiplier(),2)).append(" |");
+        if(reloadMultiplier != 1f){
+            statusText.add(NumberFormat.formatFloat(reloadMultiplier, " [violet]攻速[white]: @@"));
         }
-        if(unit.healthMultiplier() != 1f){
-            statusText.append(" [acid]血[white]: ").append((unit.healthMultiplier() == Float.POSITIVE_INFINITY) ? "Inf" : Strings.autoFixed(unit.healthMultiplier(),2)).append(" |");
+        if(speedMultiplier != 1f){
+            statusText.add(NumberFormat.formatFloat(speedMultiplier, " [cyan]移速[white]: @@"));
         }
-        return statusText.substring(0,statusText.length()-2);
+        if (statusText.isEmpty()) return null;
+        Table table = new Table();
+        for (int i = 0;i < statusText.size;i++) {
+            if (i % 2 == 0) table.add(">>");
+            table.add(statusText.get(i)).left();
+            if (i % 2 == 1) table.row();
+        }
+        return table;
     }
 
     public void display(Unit unit, Table table){

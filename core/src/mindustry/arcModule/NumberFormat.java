@@ -27,6 +27,9 @@ public class NumberFormat {
     public static String formatFloat(float number, int maxDeci){
         return formatFloat(number, maxDeci, defaultFormat);
     }
+    public static String formatFloat(float number, String format){
+        return formatFloat(number, 2, format);
+    }
     public static String autoFixed(float number, int maxDeci){
         return autoFixed(number, maxDeci, defaultFormat);
     }
@@ -60,9 +63,9 @@ public class NumberFormat {
 
     public static String formatFloat(float number, int maxDeci, String format){
 
-        if(Float.isNaN(number)) return "NaN";
-        if(number == Float.POSITIVE_INFINITY) return "Inf";
-        if(number == Float.NEGATIVE_INFINITY) return "-Inf";
+        if(Float.isNaN(number)) return format(format, "NaN", "");
+        if(number == Float.POSITIVE_INFINITY) return format(format, "Inf", "");
+        if(number == Float.NEGATIVE_INFINITY) return format(format, "-Inf", "");
 
         String sign = number < 0 ? "-" : "", unit = "";
         number = Math.abs(number);

@@ -586,7 +586,7 @@ public class AdvanceToolTable extends Table {
                             if (effects == StatusEffects.none) continue;
                             if (i++ % 8 == 0) list.row();
                             list.button(effects.emoji(), squareTogglet, () -> {
-                                unitStatus.add(new StatusEntry().set(effects, 600f));
+                                unitStatus.add(new StatusEntry().set(effects, unitStatus.isEmpty() ? 600f : unitStatus.orderedItems().peek().time));
                                 rebuildTable[0].run();
                             }).size(50f).color(unitStatus.select(e -> e.effect == effects).isEmpty() ? Color.gray : Color.white).tooltip(effects.localizedName);
                         }
@@ -594,6 +594,17 @@ public class AdvanceToolTable extends Table {
 
                     t.row();
 
+                    float[] status = {1f, 1f, 1f, 1f};
+                    unitStatus.each(s -> {
+                        status[0] *= s.effect.healthMultiplier;
+                        status[1] *= s.effect.damageMultiplier;
+                        status[2] *= s.effect.reloadMultiplier;
+                        status[3] *= s.effect.speedMultiplier;
+                    });
+                    Table statusText = UnitType.getStatustext(status[0], status[1], status[2], status[3]);
+                    if (statusText != null) {
+                        t.add(statusText).row();
+                    }
                     t.table(list -> {
                         for (var entry : unitStatus) {
                             list.add(entry.effect.emoji() + entry.effect.localizedName + " ");

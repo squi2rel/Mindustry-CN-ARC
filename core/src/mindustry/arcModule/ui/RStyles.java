@@ -56,7 +56,7 @@ public class RStyles {
 
         clearAccentNonei = new ImageButtonStyle(clearNonei) {{
             up = none;
-            over = flatOver;
+            over = black3;
             down = none;
         }};
 

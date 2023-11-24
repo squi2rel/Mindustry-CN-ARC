@@ -12,6 +12,7 @@ import arc.util.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.arcModule.ARCEvents;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.dialogs.USIDDialog;
 import mindustry.core.*;
@@ -570,6 +571,7 @@ public class JoinDialog extends BaseDialog{
         if (net.client()) netClient.disconnectQuietly();
 
         Time.runTask(2f, () -> {
+            Events.fire(new ARCEvents.Connect());
             logic.reset();
             net.reset();
             Vars.netClient.beginConnecting();

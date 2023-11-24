@@ -12,6 +12,7 @@ import mindustry.arcModule.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.input.DesktopInput;
+import mindustry.ui.dialogs.EffectsDialog;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.ARCVars.arcui;
@@ -56,6 +57,9 @@ public class ScriptTable extends BaseToolsTable{
         }
         scriptButton(Items.copper.uiIcon, "一键放置", () -> {
             player.dropItems();
+        });
+        scriptButton(Icon.pencilSmall.getRegion(), "特效显示",()->{
+            EffectsDialog.withAllEffects().show();
         });
     }
 

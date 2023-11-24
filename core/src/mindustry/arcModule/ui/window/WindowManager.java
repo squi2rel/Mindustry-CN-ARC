@@ -4,12 +4,11 @@ import arc.Core;
 import arc.scene.Group;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.WidgetGroup;
-
-import java.util.ArrayList;
+import arc.struct.Seq;
 
 public class WindowManager {
     public Group group = new WidgetGroup();
-    ArrayList<Window> windows = new ArrayList<>();
+    Seq<Window> windows = new Seq<>();
 
     public WindowManager() {
         Core.scene.add(group);
@@ -26,7 +25,7 @@ public class WindowManager {
     }
 
     public void addWindow(Window w) {
-        if (windows.contains(w)) return;
+        if (!w.added) return;
         windows.add(w);
         group.addChild(w.table);
         w.center();

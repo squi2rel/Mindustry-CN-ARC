@@ -8,6 +8,7 @@ import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Log;
 import mindustry.ClientLauncher;
 import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.dialogs.AboutCN_ARCDialog;
@@ -82,5 +83,10 @@ public class ARCUI {
         Core.settings.put("yuanshen", ClientLauncher.YuanShenLoader);
 
         initArcWave();
+        try {
+            ARCChat.init();
+        } catch (Exception e) {
+            Log.err(e);
+        }
     }
 }

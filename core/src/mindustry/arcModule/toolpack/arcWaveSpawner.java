@@ -20,8 +20,6 @@ import mindustry.world.Tile;
 
 import static mindustry.Vars.*;
 import static mindustry.arcModule.DrawUtilities.arcDashCircling;
-import static mindustry.arcModule.NumberFormat.formatFloat;
-import static mindustry.arcModule.NumberFormat.formatInteger;
 
 public class arcWaveSpawner {
 
@@ -171,15 +169,15 @@ public class arcWaveSpawner {
                 t.add("[accent]" + amountL).growX().padRight(50f);
                 if (doesRow) t.row();
                 t.add("\uE813").width(50f);
-                t.add("[accent]" + formatInteger(healthL)).growX().padRight(50f);
+                t.add("[accent]" + NumberFormat.formatInteger(healthL)).growX().padRight(50f);
                 if (doesRow) t.row();
                 if (effHealthL != healthL) {
                     t.add("\uE810").width(50f);
-                    t.add("[accent]" + formatInteger(effHealthL)).growX().padRight(50f);
+                    t.add("[accent]" + NumberFormat.formatInteger(effHealthL)).growX().padRight(50f);
                     if (doesRow) t.row();
                 }
                 t.add("\uE86E").width(50f);
-                t.add("[accent]" + formatInteger(dpsL)).growX();
+                t.add("[accent]" + NumberFormat.formatInteger(dpsL)).growX();
             });
         }
 
@@ -200,7 +198,7 @@ public class arcWaveSpawner {
                         }).row();
                         StringBuilder groupInfo = new StringBuilder();
                         if (wg.shield > 0f)
-                            groupInfo.append(formatFloat(wg.shield));
+                            groupInfo.append(NumberFormat.formatFloat(wg.shield));
                         groupInfo.append("\n[]");
                         if (wg.group.spawn != -1 && spawn == -1) groupInfo.append("*");
                         if (wg.group.effect != null && wg.group.effect != StatusEffects.none)

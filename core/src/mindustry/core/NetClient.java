@@ -12,6 +12,7 @@ import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCEvents;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.XiBao;
 import mindustry.arcModule.ui.dialogs.USIDDialog;
@@ -138,6 +139,8 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(Disconnect.class, packet -> {
+            Events.fire(new ARCEvents.Disconnected(packet.reason));
+
             if(quietReset) return;
 
             ARCVars.replayController.stop();
