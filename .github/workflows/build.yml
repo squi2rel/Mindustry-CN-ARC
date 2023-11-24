@@ -12,7 +12,7 @@ jobs:
         run: |
           git clone --depth=1 --branch=master https://github.com/squi2rel/Mindustry-CN-ARC-Builds
           cd Mindustry-CN-ARC-Builds
-          BNUM=$(($GITHUB_RUN_NUMBER + 50000))
+          BNUM=$(($GITHUB_RUN_NUMBER + 50020))
           git tag ${BNUM}
           git config --global user.name "Github Actions"
           git push https://squi2rel:${{ secrets.TOKEN }}@github.com/squi2rel/Mindustry-CN-ARC-Builds ${BNUM}
