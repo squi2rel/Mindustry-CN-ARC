@@ -15,6 +15,7 @@ import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.scene.event.Touchable;
 import arc.scene.style.Drawable;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
@@ -47,6 +48,7 @@ public class ARCChat {
     private static final GlyphLayout glyphLayout = new GlyphLayout(true);
     private static final IntMap<TextureRegion> avatarCache = new IntMap<>();
     private static final Table ph = new Table();
+    private static final Interval timer = new Interval();
     public static int msgUnread;
     private static Table chatList;
     private static ChatTable cur;
@@ -99,7 +101,7 @@ public class ARCChat {
         });
         Events.on(ARCEvents.Connect.class, e -> buildButton(null));
         Events.on(ARCEvents.Disconnected.class, e -> reset());
-        chat = new Window("学术聊天", 800, 600, Icon.chat, arcui.WindowManager);
+        chat = new Window("学术聊天", 800, 600, (Drawable) Icon.chat.getRegion(), arcui.WindowManager);
         chat.closeToRemove(false);
         bs = new TextButton.TextButtonStyle() {{
             over = RFuncs.tint(1204353279);
@@ -340,7 +342,11 @@ public class ARCChat {
         if (p == null) {
             i.setDrawable(Icon.host);
             l = t2.add("服务器聊天").fillX().get();
-            Vars.net.pingHost(Reflect.get(Vars.ui.join, "lastIp"), Reflect.get(Vars.ui.join, "lastPort"), c -> l.setText(c.name), e -> {
+            t2.update(() -> {
+                if (timer.get(300)) {
+                    Vars.net.pingHost(Reflect.get(Vars.ui.join, "lastIp"), Reflect.get(Vars.ui.join, "lastPort"), c -> l.setText(c.name), e -> {
+                    });
+                }
             });
         } else {
             i.update(() -> i.setDrawable(p.icon()));

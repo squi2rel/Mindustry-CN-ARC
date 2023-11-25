@@ -386,7 +386,7 @@ public class MenuFragment{
                     if (!haveNews) {
                         t.add("这里什么都没有");
                     }
-                    Window w = new Window("学术日报", 600, 400, Icon.book, arcui.WindowManager);
+                    Window w = new Window("学术日报", 600, 400, (Drawable) Icon.book.getRegion(), arcui.WindowManager);
                     w.setBody(new Table(t2 -> t2.add(p).grow()) {{
                         setBackground(Styles.black3);
                     }});

@@ -27,6 +27,8 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.logic.LogicBlock;
 
+import java.lang.reflect.Field;
+
 import static arc.Core.camera;
 import static arc.graphics.Color.RGBtoHSV;
 import static mindustry.Vars.*;
@@ -304,5 +306,18 @@ public class RFuncs {
         post.timeout = 10000;
         post.error(e -> Core.app.post(() -> arcui.arcInfo("发生了一个错误:" + e.toString())));
         post.submit(r -> result.get(r.getResultAsString()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T get(Class<?> t, Object o, String n) throws NoSuchFieldException {
+        try {
+            Field f = t.getDeclaredField(n);
+            f.setAccessible(true);
+            return (T) f.get(o);
+        } catch (Exception e) {
+            Class<?> s = t.getSuperclass();
+            if (s == null) throw new NoSuchFieldException();
+            return get(s, o, n);
+        }
     }
 }
