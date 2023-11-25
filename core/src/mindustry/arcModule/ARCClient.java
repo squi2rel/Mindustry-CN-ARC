@@ -8,6 +8,7 @@ import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.Log;
 import arc.util.Timer;
+import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.net.ValidateException;
@@ -20,8 +21,9 @@ import java.security.spec.X509EncodedKeySpec;
 
 @SuppressWarnings({"unused", "NewApi"})
 public class ARCClient {
-    ObjectMap<String, ObjectSet<Cons2<Player, byte[]>>> handler = new ObjectMap<>();
     private static final IntMap<byte[]> keys = new IntMap<>();
+    private static final byte[] emptyByte = new byte[0];
+    private final ObjectMap<String, ObjectSet<Cons2<Player, byte[]>>> handler = new ObjectMap<>();
     public static byte[] myKey;
     public static PrivateKey myPrivate;
     private static Timer.Task keyTask;
@@ -43,8 +45,10 @@ public class ARCClient {
                 } catch (Exception ignored) {
                 }
             });
-            Events.on(ARCEvents.PlayerJoin.class, e -> ARCClient.sendKey());
+            Events.on(ARCEvents.PlayerJoin.class, e -> sendKey());
             Events.on(ARCEvents.PlayerLeave.class, e -> keys.remove(e.player.id));
+            Events.on(EventType.WorldLoadEndEvent.class, e -> send("ARCKeyRequest", emptyByte));
+            addHandler("ARCKeyRequest", (p, d) -> sendKey());
         } catch (Exception e) {
             Log.err(e);
         }
@@ -52,7 +56,7 @@ public class ARCClient {
 
     public static void sendKey() {
         if (keyTask != null) keyTask.cancel();
-        keyTask = Timer.schedule(() -> ARCClient.send("ARCKey", s -> {
+        keyTask = Timer.schedule(() -> send("ARCKey", s -> {
             try {
                 s.writeShort(myKey.length);
                 s.write(myKey);
