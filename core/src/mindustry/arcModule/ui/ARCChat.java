@@ -197,6 +197,12 @@ public class ARCChat {
             });
             inner = t.table().grow();
         }));
+        chat.addListener(WindowEvents.restoreSize, w -> {
+            if (cur != null) {
+                msgUnread -= cur.curMsgUnread;
+                cur.curMsgUnread = 0;
+            }
+        });
         reset();
     }
 
@@ -227,13 +233,13 @@ public class ARCChat {
         t2.align(align);
         if (!isMe) t2.add(p.name()).get().setAlignment(align);
         t2.row();
-        Table t3 = t2.table().fillX().get();
+        Table t3 = t2.table().fillX().pad(5, 15, 5, 15).get();
         t3.align(align);
         String msg = message.substring(1);
         switch (message.charAt(0)) {
             case 'M' -> {
                 t3.add(new ReadOnlyTextArea(msg, isMe ? myStyle : otherStyle, pane));
-                String s = msg.substring(0, Math.min(20, msg.length()));
+                String s = msg.replace("\n", " ").substring(0, Math.min(20, msg.length()));
                 ct.lastText = Strings.stripColors(isMe || isPrivate ? s : p.name() + s);
             }
             case 'I' -> {
@@ -267,7 +273,7 @@ public class ARCChat {
                 }, e -> img.setDrawable((Drawable) Core.atlas.getDrawable("error")));
                 t3.add(img).maxHeight(500).pad(10);
             }
-            default -> t2.add(new ReadOnlyTextArea("[不支持的消息]", isMe ? myStyle : otherStyle, pane));
+            default -> t3.add(new ReadOnlyTextArea("[不支持的消息]", isMe ? myStyle : otherStyle, pane));
         }
         if (isMe) {
             t.add(t2).growX();
@@ -277,7 +283,7 @@ public class ARCChat {
             t.add(t2).growX();
         }
         if (cur == ct && isScrollPaneAtBottom(cur.pane)) setScrollYToButton(cur.pane);
-        if (cur != ct) {
+        if (cur != ct || chat.minSized || !chat.visible()) {
             msgUnread++;
             ct.curMsgUnread++;
         }

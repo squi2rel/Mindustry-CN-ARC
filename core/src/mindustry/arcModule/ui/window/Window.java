@@ -39,7 +39,7 @@ public class Window {
     Table cont;
     Drawable icon;
     public Image iconImage;
-    boolean removed = false, added = false, minSized = false, resizable = true, maxSizable = true, minSizable = true, closable = true;
+    public boolean removed = false, added = false, minSized = false, resizable = true, maxSizable = true, minSizable = true, closable = true;
     boolean cursorRestored = true, closeToRemove = true;
     float minWidth = 200, minHeight = 200;
     private final ObjectMap<Enum<WindowEvents>, Seq<Cons<Window>>> events = new ObjectMap<>();
@@ -141,6 +141,10 @@ public class Window {
 
     public void center() {
         pos((table.parent.getWidth() - table.getWidth()) / 2, (table.parent.getHeight() - table.getHeight()) / 2);
+    }
+
+    public boolean visible() {
+        return table.visible && !removed;
     }
 
     public void remove() {
