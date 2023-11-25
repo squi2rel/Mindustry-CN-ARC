@@ -58,7 +58,11 @@ public class Window {
     }
 
     public Window(String title, float width, float height, WindowManager manager) {
-        this(title, width, height, Core.atlas.getDrawable("error"), manager);
+        this(title, width, height, (TextureRegionDrawable) Core.atlas.getDrawable("error"), manager);
+    }
+
+    public Window(String title, float width, float height, TextureRegion icon, WindowManager manager) {
+        this(title, width, height, new TextureRegionDrawable(icon), manager);
     }
 
     public Window(String title, float width, float height, Drawable icon, WindowManager manager) {
