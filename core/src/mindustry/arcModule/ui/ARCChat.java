@@ -28,6 +28,7 @@ import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.window.Window;
 import mindustry.arcModule.ui.window.WindowEvents;
+import mindustry.game.EventType;
 import mindustry.gen.Icon;
 import mindustry.gen.Player;
 import mindustry.gen.Tex;
@@ -99,8 +100,15 @@ public class ARCChat {
             }
             messages.remove(e.player.id);
         });
-        Events.on(ARCEvents.Connect.class, e -> buildButton(null));
+        Events.on(ARCEvents.Connect.class, e -> {
+            reset();
+            buildButton(null);
+        });
         Events.on(ARCEvents.Disconnected.class, e -> reset());
+        Events.on(EventType.WorldLoadEndEvent.class, e -> {
+            reset();
+            buildButton(null);
+        });
         chat = new Window("学术聊天", 800, 600, Icon.chat.getRegion(), arcui.WindowManager);
         chat.closeToRemove(false);
         bs = new TextButton.TextButtonStyle() {{
