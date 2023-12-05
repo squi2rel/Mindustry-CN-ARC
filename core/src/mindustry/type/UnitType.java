@@ -1487,32 +1487,31 @@ public class UnitType extends UnlockableContent implements Senseable{
                     }
                 }
                 Draw.reset();
-            }
 
-            float index = 0f;
-            float iconSize = 4f;
-            int iconColumns = Math.max((int) (unit.hitSize() / (iconSize + 1f)), 4);
-            float iconWidth = Math.min(unit.hitSize() / iconColumns, iconSize + 1f);
-            for(var entry : unit.statuses()){
-                Draw.rect(entry.effect.uiIcon,
-                        unit.x - unit.hitSize() * 0.6f + iconWidth * (index % iconColumns),
-                        unit.y + (unit.hitSize() / 2f) + 3f + iconSize * Mathf.floor(index / iconColumns),
-                        iconSize, iconSize);
-                index++;
-            }
-
-            index = 0f;
-            if(unit instanceof Payloadc payload && payload.payloads().any()){
-                for(Payload p : payload.payloads()){
-                    Draw.rect(p.icon(),
-                            unit.x - unit.hitSize() * 0.6f + 0.5f * iconSize * index,
-                            unit.y + (unit.hitSize() / 2f) - 4f,
-                            4f, 4f);
+                float index = 0f;
+                float iconSize = 4f;
+                int iconColumns = Math.max((int) (unit.hitSize() / (iconSize + 1f)), 4);
+                float iconWidth = Math.min(unit.hitSize() / iconColumns, iconSize + 1f);
+                for(var entry : unit.statuses()){
+                    Draw.rect(entry.effect.uiIcon,
+                            unit.x - unit.hitSize() * 0.6f + iconWidth * (index % iconColumns),
+                            unit.y + (unit.hitSize() / 2f) + 3f + iconSize * Mathf.floor(index / iconColumns),
+                            iconSize, iconSize);
                     index++;
                 }
-                Draw.reset();
-            }
 
+                index = 0f;
+                if(unit instanceof Payloadc payload && payload.payloads().any()){
+                    for(Payload p : payload.payloads()){
+                        Draw.rect(p.icon(),
+                                unit.x - unit.hitSize() * 0.6f + 0.5f * iconSize * index,
+                                unit.y + (unit.hitSize() / 2f) - 4f,
+                                4f, 4f);
+                        index++;
+                    }
+                    Draw.reset();
+                }
+            }
         }
 
         //display logicAI info by MI2

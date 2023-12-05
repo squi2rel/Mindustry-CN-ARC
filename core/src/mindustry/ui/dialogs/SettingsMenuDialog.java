@@ -559,6 +559,7 @@ public class SettingsMenuDialog extends BaseDialog{
                     return s + "";
                 }
             });
+            arc.checkPref("hoveredTileInfo", false);
 
             arc.addCategory("arcAddBlockInfo");
             arc.sliderPref("overdrive_zone", 0, 0, 100, 2, i -> i > 0 ? i + "%" : "关闭");

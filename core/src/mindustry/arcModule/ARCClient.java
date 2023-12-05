@@ -107,6 +107,7 @@ public class ARCClient {
             int read = s.read(data);
             if (length != read) throw new ValidateException(player, "无效数据");
             set.each(c -> c.get(player, data));
+        } catch (ValidateException ignored) {
         } catch (Exception e) {
             Log.err(e);
         }

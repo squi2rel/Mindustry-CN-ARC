@@ -93,11 +93,9 @@ public class ARCChat {
         Events.on(ARCEvents.PlayerLeave.class, e -> {
             ChatTable ct = messages.get(e.player.id);
             if (ct == null) return;
-            if (ct == cur) {
-                chatList.getCells().remove(chatList.getCell(cur.button));
-                chatList.removeChild(cur.button);
-                switchChat(0, null, null);
-            }
+            chatList.getCells().remove(chatList.getCell(ct.button));
+            chatList.removeChild(ct.button);
+            if (ct == cur) switchChat(0, null, null);
             messages.remove(e.player.id);
         });
         Events.on(ARCEvents.Connect.class, e -> {
@@ -105,10 +103,6 @@ public class ARCChat {
             buildButton(null);
         });
         Events.on(ARCEvents.Disconnected.class, e -> reset());
-        Events.on(EventType.WorldLoadEndEvent.class, e -> {
-            reset();
-            buildButton(null);
-        });
         chat = new Window("学术聊天", 800, 600, Icon.chat.getRegion(), arcui.WindowManager);
         chat.closeToRemove(false);
         bs = new TextButton.TextButtonStyle() {{
@@ -464,9 +458,9 @@ public class ARCChat {
         private void computePrefSize() {
             if (pane == null) return;
             prefSizeInvalid = false;
-            glyphLayout.setText(style.font, text, Color.white, Math.max(pane.getWidth() - style.background.getLeftWidth() - style.background.getRightWidth() - 60 - 10, 100), Align.left, true);
+            glyphLayout.setText(style.font, text, Color.white, Math.max(pane.getWidth() - style.background.getLeftWidth() - style.background.getRightWidth() - 60 - 10, 100), Align.topLeft, true);
             prefW = glyphLayout.width + style.background.getLeftWidth() + style.background.getRightWidth();
-            prefH = glyphLayout.height + style.background.getTopHeight() + style.background.getBottomHeight() + 6;
+            prefH = glyphLayout.height + style.background.getTopHeight() + style.background.getBottomHeight() + style.font.getLineHeight() + 1;
         }
 
         @Override

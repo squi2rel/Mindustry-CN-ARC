@@ -452,7 +452,7 @@ public class PlacementFragment{
                             }}
 
                         //只要可行便绘制地板|建筑，移除了其他重复绘制
-                        if (hoveredTile != null) {
+                        if (Core.settings.getBool("hoveredTileInfo") && hoveredTile != null) {
                             topTable.row();
                             topTable.row();
                             topTable.table(t -> {

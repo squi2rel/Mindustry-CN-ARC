@@ -513,7 +513,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 player.con.send(packet, true);
             }
 
-            throw new ValidateException(player, "Player cannot configure a tile.");
+            if (headless) throw new ValidateException(player, "Player cannot configure a tile.");
         }
         build.configured(player == null || player.dead() ? null : player.unit(), value);
         Events.fire(new ConfigEvent(build, player, value));
