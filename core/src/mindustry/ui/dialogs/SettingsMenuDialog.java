@@ -350,6 +350,7 @@ public class SettingsMenuDialog extends BaseDialog{
             sound.sliderPref("musicvol", 100, 0, 100, 1, i -> i + "%");
             sound.sliderPref("sfxvol", 100, 0, 100, 1, i -> i + "%");
             sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
+            sound.sliderPref("arcvol", settings.getInt("musicvol"), 0, 100, 1, i -> i + "%");
 
             game.addCategory("arcCNet");
             game.stringInput("arcNetProxy", "");
@@ -604,8 +605,16 @@ public class SettingsMenuDialog extends BaseDialog{
             arc.checkPref("blockWeaponTargetLineWhenIdle", false);
 
             arc.addCategory("arcAddUnitInfo");
-            arc.sliderPref("unitweapon_range", 0, 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
-            arc.sliderPref("unitAlertRange", 0, 0, 30, 1, s -> {
+            arc.checkPref("alwaysShowPlayerUnit", false);
+
+            arc.sliderPref("unitTransparency", 100, 0, 100, 5, i -> i > 0 ? i + "%" : "关闭");
+            arc.sliderPref("unitDrawMinHealth", settings.getInt("minhealth_unitshown",0), 0, 2500, 50, i -> i + "[red]HP");
+
+            arc.checkPref("unitHealthBar", false);
+            arc.sliderPref("unitBarDrawMinHealth", settings.getInt("minhealth_unithealthbarshown",0), 0, 2500, 100, i -> i + "[red]HP");
+
+
+            arc.sliderPref("unitWeaponRange", settings.getInt("unitAlertRange",0), 0, 30, 1, s -> {
                 if (s == 0) {
                     return "关闭";
                 } else if (s == 30) {
@@ -614,12 +623,12 @@ public class SettingsMenuDialog extends BaseDialog{
                     return s + "格";
                 }
             });
-            arc.checkPref("unitWeaponTargetLine", false);
+            arc.sliderPref("unitWeaponRangeAlpha", settings.getInt("unitweapon_range",0), 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
 
+            arc.checkPref("unitWeaponTargetLine", false);
+            arc.checkPref("showminebeam", true);
             arc.checkPref("unitItemCarried", false);
             arc.checkPref("unithitbox", false);
-
-
             arc.checkPref("unitLogicMoveLine", false);
             arc.checkPref("unitLogicTimerBars", false);
             arc.checkPref("arcBuildInfo",false);
@@ -720,13 +729,6 @@ public class SettingsMenuDialog extends BaseDialog{
                 }
             });
             forcehide.checkPref("displayblock", true);
-            forcehide.addCategory("arcCDisplayUnit");
-            forcehide.checkPref("unitHealthBar", false);
-            forcehide.checkPref("alwaysShowPlayerUnit", false);
-            forcehide.checkPref("showminebeam", true);
-            forcehide.sliderPref("unitTransparency", 100, 0, 100, 5, i -> i > 0 ? i + "%" : "关闭");
-            forcehide.sliderPref("minhealth_unitshown", 0, 0, 2500, 50, i -> i + "[red]HP");
-            forcehide.sliderPref("minhealth_unithealthbarshown", 0, 0, 2500, 100, i -> i + "[red]HP");
             forcehide.addCategory("arcCDisplayEffect");
             forcehide.checkPref("bulletShow", true);
             forcehide.checkPref("drawlight", true);

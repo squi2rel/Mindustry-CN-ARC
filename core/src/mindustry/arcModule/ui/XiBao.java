@@ -20,6 +20,7 @@ import mindustry.core.GameState;
 import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 
+import static arc.Core.settings;
 import static mindustry.Vars.*;
 
 public class XiBao {
@@ -76,7 +77,7 @@ public class XiBao {
             }
         });
         if (hasMusic) {
-            music.setVolume(1);
+            music.setVolume(settings.getInt("arcvol"));
             music.setPosition(0);
             music.play();
         }

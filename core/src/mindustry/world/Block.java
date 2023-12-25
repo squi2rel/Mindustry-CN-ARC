@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.arcModule.NumberFormat;
+import mindustry.arcModule.draw.ARCBuilds;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -386,7 +387,7 @@ public class Block extends UnlockableContent implements Senseable{
         //delegates to entity unless it is null
         if(tile.build != null){
             tile.build.draw();
-            if (tile.block instanceof BaseTurret t) t.drawRange((BaseTurret.BaseTurretBuild) tile.build);
+            if (tile.block instanceof BaseTurret t) ARCBuilds.arcTurret((BaseTurret.BaseTurretBuild) tile.build);
         }else{
             Draw.rect(
                     variants == 0 ? region :

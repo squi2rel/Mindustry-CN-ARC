@@ -65,9 +65,9 @@ public class HudSettingsTable extends ElementUtils.ToolTable {
         });
         checkPref("unitHealthBar", false);
         sliderPref("unitTransparency", 100, 0, 100, 5, i -> i > 0 ? i + "%" : "关闭");
-        sliderPref("minhealth_unitshown", 0, 0, 2500, 50, i -> i + "[red]HP");
-        sliderPref("minhealth_unithealthbarshown", 0, 0, 2500, 100, i -> i + "[red]HP");
-        sliderPref("unitweapon_range", 0, 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
+        sliderPref("unitDrawMinHealth", 0, 0, 2500, 50, i -> i + "[red]HP");
+        sliderPref("unitBarDrawMinHealth", 0, 0, 2500, 100, i -> i + "[red]HP");
+        sliderPref("unitWeaponRange", 0, 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
 
         checkPref("alwaysShowUnitRTSAi", false);
         checkPref("unitLogicMoveLine", true);

@@ -158,7 +158,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadSystemCursors();
 
         String proxy = settings.getString("arcNetProxy", "");
-        if (proxy != "") {
+        if (!proxy.isEmpty()) {
             try {
                 String[] parts = proxy.split(":");
                 if (parts.length != 2) throw new IllegalArgumentException("无效格式！格式应为ip:port，当前代理: " + proxy);

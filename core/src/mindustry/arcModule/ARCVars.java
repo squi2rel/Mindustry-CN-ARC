@@ -1,16 +1,20 @@
 package mindustry.arcModule;
 
 import arc.Core;
+import arc.Events;
 import arc.assets.Loadable;
 import arc.graphics.Color;
+import arc.math.Mathf;
 import arc.struct.Seq;
 import mindustry.Vars;
 import mindustry.arcModule.ui.ARCUI;
 import mindustry.core.Version;
+import mindustry.game.EventType;
 import mindustry.game.Gamemode;
 import mindustry.game.Team;
 
 import static arc.Core.settings;
+import static mindustry.Vars.world;
 
 public class ARCVars implements Loadable {
     public static ARCUI arcui = new ARCUI();
@@ -29,6 +33,16 @@ public class ARCVars implements Loadable {
     public static boolean replaying = false;
     public static ReplayController replayController;
     public static ARCClient arcClient = new ARCClient();
+
+    public static Boolean arcInfoControl = false;
+
+    static {
+        // 减少性能开销
+        Events.run(EventType.Trigger.update, () -> {
+            arcInfoControl = !arcCheatServer && (Core.settings.getBool("showOtherTeamState") ||
+                    Vars.player.team().id == 255 || Vars.state.rules.mode() != Gamemode.pvp);
+        });
+    }
 
     public static int getMaxSchematicSize(){
         int s = Core.settings.getInt("maxSchematicSize");
@@ -60,11 +74,6 @@ public class ARCVars implements Loadable {
     }
 
     public static Boolean arcInfoControl(Team team){
-        return team == Vars.player.team() || arcInfoControl();
-    }
-
-    public static Boolean arcInfoControl(){
-        return   (!arcCheatServer && (Core.settings.getBool("showOtherTeamState") ||
-                        Vars.player.team().id == 255 || Vars.state.rules.mode() != Gamemode.pvp));
+        return team == Vars.player.team() || arcInfoControl;
     }
 }

@@ -19,6 +19,7 @@ import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.NumberFormat;
+import mindustry.arcModule.draw.ARCUnits;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -50,7 +51,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     private static final Vec2 legOffset = new Vec2();
 
     //MI2 unit transparency
-    private static float legTrans = 1f, unitTrans = 1f;
+    private static float unitTrans = 1f;
+    private boolean drawUnit = true, drawUnitBar = false;
 
     private Table unitStatus = new Table();
 
@@ -1284,51 +1286,32 @@ public class UnitType extends UnlockableContent implements Senseable{
         boolean isPayload = !unit.isAdded();
 
         //透明度
-        initUnitTransp();
-        initLegTransp();
-
-        unitTrans = (float) Core.settings.getInt("unitTransparency") / 100f;
-        legTrans = unitTrans;
+        unitTrans = ARCUnits.unitTrans;
 
         Mechc mech = unit instanceof Mechc ? (Mechc) unit : null;
         float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 
-        boolean draw_unit = (unit.maxHealth + unit.shield) > (float) Core.settings.getInt("minhealth_unitshown");
-        boolean DrawMinHealthBar = (unit.maxHealth + unit.shield) > (float) Core.settings.getInt("minhealth_unithealthbarshown");
+        drawUnit = (unit.maxHealth + unit.shield) > ARCUnits.unitDrawMinHealth;
+        drawUnitBar = (unit.maxHealth + unit.shield) > ARCUnits.unitBarDrawMinHealth;
 
-        if (!draw_unit) {
+        if (!drawUnit) {
             unitTrans = 0f;
-            DrawMinHealthBar = false;
+            drawUnitBar = false;
         }
         if (ARCVars.arcInfoControl(unit.team())) {
             //玩家操控的单位具有炫酷特效
             if (unit.controller() instanceof Player) {
-                unitTrans = 100f;
-                DrawMinHealthBar = true;
                 drawPlayerEffect(unit);
-            } else if (Core.settings.getBool("alwaysShowPlayerUnit") && (unit.controller() instanceof Player || unit.controller().isBeingControlled(player.unit()))) {
-                unitTrans = 100f;
-                DrawMinHealthBar = true;
-                Draw.color(unit.team.color);
-                Draw.alpha((float) Core.settings.getInt("unitweapon_range") / 100f);
-                Lines.dashCircle(unit.x, unit.y, maxRange);
-            } else if (DrawMinHealthBar) {
-                float alertRange = (float) Core.settings.getInt("unitAlertRange");
-                boolean turretAlert = alertRange > 0 && (alertRange >= 30f ||
-                        ((!player.unit().isNull() && player.unit().targetable(unit.team)) || (control.input.commandMode && control.input.selectedUnits.size > 0)));
-                boolean canHitPlayer = player.unit().isFlying() ? targetAir : targetGround;
-                boolean canHitCommand = control.input.commandMode && (control.input.selectedUnits.size > 0);
-                boolean showHitPlayer = unit.team != player.team() && canHitPlayer && (player.unit().dst(unit.x, unit.y) <= (maxRange + (float) Core.settings.getInt("unitAlertRange") * tilesize));
-                boolean showHitCommand = unit.team != player.team() && canHitCommand &&
-                        Core.input.mouseWorld().dst(unit.x, unit.y) <= (maxRange + (float) Core.settings.getInt("unitAlertRange") * tilesize);
-
-                Draw.color(unit.team.color);
-                float unitRangeAlpha = turretAlert && (showHitPlayer || showHitCommand) ? 1f : Core.settings.getInt("unitweapon_range") / 100f;
-                Draw.alpha(unitRangeAlpha);
-                Lines.dashCircle(unit.x, unit.y, maxRange);
+                if (Core.settings.getBool("alwaysShowPlayerUnit")) {
+                    unitTrans = 100f;
+                    drawUnitBar = true;
+                }
+            }
+            if (drawUnitBar) {
+                ARCUnits.drawWeaponRange(unit);
             }
 
-            if (!control.input.commandMode && Core.settings.getBool("alwaysShowUnitRTSAi") && unit.isCommandable() && unit.command().command != null && unit.command().command.name.equals("move") && ARCVars.arcInfoControl()) {
+            if (!control.input.commandMode && Core.settings.getBool("alwaysShowUnitRTSAi") && unit.isCommandable() && unit.command().command != null && unit.command().command.name.equals("move")) {
                 Draw.z(Layer.effect);
                 CommandAI ai = unit.command();
                 //draw target line
@@ -1342,8 +1325,6 @@ public class UnitType extends UnlockableContent implements Senseable{
                         Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f, unit.team.color);
                     }
                 }
-
-                //Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
 
                 if (ai.attackTarget != null) {
                     Draw.color(unit.team.color);
@@ -1457,17 +1438,19 @@ public class UnitType extends UnlockableContent implements Senseable{
         float y_corr = 0f ;
         if (unit.hitSize<30f && unit.hitSize>20f && unit.controller().isBeingControlled(player.unit())) y_corr = 2f;
         if(Core.settings.getBool("unitHealthBar")){
-            if(DrawMinHealthBar && (unit.health < unit.maxHealth || unit.shield > 0)){
-                Draw.reset();
-                Lines.stroke(4f);
-                Draw.color(unit.team.color, 0.5f);
-                Lines.line(unit.x - unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr, unit.x + unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr);
-                Lines.stroke(2f);
-                Draw.color(Pal.health, 0.8f);
-                Lines.line(
-                        unit.x - unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr,
-                        unit.x + unit.hitSize() * (Math.min(Mathf.maxZero(unit.health), unit.maxHealth) * 1.2f / unit.maxHealth - 0.6f), unit.y + (unit.hitSize() / 2f) + y_corr);
-                Lines.stroke(2f);
+            if(drawUnitBar){
+                if (unit.health < unit.maxHealth){
+                    Draw.reset();
+                    Lines.stroke(4f);
+                    Draw.color(unit.team.color, 0.5f);
+                    Lines.line(unit.x - unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr, unit.x + unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr);
+                    Lines.stroke(2f);
+                    Draw.color(Pal.health, 0.8f);
+                    Lines.line(
+                            unit.x - unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr,
+                            unit.x + unit.hitSize() * (Math.min(Mathf.maxZero(unit.health), unit.maxHealth) * 1.2f / unit.maxHealth - 0.6f), unit.y + (unit.hitSize() / 2f) + y_corr);
+                    Lines.stroke(2f);
+                }
                 if(unit.shield > 0 && unit.shield<1e20){
                     for(int didgt = 1; didgt <= Mathf.digits((int)(unit.shield / unit.maxHealth)) + 1; didgt++){
                         Draw.color(Pal.shield, 0.8f);
@@ -1811,11 +1794,11 @@ public class UnitType extends UnlockableContent implements Senseable{
                 float scl = shadowElevation * invDrown;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(Pal.shadow);
-                Draw.alpha(legTrans); //
+                Draw.alpha(unitTrans); //
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
                 Draw.color();
             }
-            Draw.alpha(legTrans); //
+            Draw.alpha(unitTrans); //
 
             Draw.mixcol(Tmp.c3, Tmp.c3.a);
 
@@ -1948,14 +1931,6 @@ public class UnitType extends UnlockableContent implements Senseable{
         else if (flying) return "[acid]";
         else if (hovering) return "[sky]";
         else return "[stat]";
-    }
-
-    public static void initUnitTransp(){
-        unitTrans = (float)Core.settings.getInt("unitTransparency") / 100f;
-    }
-
-    public static void initLegTransp(){
-        legTrans = (float)Core.settings.getInt("unitTransparency") / 100f;
     }
     //endregion
 

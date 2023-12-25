@@ -32,8 +32,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.ConstructBlock.*;
 
-import java.util.Arrays;
-
 import static mindustry.Vars.*;
 import static mindustry.arcModule.ARCVars.arcui;
 
@@ -597,7 +595,7 @@ public class PlacementFragment{
                                             });
                                         }
 
-                                        int hasFlyer = control.input.selectedUnits.contains(Flyingc::isFlying) ? 1 : 0;
+                                        int hasFlyer = control.input.selectedUnits.contains(unit -> unit.isFlying()) ? 1 : 0;
                                         int hasLand = control.input.selectedUnits.contains(unit -> !unit.isFlying() && !unit.type.naval) ? 1 : 0;
                                         int hasNaval = control.input.selectedUnits.contains(unit -> unit.type.naval) ? 1 : 0;
                                         if (hasFlyer + hasLand + hasNaval >=2 ){
