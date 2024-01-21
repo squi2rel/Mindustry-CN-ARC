@@ -351,6 +351,7 @@ public class Hack {
                 if (len > itemTransferRange) return;
                 final int[] cnt = {0};
                 indexer.eachBlock(player.team(), player.x, player.y, itemTransferRange, b -> b.block instanceof OverdriveProjector, b -> {
+                    if (b == null) return;
                     if (cnt[0] >= autoFillMaxCount) return;
                     ConsumeItems consume = ((ConsumeItems) b.block.consumeBuilder.find(c -> c instanceof ConsumeItems));
                     if (consume == null) return;

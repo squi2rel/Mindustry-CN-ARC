@@ -10,7 +10,7 @@ public class ClassBuilder extends JSBuilder {
     int spaces;
 
     public ClassBuilder(String name, int spaces) {
-        className = name + " ";
+        className = name;
         this.spaces = spaces;
         isBlock = noSemicolon = true;
     }
@@ -54,6 +54,12 @@ public class ClassBuilder extends JSBuilder {
         CodeBlock cb = new CodeBlock(spaces + 4);
         func.add(cb);
         return cb.addSynx(name, sb.toString());
+    }
+
+    public CodeBlock addMethod(String name, String args) {
+        CodeBlock cb = new CodeBlock(spaces + 4);
+        func.add(cb);
+        return cb.addSynx(name, args);
     }
 
     @Override

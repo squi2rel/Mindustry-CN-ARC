@@ -14,8 +14,6 @@ import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Set;
 
 import static mindustry.annotations.BaseProcessor.*;
 
@@ -26,6 +24,8 @@ public class CallGenerator{
     static StringMap methodTable = new StringMap();
     static StringMap methodTableString = new StringMap();
     static int build = 146;//坏
+    static CodeBlock call = new CodeBlock(0);
+    static ClassBuilder callC = new ClassBuilder("Call", 0);
 
     static {
         methodTable.put(".*mindustry\\.ui\\..*", "");
@@ -47,13 +47,18 @@ public class CallGenerator{
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         CodeBlock code = new CodeBlock(0);
+        call.add("//CODEGEN from squi2rel (github.com/squi2rel/Mindustry-CN-ARC) build" + build);
+        call.add("const Packets = require(\"./Packets\")");
+        call.add(callC);
+        callC.addVariable("#game");
+        callC.addMethod("constructor", "game").add("this.#game = game");
         int[] packetID = {4};
         code.add("//CODEGEN from squi2rel (github.com/squi2rel/Mindustry-CN-ARC) build" + build);
         code.add("const Packet = require(\"./Packet\")");
         code.add("const TypeIO = require(\"./TypeIO\")");
         code.add("const crc32 = require(\"crc-32\")");
         code.add("const Packets = new Map()");
-        code.add("class StreamBegin extends Packet{\n" +
+        code.add("class StreamBegin extends Packet {\n" +
                 "    _id = 0;\n" +
                 "    static #lastid = 0;\n" +
                 "    total;\n" +
@@ -74,7 +79,7 @@ public class CallGenerator{
                 "    }\n" +
                 "}\n" +
                 "Packets.set(0,StreamBegin);\n" +
-                "class StreamChunk extends Packet{\n" +
+                "class StreamChunk extends Packet {\n" +
                 "    _id = 1;\n" +
                 "    id;\n" +
                 "    data;\n" +
@@ -89,7 +94,7 @@ public class CallGenerator{
                 "    }\n" +
                 "}\n" +
                 "Packets.set(1, StreamChunk);\n" +
-                "class WorldStream extends Packet{\n" +
+                "class WorldStream extends Packet {\n" +
                 "    _id = 2;\n" +
                 "    stream;\n" +
                 "    handleClient(nc) {\n" +
@@ -106,15 +111,15 @@ public class CallGenerator{
                 "    uuid;\n" +
                 "    write(buf) {\n" +
                 "        buf.putInt(" + build + ");\n" +
-                "        TypeIO.writeString(buf,\"official\");\n" +
-                "        TypeIO.writeString(buf,this.name);\n" +
-                "        TypeIO.writeString(buf,\"Mars\");\n" +
-                "        TypeIO.writeString(buf,this.usid);\n" +
-                "        let uuidbuf=Buffer.from(this.uuid,\"base64\");\n" +
+                "        TypeIO.writeString(buf, \"official\");\n" +
+                "        TypeIO.writeString(buf, this.name);\n" +
+                "        TypeIO.writeString(buf, \"en\");\n" +
+                "        TypeIO.writeString(buf, this.usid);\n" +
+                "        let uuidbuf = Buffer.from(this.uuid, \"base64\");\n" +
                 "        buf.put(uuidbuf);\n" +
                 "        buf.putLong(crc32.buf(uuidbuf));\n" +
                 "        buf.put(0);\n" +
-                "        buf.put([0xff,0xa1,0x08,0xff]);\n" +
+                "        buf.put([0xff, 0xa1, 0x08, 0xff]);\n" +
                 "        buf.put(0)\n" +
                 "    }\n" +
                 "}\n" +
@@ -187,7 +192,7 @@ public class CallGenerator{
             }
 
             //write the completed packet class
-            JavaFile.builder(packageName, packet.build()).build().writeTo(BaseProcessor.filer);
+            JavaFile.builder(packageName, packet.build()).build().writeTo(filer);
 
             code.add("Packets.set(" + packetID[0]++ + ", " + ent.packetClassName + ")");
         }
@@ -198,17 +203,19 @@ public class CallGenerator{
             code.add("global." + ent.packetClassName + " = " + ent.packetClassName);
         }
         ObjectBuilder ob = code.add("module.exports = ", cb -> cb.noSemicolon = true).newObject();
-        ob.set("StreamBegin").set("StreamChunk").set("WorldStream").set("ConnectPacket");
+        ob.put("StreamBegin").put("StreamChunk").put("WorldStream").put("ConnectPacket");
 
         for(MethodEntry ent : methods){
-            ob.set(ent.packetClassName);
+            ob.put(ent.packetClassName);
         }
 
-        ob.set("get", new CodeBlock("n => Packets.get(n)"));
+        ob.put("get", new CodeBlock("n => Packets.get(n)"));
+        call.add("module.exports = Call");
         //build and write resulting class
         TypeSpec spec = callBuilder.build();
-        JavaFile.builder(packageName, spec).build().writeTo(BaseProcessor.filer);
+        JavaFile.builder(packageName, spec).build().writeTo(filer);
 
+        new Fi("Call.js").writeString(call.build());
         new Fi("Packets.js").writeString(code.build());
     }
 
@@ -240,7 +247,7 @@ public class CallGenerator{
                 builder.beginControlFlow("if(mindustry.Vars.net.server() || mindustry.arcModule.ARCVars.replayController.writing)");
             }
 
-            if(BaseProcessor.isPrimitive(typeName)){ //check if it's a primitive, and if so write it
+            if(isPrimitive(typeName)){ //check if it's a primitive, and if so write it
                 builder.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
                 jsBuilder.add("buf.put" + (contains(bridgeTable, typeName) ? "" : typeName.substring(0,1).toUpperCase() + typeName.substring(1)) + "(this." + varName + ")");
             }else{
@@ -248,7 +255,7 @@ public class CallGenerator{
                 String ser = serializer.getNetWriter(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), true));
 
                 if(ser == null){ //make sure a serializer exists!
-                    BaseProcessor.err("No method to write class type: '" + typeName + "'", var);
+                    err("No method to write class type: '" + typeName + "'", var);
                 }
 
                 //add statement for writing it
@@ -312,15 +319,15 @@ public class CallGenerator{
 
             js.addVariable(varName);
             //write primitives automatically
-            if(BaseProcessor.isPrimitive(typeName)){
+            if(isPrimitive(typeName)){
                 builder.addStatement("$L = READ.$L()", varName, pname);
-                jsBuilder.add("this." + varName + "=buf.get" + (contains(bridgeTable, typeName) ? "" : typeName.substring(0,1).toUpperCase() + typeName.substring(1)) + "()");
+                jsBuilder.add("this." + varName + " = buf.get" + (contains(bridgeTable, typeName) ? "" : typeName.substring(0,1).toUpperCase() + typeName.substring(1)) + "()");
             }else{
                 //else, try and find a serializer
                 String ser = serializer.readers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), false));
 
                 if(ser == null){ //make sure a serializer exists!
-                    BaseProcessor.err("No read method to read class type '" + typeName + "' in method " + ent.targetMethod + "; " + serializer.readers, var);
+                    err("No read method to read class type '" + typeName + "' in method " + ent.targetMethod + "; " + serializer.readers, var);
                 }
 
                 //add statement for reading it
@@ -354,12 +361,12 @@ public class CallGenerator{
         //validate client methods to make sure
         if(ent.where.isClient){
             if(params.isEmpty()){
-                BaseProcessor.err("Client invoke methods must have a first parameter of type Player", elem);
+                err("Client invoke methods must have a first parameter of type Player", elem);
                 return;
             }
 
             if(!params.get(0).mirror().toString().contains("Player")){
-                BaseProcessor.err("Client invoke methods should have a first parameter of type Player", elem);
+                err("Client invoke methods should have a first parameter of type Player", elem);
                 return;
             }
         }
@@ -373,6 +380,20 @@ public class CallGenerator{
         if(forwarded){
             method.addParameter(ClassName.bestGuess("mindustry.net.NetConnection"), "exceptConnection");
         }
+
+        Seq<String> sb = new Seq<>();
+        for(int i = 0; i < params.size; i++){
+            //first argument is skipped as it is always the player caller
+            if((!ent.where.isServer) && i == 0){
+                continue;
+            }
+
+            Svar var = params.get(i);
+
+            sb.add(var.name());
+        }
+
+        CodeBlock jsMethod = callC.addMethod(elem.name(), sb.toArray(String.class));
 
         //call local method if applicable, shouldn't happen when forwarding method as that already happens by default
         if(!forwarded && ent.local != Loc.none){
@@ -410,6 +431,8 @@ public class CallGenerator{
         //add statement to create packet from pool
         method.addStatement("$1T packet = new $1T()", tname("mindustry.gen." + ent.packetClassName));
 
+        if (jsMethod != null) jsMethod.add("let packet = new Packets." + ent.packetClassName + "()");
+
         method.addTypeVariables(Seq.with(elem.e.getTypeParameters()).map(BaseProcessor::getTVN));
 
         for(int i = 0; i < params.size; i++){
@@ -433,6 +456,7 @@ public class CallGenerator{
             }
 
             method.addStatement("packet.$L = $L", varName, varName);
+            if (jsMethod != null) jsMethod.add("packet." + varName + " = " + varName);
 
             if(writePlayerSkipCheck){ //write end check
                 method.endControlFlow();
@@ -456,6 +480,7 @@ public class CallGenerator{
         //send the actual packet
         method.addStatement(sendString + "packet, " + (!ent.unreliable) + ")");
 
+        if (jsMethod != null) jsMethod.add("this.#game.netClient.send(packet, " + (!ent.unreliable) + ")");
 
         //end check for server/client
         method.endControlFlow();

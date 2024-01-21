@@ -31,12 +31,12 @@ public class ObjectBuilder extends JSBuilder {
         return sb.toString();
     }
 
-    public ObjectBuilder set(String name, JSBuilder code) {
+    public ObjectBuilder put(String name, JSBuilder code) {
         map.put(name, code);
         return this;
     }
 
-    public ObjectBuilder set(String name) {
+    public ObjectBuilder put(String name) {
         map.put(name, null);
         return this;
     }

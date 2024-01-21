@@ -45,11 +45,18 @@ public class CodeBlock extends JSBuilder {
     }
 
     public CodeBlock addSynx(String synx, String cond) {
-        add(synx + "(" + cond + "){", cb -> cb.noSemicolon = true);
+        add(synx + "(" + cond + ") {", cb -> cb.noSemicolon = true);
         CodeBlock cb = newBlock();
         add("}", cbcb -> cbcb.noSemicolon = true);
         cb.noSemicolon = true;
         return cb;
+    }
+
+    public CodeBlock addMethod(String name, String args) {
+        CodeBlock cb = new CodeBlock(spaces);
+        cb.noSemicolon = true;
+        add(cb);
+        return cb.addSynx("function " + name, args);
     }
 
     @Override
