@@ -50,6 +50,13 @@ public class MapInfoDialog extends BaseDialog{
                 tags.put("description", text);
             }).size(400f, 140f).maxTextLength(1000).get();
 
+            t.row();
+            t.add("[acid]地图模式标签").padRight(8).left();
+
+            TextField modeName = t.field(state.isPlaying() ? state.rules.modeName : tags.get("modeName", ""), Styles.areaField, text -> {
+                tags.put("modeName", text);
+            }).size(400f, 55f).maxTextLength(1000).get();
+
             if (Core.settings.getBool("arcPlayerList")) {
                 t.row();
                 t.add("[cyan]服务器标签").padRight(8).left();
@@ -156,6 +163,7 @@ public class MapInfoDialog extends BaseDialog{
 
             name.change();
             description.change();
+            modeName.change();
             author.change();
 
             t.margin(16f);

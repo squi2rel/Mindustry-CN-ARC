@@ -83,10 +83,23 @@ public enum Binding implements KeyBind{
     point(KeyCode.j),
     showRTSAi(KeyCode.l),
     console(KeyCode.f8),
-    lockonLastMark(KeyCode.f12),
-    arcDetail(KeyCode.f12),
-    arcScanMode(KeyCode.f12),
-    oreAdsorption(KeyCode.f12)
+    lockonLastMark(KeyCode.unknown),
+    arcDetail(KeyCode.unknown),
+    arcScanMode(KeyCode.unknown),
+    oreAdsorption(KeyCode.unknown),
+
+    camera_select_01(KeyCode.unknown),
+    camera_select_02(KeyCode.unknown),
+    camera_select_03(KeyCode.unknown),
+    camera_select_04(KeyCode.unknown),
+    camera_select_05(KeyCode.unknown),
+    camera_select_06(KeyCode.unknown),
+    camera_select_07(KeyCode.unknown),
+    camera_select_08(KeyCode.unknown),
+    camera_select_09(KeyCode.unknown),
+    camera_select_10(KeyCode.unknown),
+    camera_select_next(KeyCode.unknown),
+    camera_select_prev(KeyCode.unknown)
     ;
 
     private final KeybindValue defaultValue;

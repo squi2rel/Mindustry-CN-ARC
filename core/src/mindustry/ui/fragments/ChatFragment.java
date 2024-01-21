@@ -321,67 +321,11 @@ public class ChatFragment extends Table{
         try {
             if (message != null) arcui.MessageDialog.resolveMsg(message, playersender);
             if (playersender != null && playersender.unit() != null)
-                message = playersender.unit().type.emoji() + " " + message;
+                message = (playersender.unit().isNull() ? Iconc.alphaaaa : playersender.unit().type.emoji()) + " " + message;
             addMessage(message);
         } catch (Exception e) {
             Log.err(e);
         }
-    }
-
-    private boolean arcMessage(String message){
-        if (message.startsWith("!help")) {
-            helpMessage();
-            return true;
-        }
-        if (message.startsWith("!clear")) {
-            clearMessages();
-            messages.insert(0, "[cyan][ARC" + ARCVars.arcVersion + "][pink]聊天记录已清空");
-            return true;
-        }
-        if (message.startsWith("!log")) {
-            copyMessage(message);
-            messages.insert(0, "[cyan][ARC" + ARCVars.arcVersion + "][pink]聊天记录已复制到粘贴板");
-            return true;
-        }
-        return false;
-    }
-
-    private void copyMessage(String message) {
-        int logLength = Integer.min(20,messages.size - 1);
-        try {
-            logLength = Integer.min(messages.size - 1, Integer.parseInt(message.substring(4, message.length()).trim()));
-        } catch (Exception e) {
-        }
-
-        StringBuilder messageHis = new StringBuilder();
-        messageHis.append("下面是[ARC").append(ARCVars.arcVersion).append("] 导出的游戏内聊天记录").append("\n");
-        messageHis.append("*** 当前地图名称: ").append(state.map.name()).append("（模式：").append(state.rules.modeName).append("）\n");
-        messageHis.append("*** 当前波次: ").append(state.wave).append("\n");
-        messageHis.append("*** 导出模式: ").append(getValidType()).append("\n");
-
-        StringBuilder messageLs = new StringBuilder();
-        int messageCount = 0;
-        for (int i = 0; i <messages.size && messageCount <= logLength; i++) {
-            String msg = messages.get(i);
-            if (!chatValidType(msg)) continue;
-            messageLs.insert(0,messages.get(i) + "\n");
-            messageCount +=1;
-        }
-
-        messageHis.append("成功选取共 ").append(messageCount).append(" 条记录，如下：\n");
-        messageHis.append(messageLs);
-        Core.app.setClipboardText(Strings.stripGlyphs(Strings.stripColors(messageHis.toString())));
-    }
-
-    private void helpMessage() {
-        StringBuilder msg = new StringBuilder();
-        msg.append("[cyan][ARC").append(ARCVars.arcVersion).append("][violet]聊天辅助器").append("\n\n");
-        msg.append("[acid]!help  [white]调出本帮助菜单").append("\n");
-        msg.append("[acid]!clear  [white]清除聊天记录").append("\n");
-        msg.append("[acid]!log  [white]复制聊天记录到粘贴板，默认导出20条").append("\n");
-        msg.append("[acid]!logx  [white]复制最近的x条聊天记录，数字可修改").append("\n\n");
-        msg.append("[orange]如果与服务器插件有指令冲突，请及时反馈。\n可以在设置处设置导出情况");
-        ui.showInfo(msg.toString());
     }
 
     private boolean chatValidType(String msg) {
@@ -394,15 +338,6 @@ public class ChatFragment extends Table{
         else if(chatType==2 && !(msg.contains("[acid][公屏][white]") || msg.contains("[逻辑~") )) return false;
         return true;
     }
-
-    private String getValidType() {
-        int chatType = settings.getInt("chatValidType");
-        if (chatType==0) return "原版模式";   //默认下无视hub
-        else if (chatType==1) return "纯净聊天";
-        else if (chatType==2) return "服务器记录";
-        return "全部记录";
-    }
-
 
     public enum ChatMode{
         normal(""),

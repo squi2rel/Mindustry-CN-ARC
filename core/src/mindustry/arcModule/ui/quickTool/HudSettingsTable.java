@@ -1,4 +1,4 @@
-package mindustry.arcModule.ui;
+package mindustry.arcModule.ui.quickTool;
 
 import arc.Events;
 import arc.struct.Seq;
@@ -21,6 +21,8 @@ import static mindustry.Vars.*;
 import static arc.Core.bundle;
 import static arc.Core.settings;
 import static mindustry.arcModule.ARCVars.arcui;
+import static mindustry.arcModule.ElementUtils.NCtextStyle;
+import static mindustry.arcModule.ElementUtils.textStyle;
 
 public class HudSettingsTable extends ElementUtils.ToolTable {
     protected Seq<Setting> list = new Seq<>();

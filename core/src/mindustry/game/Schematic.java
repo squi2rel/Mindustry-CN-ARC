@@ -299,6 +299,12 @@ public class Schematic implements Publishable, Comparable<Schematic>{
             block = Blocks.air;
         }
 
+        public Stile(Block block, int x, int y){
+            this.block = block;
+            this.x = (short)x;
+            this.y = (short)y;
+        }
+
         public Stile set(Stile other){
             block = other.block;
             x = other.x;

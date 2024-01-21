@@ -18,6 +18,23 @@ import static mindustry.ui.Styles.flatOver;
 
 public class ElementUtils {
 
+    public static TextButton.TextButtonStyle textStyle = new TextButton.TextButtonStyle() {{
+        down = flatOver;
+        up = pane;
+        over = flatDownBase;
+        font = Fonts.def;
+        fontColor = Color.white;
+        disabledFontColor = Color.gray;
+        checked = flatDown;
+    }}, NCtextStyle = new TextButton.TextButtonStyle() {{
+                down = flatOver;
+                up = pane;
+                over = flatDownBase;
+                font = Fonts.def;
+                fontColor = Color.white;
+                disabledFontColor = Color.gray;
+            }};
+
     public static <T extends Element> T tooltip(T element, String text) {
         return tooltip(element, text, true);
     }
@@ -102,23 +119,7 @@ public class ElementUtils {
         public String icon = "";
         public boolean expand = false;
 
-        public TextButton.TextButtonStyle textStyle = new TextButton.TextButtonStyle() {{
-                    down = flatOver;
-                    up = pane;
-                    over = flatDownBase;
-                    font = Fonts.def;
-                    fontColor = Color.white;
-                    disabledFontColor = Color.gray;
-                    checked = flatDown;
-                }},
-                NCtextStyle = new TextButton.TextButtonStyle() {{
-                    down = flatOver;
-                    up = pane;
-                    over = flatDownBase;
-                    font = Fonts.def;
-                    fontColor = Color.white;
-                    disabledFontColor = Color.gray;
-                }};
+
 
         public void rebuild(){
             clear();

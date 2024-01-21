@@ -57,11 +57,15 @@ public class RFuncs {
     }
 
     public static void arcSetCamera(float x, float y) {
+        arcSetCamera(x, y, false);
+    }
+
+    public static void arcSetCamera(float x, float y, boolean effect) {
         if (control.input instanceof DesktopInput input) {
             input.panning = true;
         }
         camera.position.set(x, y);
-        Fx.arcIndexer.at(x, y);
+        if (effect) Fx.arcIndexer.at(x, y);
     }
 
     public static void sendChatMsg(String msg) {
@@ -280,7 +284,8 @@ public class RFuncs {
         cursorChecked = true;
         String path;
         Fi tmp;
-        if ((path = Core.settings.getString("arcCursorPath", null)) != null && !path.isEmpty() && (tmp = new Fi(path)).isDirectory()) cachedCursor = tmp;
+        if ((path = Core.settings.getString("arcCursorPath", null)) != null && !path.isEmpty() && (tmp = new Fi(path)).isDirectory())
+            cachedCursor = tmp;
         return cachedCursor;
     }
 

@@ -36,6 +36,8 @@ public class ARCVars implements Loadable {
 
     public static Boolean arcInfoControl = false;
 
+    public static int maxBuildPlans = 50;
+
     static {
         // 减少性能开销
         Events.run(EventType.Trigger.update, () -> {

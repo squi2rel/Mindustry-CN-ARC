@@ -1,4 +1,4 @@
-package mindustry.arcModule.ui;
+package mindustry.arcModule.ui.quickTool;
 
 import arc.Core;
 import arc.Events;
@@ -6,10 +6,12 @@ import arc.func.Cons;
 import arc.func.Floatf;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.math.geom.Geometry;
 import arc.math.geom.Rect;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.struct.StringMap;
 import arc.util.Tmp;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ElementUtils;
@@ -20,6 +22,7 @@ import mindustry.content.Liquids;
 import mindustry.content.UnitTypes;
 import mindustry.entities.units.BuildPlan;
 import mindustry.game.EventType;
+import mindustry.game.Schematic;
 import mindustry.game.Team;
 import mindustry.game.Teams;
 import mindustry.gen.Building;
@@ -31,6 +34,8 @@ import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ConstructBlock;
+import mindustry.world.blocks.environment.Floor;
+import mindustry.world.blocks.environment.OverlayFloor;
 import mindustry.world.blocks.power.ThermalGenerator;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.storage.CoreBlock;
@@ -38,6 +43,8 @@ import mindustry.world.blocks.storage.CoreBlock;
 import static mindustry.Vars.*;
 import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.DrawUtilities.arcDrawText;
+import static mindustry.arcModule.ElementUtils.NCtextStyle;
+import static mindustry.arcModule.ElementUtils.textStyle;
 import static mindustry.arcModule.RFuncs.*;
 
 public class AdvanceBuildTool extends ElementUtils.ToolTable {
@@ -56,13 +63,16 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
 
     private boolean shadowBuild = false;
 
+    public static boolean buildPlansConstrain = true;
+
     public AdvanceBuildTool() {
         icon = Blocks.buildTower.emoji();
         Events.on(EventType.WorldLoadEvent.class, e -> {
+            buildPlansConstrain = true;
             rebuild();
         });
-        Events.run(EventType.Trigger.update,()->{
-            if (shadowBuild && player.unit() != null && player.unit().plans!=null && player.unit().activelyBuilding()) {
+        Events.run(EventType.Trigger.update, () -> {
+            if (shadowBuild && player.unit() != null && player.unit().plans != null && player.unit().activelyBuilding()) {
                 if (player.unit().buildPlan().progress == 0) return;
                 player.unit().plans.remove(player.unit().buildPlan());
                 Call.deletePlans(player, new int[]{player.unit().plans.indexOf(player.unit().buildPlan(), true)});
@@ -72,7 +82,7 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
     }
 
     @Override
-    protected void buildTable(){
+    protected void buildTable() {
         table(t -> {
             t.setBackground(Styles.black6);
             t.table(tt -> {
@@ -100,7 +110,7 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
                     Draw.color(Pal.stat, 0.7f);
                     Draw.z(Layer.effect - 1f);
                     Lines.stroke(Math.min(Math.abs(width), Math.abs(height)) / tilesize / 10f);
-                    Lines.rect(selection.x * tilesize, selection.y * tilesize, selection.width * tilesize, selection.height * tilesize);
+                    Lines.rect(selection.x * tilesize - tilesize / 2f, selection.y * tilesize - tilesize / 2f, selection.width * tilesize + tilesize, selection.height * tilesize + tilesize);
                     Draw.reset();
                 });
             }).fillX().row();
@@ -125,8 +135,8 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
                 tt.button("S", NCtextStyle, this::searchBlock).update(button -> {
 
                     buildingSeq = player.team().data().buildings.select(building1 -> building1.block == searchBlock);
-                    if (searchBlock.privileged){
-                        for(Team team : Team.all) {
+                    if (searchBlock.privileged) {
+                        for (Team team : Team.all) {
                             if (team == player.team()) continue;
                             buildingSeq.add(team.data().buildings.select(building1 -> building1.block == searchBlock));
                         }
@@ -143,7 +153,7 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
                     else button.setText("\uE88A" + (searchBlockIndex + 1) + "/" + buildingSeq.size);
                 }).tooltip("[cyan]搜索方块").growX().height(30f);
 
-                tt.button(searchBlock.emoji(), NCtextStyle, ()->{
+                tt.button(searchBlock.emoji(), NCtextStyle, () -> {
                     new BlockSelectDialog(Block::isPlaceable, block -> searchBlock = block, block -> searchBlock == block).show().hidden(this::rebuild);
                     searchBlockIndex = 0;
                 }).tooltip("[acid]搜索替换").width(30f).height(30f);
@@ -170,6 +180,30 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
                     shadowBuild = !shadowBuild;
                 }).checked(a -> shadowBuild).size(30, 30).tooltip("虚影建造模式\n[red]有些服限制发包数较低，建筑较多时会被踢出。请酌情使用");
             }).fillX().row();
+            if (!net.client()) {
+                t.table(tt -> {
+                    tt.button("\uF8C9", textStyle, () -> {
+                        buildPlansConstrain = !buildPlansConstrain;
+                        Core.settings.put("forcePlacement", !buildPlansConstrain);
+                        if (mobile)
+                            arcui.arcInfo("允许蓝图建造地形");
+                    }).checked(a -> !buildPlansConstrain).size(30, 30).tooltip("允许蓝图建造地形");
+                    tt.button("\uE800", NCtextStyle, () -> {
+                        instantBuild();
+                        if (mobile)
+                            arcui.arcInfo("瞬间建造\n[cyan]强制瞬间建造[acid]选择范围内[cyan]内规划中的所有建筑\n[orange]可能出现bug");
+                    }).size(30, 30).tooltip("瞬间建造\n[cyan]强制瞬间建造[acid]选择范围内[cyan]规划中的所有建筑\n[orange]可能出现bug");
+                    tt.button("\uF8D2", NCtextStyle, () -> {
+                        if (buildPlansConstrain) arcui.arcInfo("请开启允许蓝图建造地形 \uF8C9");
+                        else saveTerrain(true);
+                    }).size(30, 30).tooltip("复制所选范围内的地板作为蓝图");
+                    tt.button("\uF8C4", NCtextStyle, () -> {
+                        if (buildPlansConstrain) arcui.arcInfo("请开启允许蓝图建造地形 \uF8C9");
+                        else saveTerrain(false);
+                    }).size(30, 30).tooltip("复制所选范围内的修饰作为蓝图");
+
+                }).fillX().row();
+            }
         });
     }
 
@@ -257,8 +291,8 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
         return true;
     }
 
-    void searchBlock(){
-        if (buildingSeq.size == 0){
+    void searchBlock() {
+        if (buildingSeq.size == 0) {
             arcui.arcInfo("[violet]方块搜索\n[acid]未找到此方块");
             return;
         }
@@ -267,6 +301,53 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
 
         arcSetCamera(searchBuild);
         arcui.arcInfo("[violet]方块搜索\n[acid]找到方块[cyan]" + (searchBlockIndex + 1) + "[acid]/[cyan]" + buildingSeq.size + "[white]" + searchBlock.emoji());
+    }
+
+    void instantBuild() {
+        player.unit().plans.each(buildPlan -> {
+            if (!contain(buildPlan.tile())) return;
+            forceBuildBlock(buildPlan.block, buildPlan.tile(), player.team(), buildPlan.rotation, buildPlan.config);
+        });
+    }
+
+    void saveTerrain(boolean floor) {
+        buildTiles.updateTiles();
+        Seq<Schematic.Stile> tiles = new Seq<>();
+        buildTiles.validTile.each(tile -> {
+            if (!floor && tile.overlay() == Blocks.air) return;
+            tiles.add(new Schematic.Stile(floor ? tile.floor() : tile.overlay(), tile.x - buildTiles.minx, tile.y - buildTiles.miny));
+        });
+        control.input.lastSchematic = new Schematic(tiles, new StringMap(), buildTiles.width, buildTiles.height);
+        control.input.useSchematic(control.input.lastSchematic);
+    }
+
+    void forceBuildBlock(Block block, Tile tile, Team team, int rotation, Object config) {
+        if (block == Blocks.cliff) buildCliff(tile);
+        else if (block instanceof OverlayFloor) {
+            tile.setOverlay(block);
+        } else if (block instanceof Floor floor) {
+            tile.setFloor(floor);
+        } else {
+            tile.setBlock(block, team, rotation);
+            tile.build.configure(config);
+        }
+        pathfinder.updateTile(tile);
+    }
+
+    void buildCliff(Tile tile) {
+        int rotation = 0;
+        for (int i = 0; i < 8; i++) {
+            Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+            if (other != null && !other.floor().hasSurface()) {
+                rotation |= (1 << i);
+            }
+        }
+
+        if (rotation != 0) {
+            tile.setBlock(Blocks.cliff);
+        }
+
+        tile.data = (byte) rotation;
     }
 
     enum BuildRange {
@@ -283,6 +364,8 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
 
         boolean canBuild = true;
 
+        public int minx, miny, maxx, maxy, width, height;
+
         public BuildTiles() {
         }
 
@@ -296,14 +379,24 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
         }
 
         public void updateTiles() {
+            minx = 9999;
+            miny = 9999;
+            maxx = -999;
+            maxy = -999;
             validTile.clear();
             eff.clear();
             world.tiles.eachTile(tile -> {
                 if (tile == null) return;
                 if (!contain(tile)) return;
                 validTile.add(tile);
+                minx = Math.min(minx, tile.x);
+                miny = Math.min(miny, tile.y);
+                maxx = Math.max(maxx, tile.x);
+                maxy = Math.max(maxy, tile.y);
             });
             validTile.each(tile -> tile.buildEff = 0f);
+            width = maxx - minx;
+            height = maxy - miny;
         }
 
         void checkValid() {
