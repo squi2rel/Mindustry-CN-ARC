@@ -63,7 +63,7 @@ public class Hack {
     //显示
     public static boolean noFog, useWindowedMenu;
     //多人
-    public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn, privateMsg;
+    public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn, privateMsg, ghost;
     public static String chosenUUID = null;
     public static int autoGGDelay;
     //移动
@@ -94,6 +94,7 @@ public class Hack {
         manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
         manager.register("多人", "rejoin", new Config("重进", null, changed(Hack::reconnect)));
         manager.register("多人", "privateMsg", new Config("VAPE聊天", null, changed(e -> privateMsg = e)));
+        manager.register("多人", "ghost", new Config("幽灵玩家", new Element[]{new Label("能看建筑看不到单位"), new Label("无法交互和聊天"), new Label("不会显示玩家加入")}, changed(e -> ghost = e)));
 
         manager.register("移动", "immediatelyTurn", new Config("瞬间转向", null, changed(e -> immediatelyTurn = e)));
         manager.register("移动", "ignoreTurn", new Config("无视旋转", null, changed(e -> ignoreTurn = e)));
@@ -120,7 +121,7 @@ public class Hack {
         manager.register("交互", "holdFill", new Config("按住装填", new Element[]{new Label(""), slider("holdFill", 50f, 500f, 1f, 100f, f -> holdFillInterval = Mathf.ceil(f), 0, f -> "间隔 " + holdFillInterval + "ms"), new Label(""), slider("holdFill2", 0f, 1000f, 1f, 500f, f -> holdFillMinItem = Mathf.ceil(f), 2, f -> "核心物资下限 " + holdFillMinItem), check("holdFill", "填满", false, b -> holdFillMode = b), check("holdFill2", "核心优先", false, b -> holdFillMode2 = b), new Label("指定物品"), new Table(t -> ItemSelection.buildTable(null, t, content.items(), () -> chosenItem, i -> chosenItem = i))}, changed(e -> holdFill = e, c -> holdFillInterval + "ms")));
         manager.register("交互", "autoFill", new Config("自动装超速", new Element[]{new Label(""), slider("autoFill", 50f, 2000f, 1f, 100f, f -> autoFillInterval = Mathf.ceil(f), 0, f -> "检测间隔 " + autoFillInterval + "ms"), new Label(""), slider("autoFill2", 1f, 20f, 1f, 5f, f -> autoFillMaxCount = Mathf.ceil(f), 2, f -> "每次装 " + autoFillMaxCount + " 个超速")}, changed(e -> autoFill = e, c -> autoFillInterval + "ms")));
         manager.register("交互", "allowBlue", new Config("允许蓝图", null, changed(e -> allowBlue = e)));
-        manager.register("交互", "immeRespawn", new Config("立即重生", new Element[]{check("immeRespawn", "准心优先(全局)", false, b -> spawnOnCursor = b), check("immeRespawn2", "大核优先(全局)", true, b -> spawnOnBigger = b)}, changed(e -> immeRespawn = e)));
+        manager.register("交互", "immeRespawn", new Config("立即重生", new Element[]{check("immeRespawn", "准心优先", false, b -> spawnOnCursor = b), check("immeRespawn2", "大核优先", true, b -> spawnOnBigger = b)}, changed(e -> immeRespawn = e)));
         manager.register("交互", "noLimit", new Config("偷看建筑", null, changed(e -> noDisplayLimit = e)));
         initFill();
 
