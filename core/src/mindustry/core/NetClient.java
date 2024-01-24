@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
+import arc.util.Timer;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
@@ -34,7 +35,6 @@ import mindustry.world.modules.*;
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
-import java.util.Timer;
 
 import static mindustry.Vars.*;
 
@@ -128,13 +128,12 @@ public class NetClient implements ApplicationListener{
 
             if(!Core.settings.getBool("arcAnonymity")){
                 // 原则上都应该发送，仅用于测试
-                Timer timer=new Timer();
-                timer.schedule(new TimerTask(){
-                    public void run(){
-                        Call.serverPacketReliable("ARC", ARCVars.arcVersion);
-                        Call.serverPacketReliable("ARC-build",Version.arcBuild + "");
-                        Call.serverPacketReliable("CheatOverride", ARCVars.arcCheatServer + "");
-                    }},5000);
+                // 这段谁写的 太几把了
+                Timer.schedule(() -> {
+                    Call.serverPacketReliable("ARC", ARCVars.arcVersion);
+                    Call.serverPacketReliable("ARC-build",Version.arcBuild + "");
+                    Call.serverPacketReliable("CheatOverride", ARCVars.arcCheatServer + "");
+                }, 5000);
             }
         });
 
