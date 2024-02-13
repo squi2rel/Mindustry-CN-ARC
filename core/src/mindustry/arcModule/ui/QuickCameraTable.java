@@ -21,6 +21,9 @@ public class QuickCameraTable extends Table {
     private static int quickHudSize = Core.settings.getInt("quickHudSize", 0);
     private static SingleHud[] hudList = new SingleHud[quickHudSize];
 
+    boolean hoverMode = Core.settings.getBool("arcCameraHoverMode", false);
+    boolean saveScale = Core.settings.getBool("arcCameraSaveScale", true);
+
     Binding[] cameraSelect = {
             Binding.camera_select_01,
             Binding.camera_select_02,
@@ -74,6 +77,19 @@ public class QuickCameraTable extends Table {
             t.button(Blocks.radar.emoji(), clearLineNonet, () -> arcui.arcInfo("[acid]ARC-快捷窗口[white]\n" +
                     "附身炮台下点会锁定炮台，指挥模式控兵下会锁定兵，其余情况下锁定当前界面"
             ));
+            if (!mobile) {
+                t.button("\uE88E", clearLineNoneTogglet, () -> {
+                    hoverMode = !hoverMode;
+                    arcui.arcInfo("[acid]当前为" + (hoverMode ? "悬浮" : "点击") + "切换视角模式");
+                    Core.settings.put("arcCameraHoverMode", hoverMode);
+                    rebuild();
+                }).checked(hoverMode).width(50f);
+            }
+            t.button("\uE80B", clearLineNoneTogglet, () -> {
+                saveScale = !saveScale;
+                arcui.arcInfo("[acid]当前" + (saveScale ? "" : "不") + "保存视角缩放");
+                Core.settings.put("arcCameraSaveScale", saveScale);
+            }).checked(saveScale).width(50f);
             for (int i = 0; i < quickHudSize; i++) hudButton(t, i);
         }).height(50f);
     }
@@ -83,11 +99,20 @@ public class QuickCameraTable extends Table {
             Label field = t.add("").get();
             Events.run(EventType.Trigger.update,
                     () -> field.setText((Core.keybinds.get(cameraSelect[index]).key == KeyCode.unknown ? "" : "[cyan]" + Core.keybinds.get(cameraSelect[index]).key.toString()) + hudList[index].getName()));
-            field.hovered(() -> hudList[index].getHud());
-            t.button("\uE813", clearLineNonet, () -> {
-                addHud(index);
-                rebuild();
-            });
+            if (hoverMode) field.hovered(() -> hudList[index].getHud());
+            else field.clicked(() -> hudList[index].getHud());
+            if (hudList[index].isValid()) {
+                t.button("\uE815", clearLineNonet, () -> {
+                    hudList[index] = new SingleHud();
+                    rebuild();
+                });
+            } else {
+                t.button("\uE813", clearLineNonet, () -> {
+                    addHud(index);
+                    rebuild();
+                });
+            }
+
         }).padRight(30f);
     }
 
@@ -98,6 +123,7 @@ public class QuickCameraTable extends Table {
             hudList[index] = new SingleHud(control.input.selectedUnits.first());
         } else
             hudList[index] = new SingleHud((int) (Core.camera.position.x / tilesize), (int) (Core.camera.position.y / tilesize));
+        hudList[index].showScale = saveScale;
     }
 
     static class SingleHud {
@@ -128,7 +154,7 @@ public class QuickCameraTable extends Table {
         }
 
         public String getName() {
-            if (!isValid()) return "[white]\uE815";
+            if (!isValid()) return "[lightgray]\uE815";
             StringBuilder name = new StringBuilder();
             if (unit != null) {
                 return name.append("[white]").append(unit.type.emoji()).append("[white]([acid]").append(unit.tileX()).append("[white],[acid]").append(unit.tileY()).append("[white])").toString();

@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.arcModule.toolpack.ARCTeam;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
@@ -26,6 +27,8 @@ public class Team implements Comparable<Team>{
     public static final Team[] all = new Team[256];
     /** The 6 base teams used in the editor. */
     public static final Team[] baseTeams = new Team[6];
+
+    public ARCTeam.ARCTeamData arcTeamData = new ARCTeam.ARCTeamData(this);
 
 
     public final static Team

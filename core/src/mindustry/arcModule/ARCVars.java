@@ -7,6 +7,7 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import mindustry.Vars;
+import mindustry.arcModule.toolpack.ARCTeam;
 import mindustry.arcModule.ui.ARCUI;
 import mindustry.core.Version;
 import mindustry.game.EventType;
@@ -37,6 +38,8 @@ public class ARCVars implements Loadable {
     public static Boolean arcInfoControl = false;
 
     public static int maxBuildPlans = 50;
+
+    public static ARCTeam arcTeam = new ARCTeam();
 
     static {
         // 减少性能开销

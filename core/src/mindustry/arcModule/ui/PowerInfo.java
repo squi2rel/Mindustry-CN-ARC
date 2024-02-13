@@ -30,7 +30,7 @@ public class PowerInfo {
         this.need += need;
     }
 
-    private void clear(){
+    public void clear(){
         this.powerbal = 0;
         this.stored = 0;
         this.capacity = 0;
@@ -59,17 +59,9 @@ public class PowerInfo {
         return produced / need;
     }
 
-
-    public static void update() {
-        info.clear();
-        Groups.powerGraph.each(item->{
-            if (item.graph().team == Vars.player.team())
-                info.add(item.graph().getPowerBalance(), item.graph().getLastPowerStored(), item.graph().getLastCapacity(), item.graph().getLastPowerProduced(), item.graph().getLastPowerNeeded());
-        });
-    }
-
     public static Element getBars() {
         Table power = new Table(Tex.wavepane).marginTop(6);
+        info = Vars.player.team().arcTeamData.powerInfo;
 
         Bar powerBar = new Bar(
                 () -> Core.bundle.format("bar.powerbalance", (info.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount(info.getPowerBalance())) +
@@ -90,7 +82,9 @@ public class PowerInfo {
         power.row();
         power.add(batteryBar).height(18).growX().padBottom(1);
 
-        power.update(PowerInfo::update);
+        power.update(()->{
+            info = Vars.player.team().arcTeamData.powerInfo;
+        });
         return power;
     }
 }

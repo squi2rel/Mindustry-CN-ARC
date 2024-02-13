@@ -1,7 +1,9 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import mindustry.Vars;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.claj.Claj;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -65,6 +67,10 @@ public class PausedDialog extends BaseDialog{
                 ui.join.show();
             });
             cont.button("@quit", Icon.exit, this::showQuitConfirm).colspan(2).width(dw + 10f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit"));
+
+            cont.row();
+
+            cont.button("管理claj房间", Icon.planet, () -> Claj.manageRooms.show()).colspan(2).width(450f).disabled(b -> !Vars.net.server()).row();
 
         }else{
             cont.defaults().size(130f).pad(5);

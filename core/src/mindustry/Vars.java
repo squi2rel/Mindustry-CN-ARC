@@ -39,10 +39,7 @@ import java.util.concurrent.*;
 import static arc.Core.*;
 
 public class Vars implements Loadable{
-    public static String userContentURL = "https://ghps.cc/https://raw.github.com";
-
-    /** 开始游玩时间 */
-    public static Long startPlayTime = Time.millis();
+    public static String userContentURL = "https://raw.github.com";
     /** Whether the game failed to launch last time. */
     public static boolean failedToLaunch = false;
     /** Whether to load locales. */

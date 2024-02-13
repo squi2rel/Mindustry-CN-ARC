@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.arcModule.ARCVars;
 import mindustry.core.*;
 import mindustry.mod.Mods.*;
 
@@ -24,6 +25,7 @@ public class CrashSender{
         report += "在确定不是你自己的问题后在这里报告: " + Vars.reportIssueURL + "\n\n";
         return report
         + "版本: " + Version.combined() + (Vars.headless ? " (服务器)" : "") + "\n"
+        + "学术版本: " + ARCVars.arcVersion + "\n"
         + "系统: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
         + ((OS.isAndroid || OS.isIos) && app != null ? "Android API level: " + Core.app.getVersion() + "\n" : "")
         + "Java版本: " + OS.javaVersion + "\n"

@@ -154,14 +154,14 @@ public class MapInfoTable extends BaseToolsTable{
             c.image().color(ARCVars.getThemeColor()).fillX().row();
             c.table(ct->{
                 uiRowIndex = 0;
-                for(int i=0;i<Iconc.all.length();i++){
-                    String subString = Iconc.all.substring(i,i+1);
-                    ct.button(subString,cleart, ()->{
-                        Core.app.setClipboardText(subString);
-                        sField.setText(sField.getText() + subString);
-                    }).size(50f).tooltip(subString);
-                    uiRowIndex+=1;
-                    if(uiRowIndex%15==0) ct.row();
+                for (var i : Iconc.codes) {
+                    String icon = String.valueOf((char) i.value), internal = i.key;
+                    ct.button(icon, cleart, () -> {
+                        Core.app.setClipboardText(icon);
+                        sField.setText(sField.getText() + icon);
+                    }).size(50f).tooltip(internal);
+                    uiRowIndex += 1;
+                    if (uiRowIndex % 15 == 0) ct.row();
                 }
             }).row();
         }).row();

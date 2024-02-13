@@ -1,6 +1,5 @@
 package mindustry.arcModule.ui;
 
-import arc.Events;
 import arc.func.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
@@ -9,14 +8,13 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.arcModule.ARCVars;
 import arc.util.Time;
-import mindustry.Vars;
 import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.dialogs.TeamSelectDialog;
 import mindustry.content.Blocks;
 import mindustry.content.UnitTypes;
 import mindustry.core.*;
-import mindustry.game.EventType;
+import mindustry.game.Team;
 import mindustry.game.Teams;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
@@ -24,6 +22,7 @@ import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
 
 import static mindustry.Vars.*;
+import static mindustry.arcModule.NumberFormat.*;
 import static mindustry.gen.Tex.*;
 import static mindustry.ui.Styles.*;
 
@@ -31,13 +30,15 @@ public class OtherCoreItemDisplay extends Table {
     public Seq<Teams.TeamData> teams = new Seq<>();
 
     private float lastUpd = 0f, fontScl = 0.8f;
-    private boolean show = false, showStat = true, showItem = true, showUnit = true;
+    private boolean show = false, showStat = true, showPower = true, showItem = true, showUnit = true;
 
     private Table teamsTable;
 
     private TextButton.TextButtonStyle textStyle;
 
-    private Seq<Teams.TeamData> forceShowTeam = new Seq<>();
+    private ShowType showType = ShowType.period;
+
+    private float showPeriod = 1200f; //2倍周期
 
     public OtherCoreItemDisplay() {
 
@@ -53,10 +54,6 @@ public class OtherCoreItemDisplay extends Table {
 
         teamsTable = new Table();
         rebuild();
-
-        Events.on(EventType.WorldLoadEvent.class, e -> {
-            forceShowTeam.clear();
-        });
     }
 
     void rebuild() {
@@ -76,8 +73,9 @@ public class OtherCoreItemDisplay extends Table {
 
                     buttons.button("T", textStyle, () -> {
                         new TeamSelectDialog(team -> {
-                            if (forceShowTeam.contains(team.data())) forceShowTeam.remove(team.data());
-                            else forceShowTeam.add(team.data());
+                            if (ARCVars.arcTeam.forceUpdateTeam.contains(team))
+                                ARCVars.arcTeam.forceUpdateTeam.remove(team);
+                            else ARCVars.arcTeam.forceUpdateTeam.add(team);
                             updateTeamList();
                             teamsRebuild();
                         }, team -> teams.contains(team.data()), false).show();
@@ -88,6 +86,11 @@ public class OtherCoreItemDisplay extends Table {
                         teamsRebuild();
                     }).checked(a -> showStat).size(40f).row();
 
+                    buttons.button(Blocks.powerNode.emoji(), textStyle, () -> {
+                        showPower = !showPower;
+                        teamsRebuild();
+                    }).checked(a -> showPower).size(40f).row();
+
                     buttons.button(content.items().get(0).emoji(), textStyle, () -> {
                         showItem = !showItem;
                         teamsRebuild();
@@ -96,7 +99,12 @@ public class OtherCoreItemDisplay extends Table {
                     buttons.button(UnitTypes.mono.emoji(), textStyle, () -> {
                         showUnit = !showUnit;
                         teamsRebuild();
-                    }).checked(a -> showUnit).size(40f);
+                    }).checked(a -> showUnit).size(40f).row();
+
+                    buttons.button(showType.getString(), textStyle, () -> {
+                        showType = showType.next();
+                        teamsRebuild();
+                    }).checked(gg -> false).size(40f);
                 }).left();
 
                 teamsRebuild();
@@ -120,7 +128,8 @@ public class OtherCoreItemDisplay extends Table {
         teams.sort(teamData -> -teamData.cores.size);
 
         /**name + cores + units */
-        teamsTable.add(); addTeamData(teamsTable,team -> team.team.id < 6 ? team.team.localized() : String.valueOf(team.team.id));
+        teamsTable.add();
+        addTeamData(teamsTable, team -> team.team.id < 6 ? team.team.localized() : String.valueOf(team.team.id));
         addTeamData(teamsTable, Blocks.coreNucleus.uiIcon, team -> UI.formatAmount(team.cores.size));
         addTeamData(teamsTable, UnitTypes.mono.uiIcon, team -> UI.formatAmount(team.units.size));
         addTeamData(teamsTable, UnitTypes.gamma.uiIcon, team -> String.valueOf(team.players.size));
@@ -138,17 +147,24 @@ public class OtherCoreItemDisplay extends Table {
             addTeamDataCheck(teamsTable, Blocks.basicAssemblerModule.uiIcon, team -> state.rules.unitCost(team.team));
             teamsTable.row();
         }
+        if (showPower) {
+            teamsTable.image().color(ARCVars.getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
+            addTeamData(teamsTable, Blocks.powerNode.uiIcon, team -> formatFloat(team.team.arcTeamData.powerInfo.getPowerBalance()));
+            addTeamData(teamsTable, Blocks.battery.uiIcon, team -> formatFloat(team.team.arcTeamData.powerInfo.getStored()));
+        }
 
         if (showItem) {
             teamsTable.image().color(ARCVars.getThemeColor()).fillX().height(1).colspan(999).padTop(3).padBottom(3).row();
             for (Item item : content.items()) {
                 boolean show = false;
                 for (Teams.TeamData team : teams) {
-                    if (team.hasCore() && team.core().items.get(item) > 0)
+                    if (team.team.arcTeamData.currentItems[item.id] > 0) {
                         show = true;
+                        break;
+                    }
                 }
                 if (show) {
-                    addTeamData(teamsTable, item.uiIcon, team -> (team.hasCore() && team.core().items.get(item) > 0) ? UI.formatAmount(team.core().items.get(item)) : "-");
+                    addTeamData(teamsTable, item.uiIcon, team -> formatTeamItem(team.team, item));
                 }
             }
         }
@@ -168,10 +184,18 @@ public class OtherCoreItemDisplay extends Table {
         }
     }
 
+    private String formatTeamItem(Team team, Item item) {
+        if (team.arcTeamData.currentItems[item.id] == 0) return "-";
+        StringBuilder s = new StringBuilder();
+        if (showType == ShowType.current || showType == ShowType.binary || (showType == ShowType.period && (Time.time % showPeriod) / showPeriod > 0.5f))
+            s.append(formatInteger(team.arcTeamData.currentItems[item.id]));
+        if (showType == ShowType.increment || showType == ShowType.binary || (showType == ShowType.period && (Time.time % showPeriod) / showPeriod < 0.5f))
+            s.append(team.arcTeamData.updateItems[item.id] > 0 ? "[acid]+" : "[orange]").append(formatInteger(team.arcTeamData.updateItems[item.id]));
+        return s.toString();
+    }
+
     private void updateTeamList() {
-        teams = Vars.state.teams.getActive().copy();
-        if (state.rules.waveTimer) teams.addUnique(state.rules.waveTeam.data());
-        forceShowTeam.each(team -> teams.addUnique(team));
+        teams = ARCVars.arcTeam.updateTeam.map(Team::data).copy();
     }
 
     private void addTeamDataCheck(Table table, TextureRegion icon, Floatf<Teams.TeamData> checked) {
@@ -228,4 +252,21 @@ public class OtherCoreItemDisplay extends Table {
         table.row();
     }
 
+    enum ShowType {
+        current, increment, period, binary;
+        private static final ShowType[] vals = values();
+
+        public ShowType next() {
+            return vals[(this.ordinal() + 1) % vals.length];
+        }
+
+        public String getString() {
+            return switch (this) {
+                case current -> "现";
+                case increment -> "变";
+                case period -> "切";
+                case binary -> "全";
+            };
+        }
+    }
 }
