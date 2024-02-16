@@ -42,7 +42,7 @@ public class BeControl{
     private String steamUrl;
     private String mobileUrl;
     private int updateBuild;
-    public static String gitDownloadURL = "https://gh.tinylake.tk//";
+    public static String gitDownloadURL = "https://gh.tinylake.tech/";
 
     private String patronURL = "https://afdian.net/a/Mindustry-CN-ARC";
     private String directDesktopURL,directMobileURL,directSteamURL;

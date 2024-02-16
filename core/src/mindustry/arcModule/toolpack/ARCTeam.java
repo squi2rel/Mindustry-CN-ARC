@@ -101,6 +101,7 @@ public class ARCTeam {
         }
 
         public void updateItems() {
+            if (currentItems.length == 0) init();
             for (Item item : Vars.content.items()) {
                 currentItems[item.id] = core.items.get(item);
             }
