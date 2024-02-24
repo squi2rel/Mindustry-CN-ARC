@@ -86,7 +86,7 @@ public class arcChatPicture {
             figureLink = t.field("在此输入图片网址api", text -> {
             }).width(400f).get();
             t.button("♐", () -> {
-                Call.sendChatMessage(getPrefix("yellow", "Picture").append(figureLink.getText()).toString().replace(" ",""));
+                RFuncs.shareString(getPrefix("yellow", "Picture").append(figureLink.getText()).toString().replace(" ",""));
                 figureLink.clear();
             }).disabled(disable -> !figureLink.getText().startsWith("http"));
             t.row();

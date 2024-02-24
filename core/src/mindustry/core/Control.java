@@ -264,7 +264,7 @@ public class Control implements ApplicationListener, Loadable{
                                     //when already hosting, instantly build everything. this looks bad but it's better than a desync
                                     Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
                                     build.block.placeEffect.at(build.x, build.y, build.block.size);
-                                    arcBuildEffect(build).at(build.x,build.y);
+                                    arcBuildEffect(build);
                                 }
                             }
                         }
@@ -303,7 +303,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
         build.block.placeEffect.at(build.x, build.y, build.block.size);
-        arcBuildEffect(build).at(build.x,build.y);
+        arcBuildEffect(build);
     }
 
     @Override

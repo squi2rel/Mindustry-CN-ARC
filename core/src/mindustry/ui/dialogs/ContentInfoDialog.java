@@ -6,6 +6,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.RFuncs;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.ui.Styles;
@@ -115,14 +116,14 @@ public class ContentInfoDialog extends BaseDialog{
                     String message = arcItemInfo(content,false);
                     int seperator = 145;
                     for (int i=0; i < message.length()/(float)seperator;i++){
-                        Call.sendChatMessage(message.substring(i*seperator,Math.min(message.length(),(i+1)*seperator)));
+                        RFuncs.shareString(message.substring(i*seperator,Math.min(message.length(),(i+1)*seperator)));
                     }
                 }).width(50f).disabled(!Core.settings.getBool("arcShareWaveInfo"));
                 tt.button("详",  Styles.cleart, () -> {
                     String message = arcItemInfo(content,true);
                     int seperator = 145;
                     for (int i=0; i < message.length()/(float)seperator;i++){
-                        Call.sendChatMessage(message.substring(i*seperator,Math.min(message.length(),(i+1)*seperator)));
+                        RFuncs.shareString(message.substring(i*seperator,Math.min(message.length(),(i+1)*seperator)));
                     }
                 }).width(50f).disabled(!Core.settings.getBool("arcShareWaveInfo"));
 
@@ -139,10 +140,10 @@ public class ContentInfoDialog extends BaseDialog{
 
     private String arcItemInfo(UnlockableContent content, boolean description) {
         StringBuilder builder = getPrefix("sky", "Content");
-        builder.append("标记了" + content.localizedName + content.emoji());
-        builder.append("(" + content.name + ")");
+        builder.append("标记了").append(content.localizedName).append(content.emoji());
+        builder.append("(").append(content.name).append(")");
         if (content.description != null && description) {
-            builder.append("。介绍: " + content.description);
+            builder.append("。介绍: ").append(content.description);
         }
         return builder.toString();
     }

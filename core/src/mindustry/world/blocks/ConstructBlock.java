@@ -114,7 +114,7 @@ public class ConstructBlock extends Block{
 
         if(fogControl.isVisibleTile(team, tile.x, tile.y)){
             block.placeEffect.at(tile.drawx(), tile.drawy(), block.size);
-            arcBuildEffect(tile.build).at(tile.drawx(), tile.drawy());
+            arcBuildEffect(tile.build, tile.drawx(), tile.drawy());
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
 

@@ -173,7 +173,7 @@ public class HudFragment{
                         tt.button(Iconc.players + "",cleart,()-> renderer.minimap.forceShowPlayer = !renderer.minimap.forceShowPlayer).size(30,30).tooltip("开关玩家名显示");
                         tt.button(Iconc.alphaaaa + "",cleart,() -> renderer.minimap.unitDetailsIcon = !renderer.minimap.unitDetailsIcon).size(30,30).tooltip("单位图标细节");
                     }
-                    tt.button("♐",cleart,()->Marker.lockonLastMark()).size(30,30).tooltip("锁定上个标记点");
+                    tt.button("♐",cleart, Marker::lockonLastMark).size(30,30).tooltip("锁定上个标记点");
             }).style(Styles.outlineLabel);
             if(Core.settings.getInt("AuxiliaryTable") == 3){
                 t.row();

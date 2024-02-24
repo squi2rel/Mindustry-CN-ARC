@@ -13,6 +13,7 @@ import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ARCClient;
 import mindustry.arcModule.ARCEvents;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.XiBao;
@@ -171,6 +172,11 @@ public class NetClient implements ApplicationListener{
 
             finishConnecting();
         });
+
+        ARCVars.arcClient.addHandlerString("ARCCHAT", (p, s) -> {
+            ui.chatfrag.addMessage("[violet]<ARC>[] " + netServer.chatFormatter.format(p, s), p);
+            Events.fire(new PlayerChatEvent(p, s));
+        });
     }
 
     public void addPacketHandler(String type, Cons<String> handler){
@@ -322,6 +328,10 @@ public class NetClient implements ApplicationListener{
                 }
             }
         }
+    }
+
+    public static void sendARCMessage(String msg) {
+        ARCClient.send("ARCCHAT", msg);
     }
 
     @Remote(called = Loc.client, variants = Variant.one)

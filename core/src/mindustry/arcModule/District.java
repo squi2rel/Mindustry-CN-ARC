@@ -141,7 +141,7 @@ public class District {
             t.button("发布规划区!", () -> {
                 if (!Core.settings.getBool("cheating_mode") && (voidDistrict.districtA.x - voidDistrict.districtB.x > 100f || voidDistrict.districtA.y - voidDistrict.districtB.y > 100f)) {
                     arcui.arcInfo("请勿发布无意义巨大规划区");
-                } else Call.sendChatMessage(voidDistrict.toString());
+                } else RFuncs.shareString(voidDistrict.toString());
             }).fillX();
         });
 

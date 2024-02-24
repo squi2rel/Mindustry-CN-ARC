@@ -16,6 +16,7 @@ import arc.util.OS;
 import arc.util.Strings;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.NetClient;
 import mindustry.game.*;
 import mindustry.gen.Building;
 import mindustry.gen.Call;
@@ -27,13 +28,18 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.logic.LogicBlock;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.zip.InflaterInputStream;
 
 import static arc.Core.camera;
 import static arc.graphics.Color.RGBtoHSV;
 import static mindustry.Vars.*;
 import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.gen.Tex.whiteui;
+import static mindustry.world.blocks.logic.LogicBlock.maxByteLen;
 
 @SuppressWarnings("unused")
 public class RFuncs {
@@ -68,9 +74,17 @@ public class RFuncs {
         if (effect) Fx.arcIndexer.at(x, y);
     }
 
+    public static void shareString(String s) {
+        if (Core.settings.getBool("arcNewShare", false)) {
+            NetClient.sendARCMessage(s);
+        } else {
+            Call.sendMessage(s);
+        }
+    }
+
     public static void sendChatMsg(String msg) {
         for (int i = 0; i < msg.length() / (float) msgSeperator; i++) {
-            Call.sendChatMessage(msg.substring(i * msgSeperator, Math.min(msg.length(), (i + 1) * msgSeperator)));
+            RFuncs.shareString(msg.substring(i * msgSeperator, Math.min(msg.length(), (i + 1) * msgSeperator)));
         }
     }
 
@@ -255,6 +269,20 @@ public class RFuncs {
         });
         Log.info("地图共有@个世处，总共@行指令，@个字符", data[0], data[1], data[2]);
         ui.announce(Strings.format("地图共有@个世处，总共@行指令，@个字符", data[0], data[1], data[2]), 10);
+    }
+
+    public static String getLogicCode(byte[] data){
+        try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
+            stream.read();
+            int bytelen = stream.readInt();
+            if(bytelen > maxByteLen) throw new IOException("Malformed logic data! Length: " + bytelen);
+            byte[] bytes = new byte[bytelen];
+            stream.readFully(bytes);
+            return new String(bytes, charset);
+        }catch(Exception ignored){
+            //invalid logic doesn't matter here
+        }
+        return "";
     }
 
     public static boolean has(boolean[] arr, boolean val) {

@@ -81,7 +81,7 @@ public class WaveInfoTable extends BaseToolsTable{
                 String message = RFuncs.arcShareWaveInfo(state.wave + waveOffset);
                 int seperator = 145;
                 for(int i = 0; i < message.length() / (float)seperator; i++){
-                    Call.sendChatMessage(message.substring(i * seperator, Math.min(message.length(), (i + 1) * seperator)));
+                    RFuncs.shareString(message.substring(i * seperator, Math.min(message.length(), (i + 1) * seperator)));
                 }
             }).get().setDisabled(() -> !state.rules.waves && !settings.getBool("arcShareWaveInfo"));
 

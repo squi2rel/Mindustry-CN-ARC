@@ -73,9 +73,13 @@ public class OtherCoreItemDisplay extends Table {
 
                     buttons.button("T", textStyle, () -> {
                         new TeamSelectDialog(team -> {
-                            if (ARCVars.arcTeam.forceUpdateTeam.contains(team))
+                            if (teams.contains(team.data())){
+                                ARCVars.arcTeam.updateTeam.remove(team);
                                 ARCVars.arcTeam.forceUpdateTeam.remove(team);
-                            else ARCVars.arcTeam.forceUpdateTeam.add(team);
+                            }else {
+                                ARCVars.arcTeam.updateTeam.add(team);
+                                ARCVars.arcTeam.forceUpdateTeam.add(team);
+                            }
                             updateTeamList();
                             teamsRebuild();
                         }, team -> teams.contains(team.data()), false).show();
@@ -190,7 +194,7 @@ public class OtherCoreItemDisplay extends Table {
         if (showType == ShowType.current || showType == ShowType.binary || (showType == ShowType.period && (Time.time % showPeriod) / showPeriod > 0.5f))
             s.append(formatInteger(team.arcTeamData.currentItems[item.id]));
         if (showType == ShowType.increment || showType == ShowType.binary || (showType == ShowType.period && (Time.time % showPeriod) / showPeriod < 0.5f))
-            s.append(team.arcTeamData.updateItems[item.id] > 0 ? "[acid]+" : "[orange]").append(formatInteger(team.arcTeamData.updateItems[item.id]));
+            s.append((int)team.arcTeamData.updateItems[item.id] > 0 ? "[acid]+" : "[orange]").append(formatInteger((int)(team.arcTeamData.updateItems[item.id])));
         return s.toString();
     }
 
@@ -234,7 +238,7 @@ public class OtherCoreItemDisplay extends Table {
     private void addTeamData(Table table, TextureRegion icon, String value) {
         /** 只显示一个数值 */
         table.image(icon).size(15, 15).left();
-        table.label(() -> ARCVars.getThemeColorCode() + value).fillX().get().setFontScale(fontScl);
+        table.label(() -> ARCVars.getThemeColorCode() + " ~" + value).get().setFontScale(fontScl);
         table.row();
     }
 

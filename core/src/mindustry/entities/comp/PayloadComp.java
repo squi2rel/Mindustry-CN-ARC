@@ -184,7 +184,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
             Fx.unitDrop.at(tile);
             on.block().placeEffect.at(on.drawx(), on.drawy(), on.block().size);
-            arcBuildEffect(payload.build).at(on.drawx(), on.drawy());
+            arcBuildEffect(payload.build, on.drawx(), on.drawy());
             return true;
         }
 

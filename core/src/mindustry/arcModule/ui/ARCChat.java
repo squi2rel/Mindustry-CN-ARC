@@ -34,6 +34,7 @@ import mindustry.gen.Player;
 import mindustry.gen.Tex;
 import mindustry.net.ValidateException;
 import mindustry.ui.Fonts;
+import mindustry.ui.Styles;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -136,7 +137,7 @@ public class ARCChat {
                 chatList = t2;
                 t2.align(Align.topLeft);
                 t2.defaults().height(60).width(1000).padLeft(3);
-                ScrollPane p = new ScrollPane(t2) {
+                ScrollPane p = new ScrollPane(t2, new ScrollPane.ScrollPaneStyle(Styles.smallPane)) {
                     @Override
                     public void draw() {
                         super.draw();
@@ -323,7 +324,7 @@ public class ARCChat {
                 if (chatTable.curMsgUnread != 0) {
                     Fonts.outline.setColor(Color.red);
                     Fonts.outline.draw(String.valueOf(chatTable.curMsgUnread), x, y + height);
-                }
+                }//TODO better
                 super.draw();
             }
         };
@@ -351,7 +352,7 @@ public class ARCChat {
             i.setDrawable(Icon.host);
             l = t2.add("服务器聊天").fillX().get();
             t2.update(() -> {
-                if (timer.get(300)) {
+                if (timer.get(600)) {
                     Vars.net.pingHost(Reflect.get(Vars.ui.join, "lastIp"), Reflect.get(Vars.ui.join, "lastPort"), c -> l.setText(c.name), e -> {
                     });
                 }
@@ -455,12 +456,21 @@ public class ARCChat {
             return prefH;
         }
 
+        @Override
+        protected void sizeChanged(){
+            lastText = null;
+            Font font = style.font;
+            Drawable background = style.background;
+            float availableHeight = getHeight() - (background == null ? 0 : background.getBottomHeight() + background.getTopHeight());
+            linesShowing = (int) Math.ceil(availableHeight / font.getLineHeight());
+        }
+
         private void computePrefSize() {
             if (pane == null) return;
             prefSizeInvalid = false;
             glyphLayout.setText(style.font, text, Color.white, Math.max(pane.getWidth() - style.background.getLeftWidth() - style.background.getRightWidth() - 60 - 10, 100), Align.topLeft, true);
             prefW = glyphLayout.width + style.background.getLeftWidth() + style.background.getRightWidth();
-            prefH = glyphLayout.height + style.background.getTopHeight() + style.background.getBottomHeight() + style.font.getLineHeight() + 1;
+            prefH = glyphLayout.height + style.background.getTopHeight() + style.background.getBottomHeight();
         }
 
         @Override

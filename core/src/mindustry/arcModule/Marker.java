@@ -206,7 +206,7 @@ public class Marker {
         public void sendMessage(Vec2 pos) {
             String text = getPrefix(color, name) +
                     "(" + World.toTile(pos.x) + "," + World.toTile(pos.y) + ")";
-            Call.sendChatMessage(text);
+            RFuncs.shareString(text);
             MessageDialog.addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.markLoc, text, pos));
         }
 

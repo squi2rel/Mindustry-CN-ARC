@@ -36,7 +36,7 @@ import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.logic.LogicDialog.*;
 
 public class LogicBlock extends Block{
-    private static final int maxByteLen = 1024 * 100;
+    public static final int maxByteLen = 1024 * 100;
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;

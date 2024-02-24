@@ -16,6 +16,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.arcModule.ARCClient;
 import mindustry.arcModule.ARCVars;
+import mindustry.core.NetClient;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -221,6 +222,11 @@ public class ChatFragment extends Table{
             return;
         }
 
+        if (settings.getBool("arcChatEnabled", false) && message.startsWith(ChatMode.arc.prefix + " ")) {
+            NetClient.sendARCMessage(message.substring(ChatMode.arc.prefix.length() + 1));
+            return;
+        }
+
         Call.sendChatMessage(message);
     }
 
@@ -342,7 +348,8 @@ public class ChatFragment extends Table{
     public enum ChatMode{
         normal(""),
         team("/t"),
-        admin("/a", player::admin)
+        admin("/a", player::admin),
+        arc("/arcchat", () -> settings.getBool("arcChatEnabled", false))
         ;
 
         public String prefix;

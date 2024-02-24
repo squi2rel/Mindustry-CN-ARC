@@ -21,6 +21,8 @@ public class ARCTeam {
     public Seq<Team> lastUpdateTeam = new Seq<>();  //上一个更新的队伍
     public Seq<Team> forceUpdateTeam = new Seq<>(); //强制显示的队伍，开始新地图时清空
 
+    public Seq<Team> activeTeam = new Seq<>(); //
+
     public float lastUpd = 0;
     public float resUpd = 0;
 
@@ -29,7 +31,7 @@ public class ARCTeam {
     public ARCTeam() {
         Events.on(EventType.WorldLoadEvent.class, e -> {
             forceUpdateTeam.clear();
-            updateTeamList();
+            initTeamList();
             updateTeam.each(team -> team.arcTeamData.init());
         });
 
@@ -39,7 +41,7 @@ public class ARCTeam {
                 lastUpd = Time.time;
                 updateTeamList();
             }
-            if (Time.time - resUpd > updateTimer * 60f) {
+            if (Time.time - resUpd > 60f) {
                 resUpd = Time.time;
                 updateTeam.each(team -> team.arcTeamData.updateDiffItems());
             }
@@ -47,10 +49,15 @@ public class ARCTeam {
         });
     }
 
-    public void updateTeamList() {
+    public void initTeamList() {
         updateTeam.clear();
         Vars.state.teams.getActive().each(teamData -> updateTeam.add(teamData.team));
         if (state.rules.waveTimer) updateTeam.addUnique(state.rules.waveTeam);
+    }
+
+    public void updateTeamList() {
+        activeTeam = state.teams.getActive().map(teamData -> teamData.team);
+        updateTeam.retainAll(team -> activeTeam.contains(team));
         forceUpdateTeam.each(team -> updateTeam.addUnique(team));
     }
 
@@ -78,7 +85,7 @@ public class ARCTeam {
         private CoreBlock.CoreBuild core;
 
         public int[] currentItems = new int[content.items().size];
-        public int[] updateItems = new int[content.items().size];
+        public float[] updateItems = new float[content.items().size];
         public int[] lastItems = new int[content.items().size];
 
         public PowerInfo powerInfo = new PowerInfo();
@@ -90,7 +97,7 @@ public class ARCTeam {
         public void init() {
             core = team.core();
             currentItems = new int[content.items().size];
-            updateItems = new int[content.items().size];
+            updateItems = new float[content.items().size];
             lastItems = new int[content.items().size];
         }
 

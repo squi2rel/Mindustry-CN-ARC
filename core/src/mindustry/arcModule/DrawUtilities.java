@@ -9,6 +9,7 @@ import arc.scene.ui.layout.Scl;
 import arc.util.Align;
 import arc.util.Time;
 import arc.util.pooling.Pools;
+import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
@@ -18,6 +19,7 @@ import mindustry.world.blocks.defense.MendProjector;
 import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.blocks.defense.Radar;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
+import mindustry.world.blocks.logic.LogicBlock;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static arc.graphics.g2d.Draw.color;
@@ -30,6 +32,8 @@ public class DrawUtilities {
 
     private static int arcCircleIndex = 0;
     static float iconSize = 0;
+
+    private static final Effect effect120 = createBuildEffect(120f), effect180 = createBuildEffect(180f);
 
     public static float arcDrawText(String text, float scl, float dx, float dy, Color color, int halign) {
         Font font = Fonts.outline;
@@ -139,33 +143,45 @@ public class DrawUtilities {
         Pools.free(layout);
     }
 
-    public static void arcDrawTextMain(String text, float x, float y) {
-        arcDrawTextMain(text, (int) x, (int) y);
+    public static void arcBuildEffect(Building build) {
+        arcBuildEffect(build, build.x, build.y);
     }
 
-    public static Effect arcBuildEffect(Building build) {
-        if (build == null || !Core.settings.getBool("arcPlacementEffect")) return new Effect();
+    public static void arcBuildEffect(Building build, float x, float y) {
+        if (build == null || !Core.settings.getBool("arcPlacementEffect")) return;
         if (build.block instanceof BaseTurret baseTurret && build.health > Core.settings.getInt("blockbarminhealth"))
-            return createBuildEffect(120f, baseTurret.range, build.team.color);
+            effect120.at(x, y, 0, new ARCEffectData(baseTurret.range, build.team.color));
         else if (build.block instanceof MendProjector mendProjector)
-            return createBuildEffect(120f, mendProjector.range, Pal.heal);
+            effect120.at(x, y, 0, new ARCEffectData(mendProjector.range, Pal.heal));
         else if (build.block instanceof OverdriveProjector overdriveProjector)
-            return createBuildEffect(120f, overdriveProjector.range, overdriveProjector.baseColor);
-        else if (build.block instanceof CoreBlock block)
-            return createBuildEffect(180f, block.fogRadius * tilesize, build.team.color);
+            effect120.at(x, y, 0, new ARCEffectData(overdriveProjector.range, overdriveProjector.baseColor));
         else if (build.block instanceof Radar radar)
-            return createBuildEffect(180f, radar.fogRadius * tilesize, build.team.color);
-        else return new Effect();
+            effect120.at(x, y, 0, new ARCEffectData(radar.fogRadius * tilesize, build.team.color));
+        else if (build.block instanceof LogicBlock logic)
+            effect120.at(x, y, 0, new ARCEffectData(logic.range, logic.mapColor));
+        else if (build.block instanceof CoreBlock block)
+            effect180.at(x, y, 0, new ARCEffectData(block.fogRadius * tilesize, build.team.color));
     }
 
-    public static Effect createBuildEffect(float lifeTime, float range, Color color) {
+    public static class ARCEffectData {
+        public final float range;
+        public final Color color;
+
+        public ARCEffectData(float range, Color color) {
+            this.range = range;
+            this.color = color;
+        }
+    }
+
+    public static Effect createBuildEffect(float lifeTime) {
         return new Effect(lifeTime, e -> {
-            color(color);
-            stroke((1.5f - e.fin() * 1f) * (range / 100));
-            if (e.fin() < 0.7f) Lines.circle(e.x, e.y, (float) ((1 - Math.pow((0.7f - e.fin()) / 0.7f, 2f)) * range));
+            ARCEffectData d = e.data();
+            color(d.color);
+            stroke((1.5f - e.fin()) * (d.range / 100));
+            if (e.fin() < 0.7f) Lines.circle(e.x, e.y, (float) ((1 - Math.pow((0.7f - e.fin()) / 0.7f, 2f)) * d.range));
             else {
                 Draw.alpha((1 - e.fin()) * 5f);
-                Lines.circle(e.x, e.y, range);
+                Lines.circle(e.x, e.y, d.range);
             }
         });
     }

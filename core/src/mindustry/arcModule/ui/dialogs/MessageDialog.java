@@ -2,6 +2,8 @@ package mindustry.arcModule.ui.dialogs;
 
 import arc.Core;
 import arc.Events;
+import arc.func.Boolf;
+import arc.func.Boolf2;
 import arc.graphics.Color;
 import arc.math.geom.Vec2;
 import arc.scene.ui.CheckBox;
@@ -46,6 +48,9 @@ public class MessageDialog extends BaseDialog {
 
     private Table historyTable;
     private Boolean fieldMode = false;
+
+    public Seq<Boolf<String>> handlers = new Seq<>();
+    public Seq<Boolf2<String, Player>> handlers2 = new Seq<>();
 
     public MessageDialog() {
         super("ARC-中央监控室");
@@ -255,6 +260,9 @@ public class MessageDialog extends BaseDialog {
             if (resolveMarkMsg(message, null)) return true;
             if (resolveServerMsg(message)) return true;
             if (arcui.MusicDialog.resolveMsg(message)) return true;
+            for (Boolf<String> handler : handlers) {
+                if (handler.get(message)) return true;
+            }
         }
 
         addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.normal, message));
@@ -262,24 +270,27 @@ public class MessageDialog extends BaseDialog {
         return false;
     }
 
-    public boolean resolveMsg(String message, @Nullable Player playersender) {
+    public void resolveMsg(String message, @Nullable Player playersender) {
         if (!ignoreMark) {
-            if (Marker.resolveMessage(message)) return true;
-            if (District.resolveMessage(message)) return true;
-            if (resolveMarkMsg(message, playersender)) return true;
-            if (arcChatPicture.resolveMessage(message, playersender)) return true;
-            if (arcui.MusicDialog.resolveMsg(message, playersender)) return true;
-            if (ui.schematics.resolveSchematic(message, playersender)) return true;
+            if (Marker.resolveMessage(message)) return;
+            if (District.resolveMessage(message)) return;
+            if (resolveMarkMsg(message, playersender)) return;
+            if (arcChatPicture.resolveMessage(message, playersender)) return;
+            if (arcui.MusicDialog.resolveMsg(message, playersender)) return;
+            if (ui.schematics.resolveSchematic(message, playersender)) return;
+            for (Boolf2<String, Player> handler : handlers2) {
+                if (handler.get(message, playersender)) return;
+            }
+
 
             if (playersender != null) {
                 addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.chat, message, playersender.name(), new Vec2(playersender.x, playersender.y)));
-                return true;
+                return;
             }
-            if (resolveServerMsg(message)) return true;
+            if (resolveServerMsg(message)) return;
         }
         addMsg(new MessageDialog.advanceMsg(MessageDialog.arcMsgType.normal, message));
 
-        return false;
     }
 
     public boolean resolveMarkMsg(String message, @Nullable Player playersender) {

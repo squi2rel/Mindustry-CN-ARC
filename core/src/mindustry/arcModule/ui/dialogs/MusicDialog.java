@@ -163,7 +163,6 @@ public class MusicDialog extends BaseDialog {
                 });
             });
             netClient.addPacketHandler("stopAudio", url -> sounds.stop());
-
         } catch (Exception ignored) {
         }
     }
@@ -506,7 +505,7 @@ public class MusicDialog extends BaseDialog {
         }
 
         public void share(MusicInfo info) {
-            Vars.ui.showConfirm("分享", "确认分享到聊天框?", () -> getInfoOrCall(info, fullInfo -> Call.sendChatMessage(getPrefix("pink", "Music") + " " + fullInfo.src + "M" + fullInfo.id), true));
+            Vars.ui.showConfirm("分享", "确认分享到聊天框?", () -> getInfoOrCall(info, fullInfo -> RFuncs.shareString(getPrefix("pink", "Music") + " " + fullInfo.src + "M" + fullInfo.id), true));
         }
 
         public void share(MusicList list) {
@@ -516,7 +515,7 @@ public class MusicDialog extends BaseDialog {
                     Http.HttpRequest req = Http.post("https://pastebin.com/api/api_post.php", "api_dev_key=sdBDjI5mWBnHl9vBEDMNiYQ3IZe0LFEk&api_option=paste&api_paste_expire_date=10M&api_paste_code=" + URLEncoder.encode(list.build(), E));
                     req.submit(r -> {
                         String code = r.getResultAsString();
-                        Call.sendChatMessage(getPrefix("pink", "Music") + " $M" + code.substring(code.lastIndexOf('/') + 1));
+                        RFuncs.shareString(getPrefix("pink", "Music") + " $M" + code.substring(code.lastIndexOf('/') + 1));
                     });
                     req.error(e -> Core.app.post(() -> ui.showException("分享失败", e)));
                 } catch (Exception e) {
@@ -873,39 +872,49 @@ public class MusicDialog extends BaseDialog {
 
         @Override
         public void getMusicInfo(String id, Cons<MusicInfo> callback, boolean noTip, MusicInfo src) {
-            Http.HttpRequest req = Http.get("https://wwwapi.kugou.com/yy/index.php?r=play/getdata&encode_album_audio_id=" + id);
-            req.header("Cookie", "kg_mid=" + uuid);
-            req.submit(res -> {
-                JsonValue j = new JsonReader().parse(res.getResultAsString());
-                if (j.getByte("status") == 0) {
-                    Core.app.post(() -> Vars.ui.showErrorMessage("此歌曲无法播放:\nKuGou Error: (" + j.getLong("err_code") + ")"));
-                    return;
+            try {
+                long timestamp = new Date().getTime();
+                String d = "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwtappid=1014clienttime=" + timestamp + "clientver=20000dfid=-encode_album_audio_id=" + id + "mid=" + uuid + "platid=4srcappid=2919token=userid=0uuid=" + uuid + "NVPh5oo715z5DIWAeQlhMDsWXXQV4hwt";
+                byte[] result = md5.digest(d.getBytes(E));
+                StringBuilder sb = new StringBuilder();
+                for (byte b : result) {
+                    sb.append(String.format("%02x", b));
                 }
-                JsonValue data = j.get("data");
-                if (data.getString("play_url").contains("clip") && !noTip) {
-                    Core.app.post(() -> Vars.ui.showConfirm("此歌曲为vip歌曲 仅支持播放部分", () -> callback.get(new MusicInfo() {{
-                        name = data.getString("song_name");
-                        author = data.getString("author_name");
-                        url = data.getString("play_url");
-                        img = data.getString("img");
-                        id = data.getString("encode_album_audio_id");
-                        src = thisId;
-                        length = data.getInt("timelength") / 1000;
-                        lrc = LRCParser.parse(data.getString("lyrics"));
-                    }})));
-                } else {
-                    callback.get(new MusicInfo() {{
-                        name = data.getString("song_name");
-                        author = data.getString("author_name");
-                        url = data.getString("play_url");
-                        img = data.getString("img");
-                        id = data.getString("encode_album_audio_id");
-                        src = thisId;
-                        length = data.getInt("timelength") / 1000;
-                        lrc = LRCParser.parse(data.getString("lyrics"));
-                    }});
-                }
-            });
+                Http.HttpRequest req = Http.get("https://wwwapi.kugou.com/play/songinfo?srcappid=2919&clientver=20000&clienttime=" + timestamp + "&mid=" + uuid + "&uuid=" + uuid + "&dfid=-&appid=1014&platid=4&encode_album_audio_id=" + id + "&token=&userid=0&signature=" + sb);
+                req.submit(res -> {
+                    JsonValue j = new JsonReader().parse(res.getResultAsString());
+                    if (j.getByte("status") == 0) {
+                        Core.app.post(() -> Vars.ui.showErrorMessage("此歌曲无法播放:\nKuGou Error: (" + j.getLong("error_code") + ") " + j.getString("msg")));
+                        return;
+                    }
+                    JsonValue data = j.get("data");
+                    if (data.getString("play_url").contains("clip") && !noTip) {
+                        Core.app.post(() -> Vars.ui.showConfirm("此歌曲为vip歌曲 仅支持播放部分", () -> callback.get(new MusicInfo() {{
+                            name = data.getString("song_name");
+                            author = data.getString("author_name");
+                            url = data.getString("play_url");
+                            img = data.getString("img");
+                            id = data.getString("encode_album_audio_id");
+                            src = thisId;
+                            length = data.getInt("timelength") / 1000;
+                            lrc = LRCParser.parse(data.getString("lyrics"));
+                        }})));
+                    } else {
+                        callback.get(new MusicInfo() {{
+                            name = data.getString("song_name");
+                            author = data.getString("author_name");
+                            url = data.getString("play_url");
+                            img = data.getString("img");
+                            id = data.getString("encode_album_audio_id");
+                            src = thisId;
+                            length = data.getInt("timelength") / 1000;
+                            lrc = LRCParser.parse(data.getString("lyrics"));
+                        }});
+                    }
+                });
+            } catch (Exception e) {
+                Core.app.post(() -> ui.showException("搜索出错!", e));
+            }
         }
 
         @Override
@@ -1135,7 +1144,7 @@ public class MusicDialog extends BaseDialog {
         public void share(MusicInfo info) {
             Vars.ui.showConfirm("分享", "确认分享到聊天框?", () -> getInfoOrCall(info, fullInfo -> {
                 try {
-                    Call.sendChatMessage(getPrefix("pink", "Music") + " " + fullInfo.src + "M" + fullInfo.id + "\uf6aa" + URLEncoder.encode(fullInfo.name, E) + "\uf6aa" + URLEncoder.encode(fullInfo.author, E));
+                    RFuncs.shareString(getPrefix("pink", "Music") + " " + fullInfo.src + "M" + fullInfo.id + "\uf6aa" + URLEncoder.encode(fullInfo.name, E) + "\uf6aa" + URLEncoder.encode(fullInfo.author, E));
                 } catch (Exception ignored) {
                 }
             }));
@@ -1149,7 +1158,7 @@ public class MusicDialog extends BaseDialog {
                     Http.HttpRequest req = Http.post("https://pastebin.com/api/api_post.php", "api_dev_key=sdBDjI5mWBnHl9vBEDMNiYQ3IZe0LFEk&api_option=paste&api_paste_expire_date=10M&api_paste_code=" + URLEncoder.encode(buildList(list), E));
                     req.submit(r -> {
                         String code = r.getResultAsString();
-                        Call.sendChatMessage(getPrefix("pink", "Music") + " $M" + code.substring(code.lastIndexOf('/') + 1));
+                        RFuncs.shareString(getPrefix("pink", "Music") + " $M" + code.substring(code.lastIndexOf('/') + 1));
                     });
                     req.error(e -> Core.app.post(() -> ui.showException("分享失败", e)));
                 } catch (Exception e) {
