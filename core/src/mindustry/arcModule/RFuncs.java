@@ -78,7 +78,7 @@ public class RFuncs {
         if (Core.settings.getBool("arcNewShare", false)) {
             NetClient.sendARCMessage(s);
         } else {
-            Call.sendMessage(s);
+            Call.sendChatMessage(s);
         }
     }
 

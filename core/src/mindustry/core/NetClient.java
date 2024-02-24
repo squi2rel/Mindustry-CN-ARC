@@ -174,8 +174,8 @@ public class NetClient implements ApplicationListener{
         });
 
         ARCVars.arcClient.addHandlerString("ARCCHAT", (p, s) -> {
-            ui.chatfrag.addMessage("[violet]<ARC>[] " + netServer.chatFormatter.format(p, s), p);
-            Events.fire(new PlayerChatEvent(p, s));
+            if (s.length() > maxTextLength) return;
+            NetClient.sendMessage("[violet]<ARC>[] " + netServer.chatFormatter.format(p, s), s, p);
         });
     }
 
@@ -331,6 +331,7 @@ public class NetClient implements ApplicationListener{
     }
 
     public static void sendARCMessage(String msg) {
+        if (msg.length() > maxTextLength) return;
         ARCClient.send("ARCCHAT", msg);
     }
 
