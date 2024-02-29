@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.arcModule.ARCClient;
 import mindustry.arcModule.ARCVars;
 import mindustry.core.NetClient;
 import mindustry.game.EventType.*;
@@ -218,7 +217,7 @@ public class ChatFragment extends Table{
         Events.fire(new ClientChatEvent(message));
 
         if (Hack.privateMsg) {
-            ARCClient.send("VAPEMSG", message);
+            ARCVars.arcClient.send("VAPEMSG", message);
             return;
         }
 
