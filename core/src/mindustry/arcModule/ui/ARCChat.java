@@ -15,20 +15,16 @@ import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.scene.event.Touchable;
 import arc.scene.style.Drawable;
-import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.struct.IntMap;
 import arc.util.*;
 import mindustry.Vars;
-import mindustry.arcModule.ARCClient;
 import mindustry.arcModule.ARCEvents;
-import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.RFuncs;
 import mindustry.arcModule.ui.window.Window;
 import mindustry.arcModule.ui.window.WindowEvents;
-import mindustry.game.EventType;
 import mindustry.gen.Icon;
 import mindustry.gen.Player;
 import mindustry.gen.Tex;
@@ -39,7 +35,8 @@ import mindustry.ui.Styles;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static mindustry.arcModule.ARCClient.*;
+import static mindustry.arcModule.ARCClient.decrypt;
+import static mindustry.arcModule.ARCVars.arcClient;
 import static mindustry.arcModule.ARCVars.arcui;
 import static mindustry.arcModule.ui.RStyles.clearAccentNonei;
 
@@ -61,7 +58,7 @@ public class ARCChat {
     private static TextField.TextFieldStyle myStyle, otherStyle, inputStyle;
 
     public static void init() throws Exception {
-        ARCVars.arcClient.addHandlerStream("ARCChat", (p, s) -> {
+        arcClient.addHandlerStream("ARCChat", (p, s) -> {
             try {
                 boolean isPrivate = s.readBoolean();
                 if (isPrivate && Vars.player.id != s.readInt()) return;
@@ -69,20 +66,20 @@ public class ARCChat {
                 int read = s.read(bytes);
                 if (read != bytes.length) return;
                 try {
-                    addMessage(p, isPrivate ? new String(decrypt(bytes, myPrivate), StandardCharsets.UTF_8) : new String(bytes, StandardCharsets.UTF_8), isPrivate, null);
+                    addMessage(p, isPrivate ? new String(decrypt(bytes, arcClient.myPrivate), StandardCharsets.UTF_8) : new String(bytes, StandardCharsets.UTF_8), isPrivate, null);
                 } catch (Exception e) {
                     Log.err(e);
                 }
             } catch (Exception ignored) {
             }
         });
-        ARCVars.arcClient.addHandlerStream("ARCChatAvatar", (p, d) -> {
+        arcClient.addHandlerStream("ARCChatAvatar", (p, d) -> {
             try {
                 setAvatar(p, d.readLong());
             } catch (Exception ignored) {
             }
         });
-        Events.on(ARCEvents.PlayerKeySend.class, e -> ARCClient.send("ARCChatAvatar", s -> {
+        Events.on(ARCEvents.PlayerKeySend.class, e -> arcClient.send("ARCChatAvatar", s -> {
             try {
                 s.writeLong(Core.settings.getLong("avatar", -1));
             } catch (Exception ignored) {
@@ -106,6 +103,10 @@ public class ARCChat {
         Events.on(ARCEvents.Disconnected.class, e -> reset());
         chat = new Window("学术聊天", 800, 600, Icon.chat.getRegion(), arcui.WindowManager);
         chat.closeToRemove(false);
+        chat.addListener(WindowEvents.open, w -> {
+            msgUnread -= cur.curMsgUnread;
+            cur.curMsgUnread = 0;
+        });
         bs = new TextButton.TextButtonStyle() {{
             over = RFuncs.tint(1204353279);
             disabled = over;
@@ -404,14 +405,14 @@ public class ARCChat {
         if (player == null) {
             send0(false, message.getBytes(StandardCharsets.UTF_8), null);
         } else {
-            send0(true, encrypt(message.getBytes(StandardCharsets.UTF_8), player), player);
+            send0(true, arcClient.encrypt(message.getBytes(StandardCharsets.UTF_8), player), player);
             addMessage(Vars.player, message, true, cur);
         }
     }
 
     private static void send0(boolean isPrivate, byte[] data, @Nullable Player target) {
         if (data == null) return;
-        ARCClient.send("ARCChat", s -> {
+        arcClient.send("ARCChat", s -> {
             try {
                 s.writeBoolean(isPrivate);
                 if (isPrivate) s.writeInt(target.id);

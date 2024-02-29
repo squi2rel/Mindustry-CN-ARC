@@ -332,7 +332,7 @@ public class NetClient implements ApplicationListener{
 
     public static void sendARCMessage(String msg) {
         if (msg.length() > maxTextLength) return;
-        ARCClient.send("ARCCHAT", msg);
+        ARCVars.arcClient.send("ARCCHAT", msg);
     }
 
     @Remote(called = Loc.client, variants = Variant.one)

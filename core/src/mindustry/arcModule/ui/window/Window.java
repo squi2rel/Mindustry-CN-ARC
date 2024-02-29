@@ -77,6 +77,7 @@ public class Window {
     public void add() {
         if (added && !closeToRemove) {
             table.visible = true;
+            fire(WindowEvents.open);
             return;
         }
         added = true;

@@ -1,5 +1,6 @@
 package mindustry.arcModule;
 
+import arc.Core;
 import arc.Events;
 import arc.func.Cons;
 import arc.func.Cons2;
@@ -18,15 +19,18 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 @SuppressWarnings({"unused", "NewApi"})
 public class ARCClient {
-    private static final IntMap<byte[]> keys = new IntMap<>();
     private static final byte[] emptyByte = new byte[0];
+    private static final int[] testArray = new int[]{-4, 114, 514, 1919, 810};
     private final ObjectMap<String, ObjectSet<Cons2<Player, byte[]>>> handler = new ObjectMap<>();
-    public static byte[] myKey;
-    public static PrivateKey myPrivate;
-    private static Timer.Task keyTask;
+    private final IntMap<byte[]> keys = new IntMap<>();
+    public byte[] myKey;
+    public PrivateKey myPrivate;
+    public boolean enabled = false;
+    private Timer.Task keyTask, testTask;
 
     public ARCClient() {
         try {
@@ -45,16 +49,32 @@ public class ARCClient {
                 } catch (Exception ignored) {
                 }
             });
-            Events.on(ARCEvents.PlayerJoin.class, e -> sendKey());
-            Events.on(ARCEvents.PlayerLeave.class, e -> keys.remove(e.player.id));
-            Events.on(EventType.WorldLoadEndEvent.class, e -> send("ARCKeyRequest", emptyByte));
             addHandler("ARCKeyRequest", (p, d) -> sendKey());
+            Events.on(ARCEvents.PlayerJoin.class, e -> {
+                if (enabled) sendKey();
+            });
+            Events.on(ARCEvents.PlayerLeave.class, e -> keys.remove(e.player.id));
+            Events.on(EventType.WorldLoadEndEvent.class, e -> {
+                enabled = false;
+                if (!Core.settings.getBool("arcCustomPacket", true)) return;
+                sendTest();
+                send("ARCKeyRequest", emptyByte);
+            });
         } catch (Exception e) {
             Log.err(e);
         }
     }
 
-    public static void sendKey() {
+    private void sendTest() {
+        Call.setUnitCommand(null, testArray, null);
+        if (testTask != null) testTask.cancel();
+        testTask = Timer.schedule(() -> {
+            ARCVars.arcui.arcInfo("[red]此服务器禁用自定义发包，请在设置内关闭自定义发包", 3);
+            enabled = false;
+        }, 2);
+    }
+
+    public void sendKey() {
         if (keyTask != null) keyTask.cancel();
         keyTask = Timer.schedule(() -> send("ARCKey", s -> {
             try {
@@ -96,9 +116,14 @@ public class ARCClient {
     }
 
     public void handle(Player player, int[] raw) {
+        if (Arrays.equals(raw, testArray)) {
+            testTask.cancel();
+            enabled = true;
+            return;
+        }
         if (raw == null || raw[0] > 0) return;
-        DataInputStream s = new DataInputStream(new ByteArrayInputStream(ARCProtocol.decode(raw)));
         try {
+            DataInputStream s = new DataInputStream(new ByteArrayInputStream(ARCProtocol.decode(raw)));
             ObjectSet<Cons2<Player, byte[]>> set = handler.get(s.readUTF());
             if (set == null) return;
             int length = s.readInt();
@@ -113,7 +138,7 @@ public class ARCClient {
         }
     }
 
-    public static void send(String name, byte[] data) {
+    public void send(String name, byte[] data) {
         if (data.length > 16384) throw new IllegalArgumentException("数据太大: " + data.length);
         ByteArrayOutputStream o = new ByteArrayOutputStream();
         DataOutputStream s = new DataOutputStream(o);
@@ -127,19 +152,23 @@ public class ARCClient {
         }
     }
 
-    public static void send(String name, String data) {
+    public void send(String name, String data) {
         send(name, data.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static void send(String name, Cons<DataOutputStream> data) {
+    public void send(String name, Cons<DataOutputStream> data) {
         ByteArrayOutputStream o = new ByteArrayOutputStream();
         data.get(new DataOutputStream(o));
         send(name, o.toByteArray());
     }
 
-    private static void send0(ByteArrayOutputStream o) {
+    private void send0(ByteArrayOutputStream o) {
         int[] encoded = ARCProtocol.encode(o.toByteArray());
         Call.setUnitCommand(null, encoded, null);
+    }
+
+    public byte[] getKey(Player player) {
+        return keys.get(player.id);
     }
 
     public static class ARCProtocol {
@@ -169,9 +198,13 @@ public class ARCClient {
         return keyPairGenerator.generateKeyPair();
     }
 
-    public static byte[] encrypt(byte[] data, Player player) throws Exception {
+    public byte[] encrypt(byte[] data, Player player) throws Exception {
         byte[] key = keys.get(player.id);
         if (key == null) throw new ValidateException(player, "未找到玩家key");
+        return encrypt(data, key);
+    }
+
+    public static byte[] encrypt(byte[] data, byte[] key) throws Exception {
         return encrypt(data, generatePublic(key));
     }
 

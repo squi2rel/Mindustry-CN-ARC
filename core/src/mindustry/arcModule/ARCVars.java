@@ -37,7 +37,7 @@ public class ARCVars implements Loadable {
 
     public static Boolean arcInfoControl = false;
 
-    public static int maxBuildPlans = 50;
+    public static final int maxBuildPlans = 100;
 
     public static ARCTeam arcTeam = new ARCTeam();
 

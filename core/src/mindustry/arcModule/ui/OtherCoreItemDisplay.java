@@ -10,12 +10,14 @@ import mindustry.arcModule.ARCVars;
 import arc.util.Time;
 import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.RFuncs;
+import mindustry.arcModule.ui.dialogs.MapStatisticsDialog;
 import mindustry.arcModule.ui.dialogs.TeamSelectDialog;
 import mindustry.content.Blocks;
 import mindustry.content.UnitTypes;
 import mindustry.core.*;
 import mindustry.game.Team;
 import mindustry.game.Teams;
+import mindustry.gen.Iconc;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
 import mindustry.ui.Fonts;
@@ -108,7 +110,9 @@ public class OtherCoreItemDisplay extends Table {
                     buttons.button(showType.getString(), textStyle, () -> {
                         showType = showType.next();
                         teamsRebuild();
-                    }).checked(gg -> false).size(40f);
+                    }).checked(gg -> false).size(40f).row();
+
+                    buttons.button(String.valueOf(Iconc.map), textStyle, () -> new MapStatisticsDialog().show()).checked(gg -> false).size(40f);
                 }).left();
 
                 teamsRebuild();

@@ -387,7 +387,7 @@ public class Block extends UnlockableContent implements Senseable{
         //delegates to entity unless it is null
         if(tile.build != null){
             tile.build.draw();
-            if (tile.block instanceof BaseTurret t) ARCBuilds.arcTurret((BaseTurret.BaseTurretBuild) tile.build);
+            ARCBuilds.drawARCBuilds(tile.build);
         }else{
             Draw.rect(
                     variants == 0 ? region :

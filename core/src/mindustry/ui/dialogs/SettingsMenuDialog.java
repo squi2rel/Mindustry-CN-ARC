@@ -549,6 +549,13 @@ public class SettingsMenuDialog extends BaseDialog{
                     return "显示资源和兵种";
                 }
             });
+            arc.sliderPref("statisticsInterval", 0, 0, 120, 10, s -> {
+                if (s == 0) {
+                    return "不统计";
+                } else {
+                    return "每 " + s + " s";
+                }
+            });
             arc.sliderPref("arcCoreItemsCol", 5, 4, 15, 1, i -> i + "列");
             arc.checkPref("showQuickToolTable", settings.getBool("showFloatingSettings"));
             arc.sliderPref("quickHudSize", 0, 0, 10, 1, i -> i + "");
@@ -578,9 +585,10 @@ public class SettingsMenuDialog extends BaseDialog{
             arc.checkPref("arcPlacementEffect", false);
 
             arc.addCategory("arcMassDriverInfo");
-            arc.sliderPref("mass_driver_line_alpha", 100, 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
-            arc.sliderPref("mass_driver_line_interval", 40, 8, 400, 4, i -> i / 8f + "格");
-            arc.stringInput("mass_driver_line_color", "ff8c66");
+            arc.sliderPref("msLineAlpha", settings.getInt("mass_driver_line_alpha", 0), 0, 100, 1, i -> i > 0 ? i + "%" : "关闭");
+            arc.checkPref("msShootingDraw", false);
+            arc.sliderPref("msLineInterval", settings.getInt("mass_driver_line_interval", 40), 8, 400, 8, i -> i / 8f + "格");
+            arc.stringInput("msLineColor", settings.getString("mass_driver_line_color", "ff8c66"));
 
             arc.addCategory("arcAddTurretInfo");
             arc.checkPref("showTurretAmmo", false);
@@ -661,6 +669,7 @@ public class SettingsMenuDialog extends BaseDialog{
             arc.checkPref("arcSelfName", false);
             arc.checkPref("arcNewShare", false);
             arc.checkPref("arcChatEnabled", false);
+            arc.checkPref("arcCustomPacket", true);
 
             arc.addCategory("arcPlayerEffect");
             arc.stringInput("playerEffectColor", "ffd37f");

@@ -17,7 +17,6 @@ import mindustry.ai.*;
 import mindustry.ai.Pathfinder.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.draw.ARCUnits;
 import mindustry.content.*;
@@ -44,17 +43,12 @@ import mindustry.world.meta.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static mindustry.Vars.*;
-import static mindustry.arcModule.ARCVars.maxBuildPlans;
-import static mindustry.arcModule.toolpack.arcPlayerEffect.drawPlayerEffect;
+import static mindustry.arcModule.draw.ARCUnits.drawARCUnits;
 
 public class UnitType extends UnlockableContent implements Senseable{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
-
-    //MI2 unit transparency
     private static float unitTrans = 1f;
-    private boolean drawUnit = true, drawUnitBar = false;
-
     private Table unitStatus = new Table();
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
@@ -1287,55 +1281,12 @@ public class UnitType extends UnlockableContent implements Senseable{
         boolean isPayload = !unit.isAdded();
 
         //透明度
-        unitTrans = ARCUnits.unitTrans;
 
         Mechc mech = unit instanceof Mechc ? (Mechc) unit : null;
         float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 
-        drawUnit = (unit.maxHealth + unit.shield) > ARCUnits.unitDrawMinHealth;
-        drawUnitBar = (unit.maxHealth + unit.shield) > ARCUnits.unitBarDrawMinHealth;
-
-        if (!drawUnit) {
-            unitTrans = 0f;
-            drawUnitBar = false;
-        }
-        if (ARCVars.arcInfoControl(unit.team())) {
-            //玩家操控的单位具有炫酷特效
-            if (unit.controller() instanceof Player) {
-                drawPlayerEffect(unit);
-                if (Core.settings.getBool("alwaysShowPlayerUnit")) {
-                    unitTrans = 100f;
-                    drawUnitBar = true;
-                }
-            }
-            if (drawUnitBar) {
-                ARCUnits.drawWeaponRange(unit);
-            }
-
-            if (!control.input.commandMode && Core.settings.getBool("alwaysShowUnitRTSAi") && unit.isCommandable() && unit.command().command != null && unit.command().command.name.equals("move")) {
-                Draw.z(Layer.effect);
-                CommandAI ai = unit.command();
-                //draw target line
-                if (ai.targetPos != null) {
-                    Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
-                    Draw.color(unit.team.color);
-                    Drawf.limitLineColor(unit, lineDest, unit.hitSize / 2f, 3.5f, unit.team.color);
-
-                    if (ai.attackTarget == null) {
-                        Draw.color(unit.team.color);
-                        Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f, unit.team.color);
-                    }
-                }
-
-                if (ai.attackTarget != null) {
-                    Draw.color(unit.team.color);
-                    Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, unit.team.color);
-                }
-                Draw.color();
-            }
-
-        }
-
+        drawARCUnits(unit);
+        unitTrans = ARCUnits.unitTrans;
         if(unitTrans == 0) return;
 
         if(unit.controller().isBeingControlled(player.unit())){
@@ -1350,7 +1301,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         Draw.z(z - 0.02f);
 
         if(mech != null){
-            if(unitTrans > 0f) drawMech(mech);
+            drawMech(mech);
 
             //side
             legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
@@ -1371,32 +1322,32 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
 
-        if(unit instanceof Payloadc && unitTrans > 0f){
+        if(unit instanceof Payloadc){
             drawPayload((Unit & Payloadc)unit);
         }
-        if(unitTrans > 0f){
-            drawSoftShadow(unit);
 
-            Draw.z(z);
+        drawSoftShadow(unit);
 
-            if(unit instanceof Crawlc c){
-                drawCrawl(c);
-            }
+        Draw.z(z);
 
-            if(drawBody) drawOutline(unit);
-            drawWeaponOutlines(unit);
-            if(engineLayer > 0) Draw.z(engineLayer);
-            if(trailLength > 0 && !naval && (unit.isFlying() || !useEngineElevation)){
-                drawTrail(unit);
-            }
-            if(engines.size > 0) drawEngines(unit);
-            Draw.z(z);
-            if(drawBody) drawBody(unit);
-            if(drawCell) drawCell(unit);
-            drawWeapons(unit);
-            if(drawItems) drawItems(unit);
-            drawLight(unit);
+        if(unit instanceof Crawlc c){
+            drawCrawl(c);
         }
+
+        if(drawBody) drawOutline(unit);
+        drawWeaponOutlines(unit);
+        if(engineLayer > 0) Draw.z(engineLayer);
+        if(trailLength > 0 && !naval && (unit.isFlying() || !useEngineElevation)){
+            drawTrail(unit);
+        }
+        if(engines.size > 0) drawEngines(unit);
+        Draw.z(z);
+        if(drawBody) drawBody(unit);
+        if(drawCell) drawCell(unit);
+        drawWeapons(unit);
+        if(drawItems) drawItems(unit);
+        drawLight(unit);
+
 
         if(unit.shieldAlpha > 0 && drawShields){
             drawShield(unit);
@@ -1434,142 +1385,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         Draw.reset();
-
-        Draw.z(Layer.shields + 6f);
-        float y_corr = 0f ;
-        if (unit.hitSize<30f && unit.hitSize>20f && unit.controller().isBeingControlled(player.unit())) y_corr = 2f;
-        if(Core.settings.getBool("unitHealthBar")){
-            if(drawUnitBar){
-                if (unit.health < unit.maxHealth){
-                    Draw.reset();
-                    Lines.stroke(4f);
-                    Draw.color(unit.team.color, 0.5f);
-                    Lines.line(unit.x - unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr, unit.x + unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr);
-                    Lines.stroke(2f);
-                    Draw.color(Pal.health, 0.8f);
-                    Lines.line(
-                            unit.x - unit.hitSize() * 0.6f, unit.y + (unit.hitSize() / 2f) + y_corr,
-                            unit.x + unit.hitSize() * (Math.min(Mathf.maxZero(unit.health), unit.maxHealth) * 1.2f / unit.maxHealth - 0.6f), unit.y + (unit.hitSize() / 2f) + y_corr);
-                    Lines.stroke(2f);
-                }
-                if(unit.shield > 0 && unit.shield<1e20){
-                    for(int didgt = 1; didgt <= Mathf.digits((int)(unit.shield / unit.maxHealth)) + 1; didgt++){
-                        Draw.color(Pal.shield, 0.8f);
-                        float shieldAmountScale = unit.shield / (unit.maxHealth * Mathf.pow(10f, (float)didgt - 1f));
-                        if(didgt > 1){
-                            Lines.line(unit.x - unit.hitSize() * 0.6f,
-                                    unit.y + (unit.hitSize() / 2f) + (float)didgt * 2f + y_corr,
-                                    unit.x + unit.hitSize() * ((Mathf.ceil((shieldAmountScale - Mathf.floor(shieldAmountScale)) * 10f) - 1f + 0.0001f) * 1.2f * (1f / 9f) - 0.6f),
-                                    unit.y + (unit.hitSize() / 2f) + (float)didgt * 2f + y_corr);
-                            //(s-1)*(1/9)because line(0) will draw length of 1
-                        }else{
-                            Lines.line(unit.x - unit.hitSize() * 0.6f,
-                                    unit.y + (unit.hitSize() / 2f) + (float)didgt * 2f + y_corr,
-                                    unit.x + unit.hitSize() * ((shieldAmountScale - Mathf.floor(shieldAmountScale) - 0.001f) * 1.2f - 0.6f),
-                                    unit.y + (unit.hitSize() / 2f) + (float)didgt * 2f + y_corr);
-                        }
-                    }
-                }
-                Draw.reset();
-
-                float index = 0f;
-                float iconSize = 4f;
-                int iconColumns = Math.max((int) (unit.hitSize() / (iconSize + 1f)), 4);
-                float iconWidth = Math.min(unit.hitSize() / iconColumns, iconSize + 1f);
-                for(var entry : unit.statuses()){
-                    Draw.rect(entry.effect.uiIcon,
-                            unit.x - unit.hitSize() * 0.6f + iconWidth * (index % iconColumns),
-                            unit.y + (unit.hitSize() / 2f) + 3f + iconSize * Mathf.floor(index / iconColumns),
-                            iconSize, iconSize);
-                    index++;
-                }
-
-                index = 0f;
-                if(unit instanceof Payloadc payload && payload.payloads().any()){
-                    for(Payload p : payload.payloads()){
-                        Draw.rect(p.icon(),
-                                unit.x - unit.hitSize() * 0.6f + 0.5f * iconSize * index,
-                                unit.y + (unit.hitSize() / 2f) - 4f,
-                                4f, 4f);
-                        index++;
-                    }
-                    Draw.reset();
-                }
-            }
-        }
-
-        //display logicAI info by MI2
-        if(unit.controller() instanceof LogicAI logicai){
-            Draw.reset();
-            if(Core.settings.getBool("unitLogicMoveLine") && Mathf.len(logicai.moveX - unit.x, logicai.moveY - unit.y) <= 1200f){
-                Lines.stroke(1f);
-                Draw.color(0.2f, 0.2f, 1f, 0.9f);
-                Lines.dashLine(unit.x, unit.y, logicai.moveX, logicai.moveY, (int)(Mathf.len(logicai.moveX - unit.x, logicai.moveY - unit.y) / 8));
-                Lines.dashCircle(logicai.moveX, logicai.moveY, logicai.moveRad);
-                Draw.reset();
-            }
-
-            //logicai timers
-            if(Core.settings.getBool("unitLogicTimerBars")){
-
-                Lines.stroke(2f);
-                Draw.color(Pal.heal);
-                Lines.line(unit.x - (unit.hitSize() / 2f), unit.y - (unit.hitSize() / 2f), unit.x - (unit.hitSize() / 2f), unit.y + unit.hitSize() * (logicai.controlTimer / logicai.logicControlTimeout - 0.5f));
-
-                Draw.reset();
-            }
-        }
-
-        if(Core.settings.getBool("unithitbox")){
-            Draw.color(unit.team.color, 0.5f);
-            Lines.circle(unit.x, unit.y, unit.hitSize / 2f);
-        }
-
-        if(Core.settings.getBool("unitbuildplan") && !unit.plans().isEmpty()) {
-
-            int counter = 0;
-            if (unit != player.unit()) {
-                for (BuildPlan b : unit.plans()) {
-                    unit.drawPlan(b, 0.5f);
-                    counter += 1;
-                    if (counter >= maxBuildPlans) break;
-                }
-            }
-            counter = 0;
-            Draw.color(Pal.gray);
-            Lines.stroke(2f);
-            float x = unit.x, y = unit.y, s = unit.hitSize / 2f;
-            for (BuildPlan b : unit.plans()) {
-                Tmp.v2.trns(Angles.angle(x, y, b.drawx(), b.drawy()), s);
-                Tmp.v3.trns(Angles.angle(x, y, b.drawx(), b.drawy()), b.block.size * 2f);
-                Lines.circle(b.drawx(), b.drawy(), b.block.size * 2f);
-                Lines.line(x + Tmp.v2.x, y + Tmp.v2.y, b.drawx() - Tmp.v3.x, b.drawy() - Tmp.v3.y);
-                x = b.drawx();
-                y = b.drawy();
-                s = b.block.size * 2f;
-                counter += 1;
-                if (counter >= maxBuildPlans) break;
-            }
-
-            counter = 0;
-            Draw.color(unit.team.color);
-            Lines.stroke(0.75f);
-            x = unit.x; y = unit.y; s = unit.hitSize / 2f;
-            for (BuildPlan b : unit.plans()) {
-                Tmp.v2.trns(Angles.angle(x, y, b.drawx(), b.drawy()), s);
-                Tmp.v3.trns(Angles.angle(x, y, b.drawx(), b.drawy()), b.block.size * 2f);
-                Lines.circle(b.drawx(), b.drawy(), b.block.size * 2f);
-                Lines.line(x + Tmp.v2.x, y + Tmp.v2.y, b.drawx() - Tmp.v3.x, b.drawy() - Tmp.v3.y);
-                x = b.drawx();
-                y = b.drawy();
-                s = b.block.size * 2f;
-                counter += 1;
-                if (counter >= maxBuildPlans) break;
-            }
-        }
     }
-
-
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
         if(unit.hasPayload()){

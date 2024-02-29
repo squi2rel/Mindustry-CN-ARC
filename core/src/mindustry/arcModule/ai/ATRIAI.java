@@ -26,7 +26,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 import static mindustry.Vars.*;
 
 public class ATRIAI extends AIController{
-    //builderAI
+    //TODO 智能逻辑，预计完成时间：99999年
 
     public static float buildRadius = 1500, retreatDst = 110f, retreatDelay = Time.toSeconds * 2f;
     public static float rebuildTime = 120f;

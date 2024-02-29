@@ -12,19 +12,15 @@ import arc.math.geom.Vec2;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.struct.*;
-import arc.util.Align;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.ai.types.LogicAI;
 import mindustry.content.Items;
 import mindustry.gen.Building;
-import mindustry.gen.Icon;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
 import mindustry.input.Binding;
-import mindustry.input.DesktopInput;
 import mindustry.type.Item;
 import mindustry.ui.Styles;
 import mindustry.world.Block;
@@ -40,10 +36,9 @@ import mindustry.world.meta.BlockGroup;
 
 
 import static mindustry.Vars.*;
-import static mindustry.arcModule.DrawUtilities.drawNSideRegion;
 import static mindustry.arcModule.RFuncs.*;
 import static mindustry.arcModule.RFuncs.calWaveTimer;
-import static mindustry.arcModule.toolpack.arcPlayerEffect.drawControlTurret;
+import static mindustry.arcModule.draw.ARCUnits.drawControlTurret;
 import static mindustry.arcModule.toolpack.arcWaveSpawner.*;
 
 public class arcScanMode {
