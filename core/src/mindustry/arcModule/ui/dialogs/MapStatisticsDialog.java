@@ -9,7 +9,7 @@ public class MapStatisticsDialog extends BaseDialog {
     private ResourceGraph graph;
 
     public MapStatisticsDialog() {
-        super("游戏详情");
+        super("ARC~游戏详情");
         if (statisticsInterval != 0){
             cont.add(graph = new ResourceGraph()).grow();
             graph.rebuild();

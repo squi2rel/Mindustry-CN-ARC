@@ -101,10 +101,13 @@ public class ResourceGraph extends Table {
             font.setColor(Color.lightGray);
 
             for (int i = 0; i < statisticsCounter; i++) {
-                float cy = y + fh, cx = graphX + graphW / (statisticsCounter - 1) * i;
+                float cy = y + fh, cx = graphX + i * spacing;
                 Lines.line(cx, cy, cx, cy + len);
-                if (i % (statisticsCounter / 4) == 0) {
-                    font.draw("" + (i + from + 1) * statisticsInterval, cx, cy - Scl.scl(2f), Align.center);
+                int time = i * statisticsInterval;
+                int min = time / 60;
+                int sec = time % 60;
+                if (statisticsCounter * statisticsInterval / 60 < 2 || (sec == 0 && (statisticsCounter * statisticsInterval < 60 || min % 5 == 0))) {
+                    font.draw(min + "'" + sec, cx, cy - Scl.scl(2f), Align.center);
                 }
             }
             font.setColor(Color.white);
@@ -142,7 +145,6 @@ public class ResourceGraph extends Table {
                 }
             }
         }
-
         colors.clear();
         colors.left();
         colors.pane(t -> {

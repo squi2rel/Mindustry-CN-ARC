@@ -9,6 +9,7 @@ import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.Log;
 import arc.util.Timer;
+import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -30,6 +31,7 @@ public class ARCClient {
     public byte[] myKey;
     public PrivateKey myPrivate;
     public boolean enabled = false;
+    public boolean disable = false;
     private Timer.Task keyTask, testTask;
 
     public ARCClient() {
@@ -56,7 +58,11 @@ public class ARCClient {
             Events.on(ARCEvents.PlayerLeave.class, e -> keys.remove(e.player.id));
             Events.on(EventType.WorldLoadEndEvent.class, e -> {
                 enabled = false;
-                if (!Core.settings.getBool("arcCustomPacket", true)) return;
+                if (disable) {
+                    disable = false;
+                    return;
+                }
+                if (!Vars.net.active() || !Core.settings.getBool("arcCustomPacket", true)) return;
                 sendTest();
                 send("ARCKeyRequest", emptyByte);
             });
@@ -117,7 +123,7 @@ public class ARCClient {
 
     public void handle(Player player, int[] raw) {
         if (Arrays.equals(raw, testArray)) {
-            testTask.cancel();
+            if (testTask != null) testTask.cancel();
             enabled = true;
             return;
         }

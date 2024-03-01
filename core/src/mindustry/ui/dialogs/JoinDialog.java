@@ -24,6 +24,8 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
 
+import java.util.regex.Pattern;
+
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
@@ -44,6 +46,9 @@ public class JoinDialog extends BaseDialog{
     Task ping;
 
     String serverSearch = "";
+
+    String srcaddress;
+    Pattern pattern;
 
     public JoinDialog(){
         super("@joingame");
@@ -152,9 +157,12 @@ public class JoinDialog extends BaseDialog{
             //why are java lambdas this bad
             Button[] buttons = {null};
 
+            pattern = Pattern.compile(Core.settings.getString("arcDisablePacket", ""));
             Button button = buttons[0] = remote.button(b -> {}, style, () -> {
 
                 if(!buttons[0].childrenPressed()){
+                    ARCVars.arcClient.disable = pattern.matcher(server.ip).find();
+
                     if(server.lastHost != null){
                         Events.fire(new ClientPreConnectEvent(server.lastHost));
                         safeConnect(server.lastHost.address, server.lastHost.port, server.lastHost.version);
@@ -437,6 +445,7 @@ public class JoinDialog extends BaseDialog{
             if(group.prioritized){
                 addHeader(groupTable, group, hidden, false);
             }
+            pattern = Pattern.compile(Core.settings.getString("arcDisablePacket", ""));
             //table containing all groups
             for(String address : group.addresses){
                 String resaddress = address.contains(":") ? address.split(":")[0] : address;
@@ -456,7 +465,11 @@ public class JoinDialog extends BaseDialog{
                         addHeader(groupTable, group, hidden, true);
                     }
 
+                    srcaddress = resaddress;
+
                     addCommunityHost(res, groupTable[1]);
+
+                    ARCVars.arcClient.disable = pattern.matcher(srcaddress).find();
 
                     groupTable[0].margin(5f);
                     groupTable[0].pack();
@@ -506,8 +519,11 @@ public class JoinDialog extends BaseDialog{
 
         container.left().top();
 
+        final String address = srcaddress;
         container.button(b -> buildServer(host, b), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
+            ARCVars.arcClient.disable = pattern.matcher(address).find();
+
             if(!Core.settings.getBool("server-disclaimer", false)){
                 ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
                     Core.settings.put("server-disclaimer", true);
