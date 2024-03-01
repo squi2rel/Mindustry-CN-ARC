@@ -462,7 +462,7 @@ public class SchematicsDialog extends BaseDialog{
             return false;
         }
         int start = msg.indexOf(' ', msg.indexOf(ShareType) + ShareType.length());
-        Http.get("https://pastebin.com/raw/" + msg.substring(start + 1), r -> readShare(r.getResultAsString().replace(" ", "+"), player));
+        Http.get("https://pastebin.com/raw/" + msg.substring(start + 1), r -> readShare(r.getResultAsString().replace(" ", "+"), sender));
         return true;
     }
 
