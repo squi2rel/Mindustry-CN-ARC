@@ -149,6 +149,9 @@ public class JoinDialog extends BaseDialog{
 
     void setupRemote(){
         remote.clear();
+
+        pattern = Pattern.compile(Core.settings.getString("arcDisablePacket", ""));
+
         for(Server server : servers){
             if(server.lastHost != null){
                 int ServerVersion = server.lastHost.version;
@@ -156,12 +159,11 @@ public class JoinDialog extends BaseDialog{
             }
             //why are java lambdas this bad
             Button[] buttons = {null};
-
-            pattern = Pattern.compile(Core.settings.getString("arcDisablePacket", ""));
+            final String ip = server.ip;
             Button button = buttons[0] = remote.button(b -> {}, style, () -> {
 
                 if(!buttons[0].childrenPressed()){
-                    ARCVars.arcClient.disable = pattern.matcher(server.ip).find();
+                    ARCVars.arcClient.disable = pattern.matcher(ip).find();
 
                     if(server.lastHost != null){
                         Events.fire(new ClientPreConnectEvent(server.lastHost));
