@@ -471,8 +471,6 @@ public class JoinDialog extends BaseDialog{
 
                     addCommunityHost(res, groupTable[1]);
 
-                    ARCVars.arcClient.disable = pattern.matcher(srcaddress).find();
-
                     groupTable[0].margin(5f);
                     groupTable[0].pack();
                 }, e -> {});
@@ -569,6 +567,7 @@ public class JoinDialog extends BaseDialog{
 
         local.button(b -> buildServer(host, b), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
+            ARCVars.arcClient.disable = false;
             safeConnect(host.address, host.port, host.version);
         }).width(w).top().left().growY();
     }

@@ -56,12 +56,10 @@ public class ARCClient {
                 if (enabled) sendKey();
             });
             Events.on(ARCEvents.PlayerLeave.class, e -> keys.remove(e.player.id));
+            Events.on(EventType.ClientPreConnectEvent.class, e -> enabled = false);
             Events.on(EventType.WorldLoadEndEvent.class, e -> {
                 enabled = false;
-                if (disable) {
-                    disable = false;
-                    return;
-                }
+                if (disable) return;
                 if (!Vars.net.active() || !Core.settings.getBool("arcCustomPacket", true)) return;
                 sendTest();
                 send("ARCKeyRequest", emptyByte);
