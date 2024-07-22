@@ -287,9 +287,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     }
 
     private String getWindowTitle() throws NoSuchAlgorithmException {
-        if(settings.getBool("bossKeyPressing", false)) {
-            return "计算器";
-        }
+        if (Control.bossKeyPressing) return "计算器";
         return "Mindustry-CN-ARC-SQUIRREL | VAPE";
     }
 

@@ -150,6 +150,7 @@ public class ResourceGraph extends Table {
         colors.pane(t -> {
             t.pane(ts -> {
                 ts.left();
+                ts.button("[green]+", Styles.fullTogglet, this::rebuild).checked(false).height(35f).width(50f);
                 for (Team team : ARCVars.arcTeam.activeTeam) {
                     ts.button(team.coloredName(), Styles.fullTogglet, () -> {
                         if (showTeams.contains(team)) showTeams.remove(team);

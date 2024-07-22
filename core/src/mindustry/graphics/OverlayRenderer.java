@@ -76,7 +76,7 @@ public class OverlayRenderer{
     public void drawBottom(){
         InputHandler input = control.input;
 
-        if(player.dead()) return;
+        //if(player.dead()) return;
 
         if(player.isBuilder()){
             player.unit().drawBuildPlans();
@@ -122,7 +122,7 @@ public class OverlayRenderer{
             for(var marker : obj.markers) marker.draw();
         });
 
-        if(player.dead()) return; //dead players don't draw
+        //if(player.dead()) return; //dead players don't draw
 
         InputHandler input = control.input;
 

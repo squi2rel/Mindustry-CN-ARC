@@ -49,24 +49,26 @@ public class AdvanceToolTable extends Table {
     private boolean show = false;
     private boolean showGameMode = false, showEntities = false, showTeamChange = false, showTimeControl = false, showCreator = false;
 
-    private boolean enableRTSCode = false;
+    private final boolean enableRTSCode = false;
 
     //unitFactory
     private int unitCount = 1;
     private float unitRandDst = 1f;
-    private Vec2 unitLoc = new Vec2(0, 0);
-    private OrderedSet<StatusEntry> unitStatus = new OrderedSet<>();
+    private final Vec2 unitLoc = new Vec2(0, 0);
+    private final OrderedSet<StatusEntry> unitStatus = new OrderedSet<>();
     private final float[] statusTime = {10, 30f, 60f, 120f, 180f, 300f, 600f, 900f, 1200f, 1500f, 1800f, 2700f, 3600f, Float.MAX_VALUE};
-    private Unit spawnUnit = UnitTypes.emanate.create(Team.sharded);
-    private Boolean showUnitSelect = false;
-    private Boolean showUnitPro = false;
-    private Boolean showStatesEffect = false;
-    private Boolean showItems = false;
-    private Boolean showPayload = false;
+    private final Unit spawnUnit = UnitTypes.emanate.create(Team.sharded);
+    private boolean showUnitSelect = false;
+    private boolean showUnitPro = false;
+    private boolean showStatesEffect = false;
+    private boolean showItems = false;
+    private boolean showPayload = false;
     private boolean showSelectPayload = false;
-    private Boolean showPayloadBlock = false;
+    private boolean showPayloadBlock = false;
     private boolean elevation = false;
     private float chatTime = 0;
+
+    public static boolean worldCreator, forcePlacement, allBlocksReveal;
 
     private final Vec2 initA = new Vec2(0, 0), initB = new Vec2(0, 0), finalA = new Vec2(0, 0);
 
@@ -74,9 +76,9 @@ public class AdvanceToolTable extends Table {
         rebuild();
         Events.on(EventType.ResetEvent.class, e -> {
             if (!state.rules.editor) {
-                Core.settings.put("worldCreator", false);
-                Core.settings.put("forcePlacement", false);
-                Core.settings.put("allBlocksReveal", false);
+                worldCreator = false;
+                forcePlacement = false;
+                allBlocksReveal = false;
             }
         });
     }
@@ -86,9 +88,7 @@ public class AdvanceToolTable extends Table {
         if (mobile) {
             table(tBox -> {
                 tBox.background(Tex.buttonEdge3);
-                tBox.button("指挥", cleart, () -> {
-                    control.input.commandMode = !control.input.commandMode;
-                }).width(80f);
+                tBox.button("指挥", cleart, () -> control.input.commandMode = !control.input.commandMode).width(80f);
 
                 tBox.button("取消", cleart, () -> {
                     if (control.input instanceof MobileInput input) input.arcClearPlans();
@@ -134,61 +134,43 @@ public class AdvanceToolTable extends Table {
                 }
 
                 if (showTimeControl) {
-                    t.table(tt -> {
-                        tt.table(tBox -> {
-                            tBox.background(Tex.buttonEdge3);
-                            tBox.add("沙漏：").left();
+                    t.table(tt -> tt.table(tBox -> {
+                        tBox.background(Tex.buttonEdge3);
+                        tBox.add("沙漏：").left();
 
-                            tBox.button("/2", cleart, () -> {
-                                changeGameSpeed(0.5f);
-                            }).tooltip("[acid]将时间流速放慢到一半").size(40f, 30f);
+                        tBox.button("/2", cleart, () -> changeGameSpeed(0.5f)).tooltip("[acid]将时间流速放慢到一半").size(40f, 30f);
 
-                            tBox.button("×2", cleart, () -> {
-                                changeGameSpeed(2f);
-                            }).tooltip("[acid]将时间流速加快到两倍").size(40f, 30f);
+                        tBox.button("×2", cleart, () -> changeGameSpeed(2f)).tooltip("[acid]将时间流速加快到两倍").size(40f, 30f);
 
-                            tBox.button("[red]S", cleart, () -> {
-                                setGameSpeed(0f);
-                            }).tooltip("[acid]暂停时间").size(30f, 30f);
+                        tBox.button("[red]S", cleart, () -> setGameSpeed(0f)).tooltip("[acid]暂停时间").size(30f, 30f);
 
-                            tBox.button("[green]N", cleart, () -> {
-                                setGameSpeed(1f);
-                            }).tooltip("[acid]恢复原速").size(30f, 30f);
+                        tBox.button("[green]N", cleart, () -> setGameSpeed(1f)).tooltip("[acid]恢复原速").size(30f, 30f);
 
-                            tBox.button("[white]F", cleart, () -> {
-                                lockFps();
-                            }).tooltip("[acid]帧率模拟").size(30f, 30f);
+                        tBox.button("[white]F", cleart, TimeControl::lockFps).tooltip("[acid]帧率模拟").size(30f, 30f);
 
-                            tBox.field(Integer.toString(targetFps), s -> {
-                                int num = Integer.parseInt(s);
-                                setTargetFps(2 <= num && num < 10000 ? num : 60);
-                            }).valid(s -> {
-                                if (!Strings.canParsePositiveInt(s)) return false;
-                                int num = Integer.parseInt(s);
-                                return 2 <= num && num < 10000;
-                            }).tooltip("允许的范围：2~9999").size(90f, 30f);
-                        }).left();
-                    }).left().row();
+                        tBox.field(Integer.toString(targetFps), s -> {
+                            int num = Integer.parseInt(s);
+                            setTargetFps(2 <= num && num < 10000 ? num : 60);
+                        }).valid(s -> {
+                            if (!Strings.canParsePositiveInt(s)) return false;
+                            int num = Integer.parseInt(s);
+                            return 2 <= num && num < 10000;
+                        }).tooltip("允许的范围：2~9999").size(90f, 30f);
+                    }).left()).left().row();
                 }
 
                 if (showCreator) {
-                    t.table(tt -> {
-                        tt.table(
-                                tBox -> {
-                                    tBox.background(Tex.pane);
-                                    tBox.button("创世神", flatToggleMenut, () -> {
-                                        Core.settings.put("worldCreator", !Core.settings.getBool("worldCreator"));
-                                    }).checked(b -> Core.settings.getBool("worldCreator")).size(70f, 30f);
-                                    tBox.button("强制放置", flatToggleMenut, () -> {
-                                        Core.settings.put("forcePlacement", !Core.settings.getBool("forcePlacement"));
-                                    }).checked(b -> Core.settings.getBool("forcePlacement")).size(70f, 30f);
-                                    tBox.button("解禁", flatToggleMenut, () -> {
-                                        Core.settings.put("allBlocksReveal", !Core.settings.getBool("allBlocksReveal"));
-                                        ui.hudfrag.blockfrag.rebuild();
-                                    }).checked(b -> Core.settings.getBool("allBlocksReveal")).tooltip("[acid]显示并允许建造所有物品").size(50f, 30f);
-                                    tBox.button("[orange]复制地形", flatToggleMenut, this::tileCopyer).tooltip("[acid]复制特定地形").size(70f, 30f).checked(jb -> false);
-                                }).left();
-                    }).left().row();
+                    t.table(tt -> tt.table(
+                            tBox -> {
+                                tBox.background(Tex.pane);
+                                tBox.button("创世神", flatToggleMenut, () -> worldCreator = !worldCreator).checked(b -> worldCreator).size(70f, 30f);
+                                tBox.button("强制放置", flatToggleMenut, () -> forcePlacement = !forcePlacement).checked(b -> forcePlacement).size(70f, 30f);
+                                tBox.button("解禁", flatToggleMenut, () -> {
+                                    allBlocksReveal = !allBlocksReveal;
+                                    ui.hudfrag.blockfrag.rebuild();
+                                }).checked(b -> allBlocksReveal).tooltip("[acid]显示并允许建造所有物品").size(50f, 30f);
+                                tBox.button("[orange]复制地形", flatToggleMenut, this::tileCopier).tooltip("[acid]复制特定地形").size(70f, 30f).checked(jb -> false);
+                            }).left()).left().row();
                 }
 
                 if (showTeamChange) {
@@ -199,11 +181,7 @@ public class AdvanceToolTable extends Table {
                             tBox.button(String.format("[#%s]%s", team.color, team.localized()), flatToggleMenut, () -> player.team(team))
                                     .checked(b -> player.team() == team).size(30f, 30f);
                         }
-                        tBox.button("[violet]+", flatToggleMenut, () -> {
-                            new TeamSelectDialog(team -> player.team(team), player.team()).show();
-                        }).checked(b -> {
-                            return !Seq.with(Team.baseTeams).contains(player.team());
-                        }).tooltip("[acid]更多队伍选择").size(30f, 30f);
+                        tBox.button("[violet]+", flatToggleMenut, () -> new TeamSelectDialog(team -> player.team(team), player.team()).show()).checked(b -> !Seq.with(Team.baseTeams).contains(player.team())).tooltip("[acid]更多队伍选择").size(30f, 30f);
 
                     }).left().row();
                 }
@@ -213,17 +191,11 @@ public class AdvanceToolTable extends Table {
                         tBox.background(Tex.buttonEdge3);
                         tBox.add("规则：").left();
 
-                        tBox.button("无限火力", flatToggleMenut, () -> {
-                            player.team().rules().cheat = !player.team().rules().cheat;
-                        }).checked(b -> player.team().rules().cheat).tooltip("[acid]开关自己队的无限火力").size(90f, 30f);
+                        tBox.button("无限火力", flatToggleMenut, () -> player.team().rules().cheat = !player.team().rules().cheat).checked(b -> player.team().rules().cheat).tooltip("[acid]开关自己队的无限火力").size(90f, 30f);
 
-                        tBox.button("编辑器", flatToggleMenut, () -> {
-                            state.rules.editor = !state.rules.editor;
-                        }).checked(b -> state.rules.editor).size(70f, 30f);
+                        tBox.button("编辑器", flatToggleMenut, () -> state.rules.editor = !state.rules.editor).checked(b -> state.rules.editor).size(70f, 30f);
 
-                        tBox.button("沙盒", flatToggleMenut, () -> {
-                            state.rules.infiniteResources = !state.rules.infiniteResources;
-                        }).checked(b -> state.rules.infiniteResources).size(50f, 30f);
+                        tBox.button("沙盒", flatToggleMenut, () -> state.rules.infiniteResources = !state.rules.infiniteResources).checked(b -> state.rules.infiniteResources).size(50f, 30f);
 
 
                     }).left().row();
@@ -268,19 +240,15 @@ public class AdvanceToolTable extends Table {
         }
     }
 
-    private void tileCopyer() {
+    private void tileCopier() {
         BaseDialog dialog = new BaseDialog("地块复制器");
         dialog.cont.table(t -> {
             t.table(tt -> {
                 tt.add("复制区角A：x= ");
-                TextField x = tt.field(Strings.autoFixed(initA.x, 2), text -> {
-                    initA.x = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                TextField x = tt.field(Strings.autoFixed(initA.x, 2), text -> initA.x = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 tt.add("  ,y= ");
-                TextField y = tt.field(Strings.autoFixed(initA.y, 2), text -> {
-                    initA.y = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                TextField y = tt.field(Strings.autoFixed(initA.y, 2), text -> initA.y = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 tt.button(StatusEffects.blasted.emoji(), () -> {
                     if (Marker.markList.size == 0) return;
@@ -291,14 +259,10 @@ public class AdvanceToolTable extends Table {
             }).row();
             t.table(tt -> {
                 tt.add("复制区角B：x= ");
-                TextField x = tt.field(Strings.autoFixed(initB.x, 2), text -> {
-                    initB.x = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                TextField x = tt.field(Strings.autoFixed(initB.x, 2), text -> initB.x = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 tt.add("  ,y= ");
-                TextField y = tt.field(Strings.autoFixed(initB.y, 2), text -> {
-                    initB.y = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                TextField y = tt.field(Strings.autoFixed(initB.y, 2), text -> initB.y = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 tt.button(StatusEffects.blasted.emoji(), () -> {
                     if (Marker.markList.size == 0) return;
@@ -309,14 +273,10 @@ public class AdvanceToolTable extends Table {
             }).row();
             t.table(tt -> {
                 tt.add("粘贴区左下坐标：x= ");
-                TextField x = tt.field(Strings.autoFixed(finalA.x, 2), text -> {
-                    finalA.x = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                TextField x = tt.field(Strings.autoFixed(finalA.x, 2), text -> finalA.x = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 tt.add("  ,y= ");
-                TextField y = tt.field(Strings.autoFixed(finalA.y, 2), text -> {
-                    finalA.y = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                TextField y = tt.field(Strings.autoFixed(finalA.y, 2), text -> finalA.y = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 tt.button(StatusEffects.blasted.emoji(), () -> {
                     if (Marker.markList.size == 0) return;
@@ -354,35 +314,31 @@ public class AdvanceToolTable extends Table {
         rebuild[0] = () -> {
             table.clear();
             /* Unit */
-            table.label(() -> "目标单位：" + spawnUnit.type.emoji() + spawnUnit.type.localizedName);
+            table.table(t -> {
+                t.add("目标单位：");
+                t.image(() -> spawnUnit.type.uiIcon);
+                t.label(() -> spawnUnit.type.localizedName);
+            });
 
             table.row();
 
             Table r = table.table().center().bottom().get();
             r.add("数量：");
-            r.field("" + unitCount, text -> {
-                unitCount = Integer.parseInt(text);
-            }).valid(Strings::canParsePositiveInt).maxTextLength(4).get();
+            r.field("" + unitCount, text -> unitCount = Integer.parseInt(text)).valid(Strings::canParsePositiveInt).maxTextLength(4).get();
 
             table.row();
 
             r.add("生成范围：");
-            r.field(Strings.autoFixed(unitRandDst, 3), text -> {
-                unitRandDst = Float.parseFloat(text);
-            }).valid(Strings::canParsePositiveFloat).tooltip("在目标点附近的这个范围内随机生成").maxTextLength(8).get();
+            r.field(Strings.autoFixed(unitRandDst, 3), text -> unitRandDst = Float.parseFloat(text)).valid(Strings::canParsePositiveFloat).tooltip("在目标点附近的这个范围内随机生成").maxTextLength(8).get();
             r.add("格");
             table.row();
 
             table.table(t -> {
                 t.add("坐标：x= ");
-                t.field(Strings.autoFixed(unitLoc.x, 2), text -> {
-                    unitLoc.x = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                t.field(Strings.autoFixed(unitLoc.x, 2), text -> unitLoc.x = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 t.add("  ,y= ");
-                t.field(Strings.autoFixed(unitLoc.y, 2), text -> {
-                    unitLoc.y = Float.parseFloat(text);
-                }).valid(Strings::canParseFloat).maxTextLength(8).get();
+                t.field(Strings.autoFixed(unitLoc.y, 2), text -> unitLoc.y = Float.parseFloat(text)).valid(Strings::canParseFloat).maxTextLength(8).get();
 
                 t.button(gamma.emoji(), () -> {
                     unitLoc.set(player.tileX(), player.tileY());
@@ -409,9 +365,7 @@ public class AdvanceToolTable extends Table {
                     Unit unit = cloneUnit(spawnUnit);
                     if (elevation) unit.elevation = 1f;
                     unit.set(unitLoc.x * tilesize + Tmp.v1.x, unitLoc.y * tilesize + Tmp.v1.y);
-                    unitStatus.each(e -> {
-                        unit.addEntry(e.effect, e.time * 60f);
-                    });
+                    unitStatus.each(e -> unit.addEntry(e.effect, e.time * 60f));
                     unit.add();
                 }
                 if (control.input instanceof DesktopInput input) {
@@ -530,42 +484,19 @@ public class AdvanceToolTable extends Table {
                     }).row();
                     t.table(tt -> {
                         tt.add("队伍：");
-                        tt.field(String.valueOf(unit.team.id), text -> {
-                            unit.team = Team.get(Integer.parseInt(text));
-                        }).valid(text -> {
-                            return Strings.canParsePositiveInt(text) && Integer.parseInt(text) < Team.all.length;
-                        }).maxTextLength(4).get();
+                        tt.field(String.valueOf(unit.team.id), text -> unit.team = Team.get(Integer.parseInt(text))).valid(text -> Strings.canParsePositiveInt(text) && Integer.parseInt(text) < Team.all.length).maxTextLength(4).get();
                         for (Team team : Team.baseTeams) {
                             tt.button("[#" + team.color + "]" + team.localized(), flatToggleMenut, () -> {
                                 unit.team = team;
                                 rebuildTable[0].run();
                             }).checked(b -> unit.team == team).size(30, 30);
                         }
-                        tt.button("[violet]+", flatToggleMenut, () -> {
-                            new TeamSelectDialog(team -> {
-                                unit.team = team;
-                                rebuildTable[0].run();
-                            }, unit.team).show();
-                        }).checked(b -> {
-                            return !Seq.with(Team.baseTeams).contains(unit.team);
-                        }).tooltip("[acid]更多队伍选择").center().width(50f).row();
+                        tt.button("[violet]+", flatToggleMenut, () -> new TeamSelectDialog(team -> {
+                            unit.team = team;
+                            rebuildTable[0].run();
+                        }, unit.team).show()).checked(b -> !Seq.with(Team.baseTeams).contains(unit.team)).tooltip("[acid]更多队伍选择").center().width(50f).row();
                     }).row();
-                    t.table(list -> {
-                        list.check("飞行模式    [orange]生成的单位会飞起来", elevation, a -> elevation = !elevation).center().padBottom(5f).padRight(10f);
-                        /*
-                        if (Core.settings.getBool("developMode")) {
-                            TextField sField = list.field(elevation + "", text -> elevation = Float.parseFloat(text)).
-                                    valid(text -> Strings.canParseFloat(text)).tooltip("单位层级").maxTextLength(10).get();
-                            list.add("层");
-                            Slider sSlider = list.slider(-10, 10, 0.05f, 0, n -> {
-                                if (elevation != n) {
-                                    sField.setText(n + "");
-                                }
-                                elevation = n;
-                            }).get();
-                            sField.update(() -> sSlider.setValue(elevation));
-                        }*/
-                    });
+                    t.table(list -> list.check("飞行模式    [orange]生成的单位会飞起来", elevation, a -> elevation = !elevation).center().padBottom(5f).padRight(10f));
                 }).row();
             }
 
@@ -615,9 +546,7 @@ public class AdvanceToolTable extends Table {
                                 list.add("<瞬间状态>");
                             } else {
                                 list.table(et -> {
-                                    TextField sField = et.field(checkInf(entry.time), text -> {
-                                        entry.time = Objects.equals(text, "Inf") ? Float.MAX_VALUE : Float.parseFloat(text);
-                                    }).valid(text -> Objects.equals(text, "Inf") || Strings.canParsePositiveFloat(text)).tooltip("buff持续时间(单位：秒)").maxTextLength(10).get();
+                                    TextField sField = et.field(checkInf(entry.time), text -> entry.time = Objects.equals(text, "Inf") ? Float.MAX_VALUE : Float.parseFloat(text)).valid(text -> Objects.equals(text, "Inf") || Strings.canParsePositiveFloat(text)).tooltip("buff持续时间(单位：秒)").maxTextLength(10).get();
 
                                     et.add("秒");
 
@@ -669,9 +598,7 @@ public class AdvanceToolTable extends Table {
                         pt.row();
                         pt.table(ptt -> {
                             ptt.add(unit.stack.item.emoji() + " 数量：");
-                            ptt.field(String.valueOf(unit.stack.amount), text -> {
-                                unit.stack.amount = Integer.parseInt(text);
-                            }).valid(value -> {
+                            ptt.field(String.valueOf(unit.stack.amount), text -> unit.stack.amount = Integer.parseInt(text)).valid(value -> {
                                 if (!Strings.canParsePositiveInt(value)) return false;
                                 int val = Integer.parseInt(value);
                                 return 0 < val && val <= unit.type.itemCapacity;
@@ -704,22 +631,20 @@ public class AdvanceToolTable extends Table {
             if (showPayload) {
                 table.table(p -> {
                     if (unit instanceof Payloadc pay) {
-                        p.table(pt -> {
-                            pay.payloads().each(payload -> {
-                                if (payload instanceof Payloadc payloadUnit) {
-                                    pt.button(payload.content().emoji() + "[red]*", squareTogglet, () -> {
-                                        pay.payloads().remove(payload);
-                                        rebuildTable[0].run();
-                                    }).color(payloadUnit.team().color).size(50f).left();
-                                } else {
-                                    pt.button(payload.content().emoji(), squareTogglet, () -> {
-                                        pay.payloads().remove(payload);
-                                        rebuildTable[0].run();
-                                    }).size(50f).left();
-                                }
-                                if (pay.payloads().indexOf(payload) % 8 == 7) pt.row();
-                            });
-                        }).row();
+                        p.table(pt -> pay.payloads().each(payload -> {
+                            if (payload instanceof Payloadc payloadUnit) {
+                                pt.button(payload.content().emoji() + "[red]*", squareTogglet, () -> {
+                                    pay.payloads().remove(payload);
+                                    rebuildTable[0].run();
+                                }).color(payloadUnit.team().color).size(50f).left();
+                            } else {
+                                pt.button(payload.content().emoji(), squareTogglet, () -> {
+                                    pay.payloads().remove(payload);
+                                    rebuildTable[0].run();
+                                }).size(50f).left();
+                            }
+                            if (pay.payloads().indexOf(payload) % 8 == 7) pt.row();
+                        })).row();
 
                         p.button("载入单位 " + UnitTypes.mono.emoji(), showSelectPayload ? Icon.upOpen : Icon.downOpen, Styles.togglet, () -> {
                             showSelectPayload = !showSelectPayload;

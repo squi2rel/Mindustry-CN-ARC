@@ -16,6 +16,7 @@ import arc.util.Tmp;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ElementUtils;
 import mindustry.arcModule.RFuncs;
+import mindustry.arcModule.ui.AdvanceToolTable;
 import mindustry.arcModule.ui.dialogs.BlockSelectDialog;
 import mindustry.content.Blocks;
 import mindustry.content.Liquids;
@@ -166,25 +167,19 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
                 });
             }).fillX().row();
             t.table(tt -> {
-                tt.button(Blocks.worldMessage.emoji(), textStyle, () -> {
-                    Core.settings.put("displayallmessage", !Core.settings.getBool("displayallmessage", false));
-                }).checked(a -> Core.settings.getBool("displayallmessage")).size(30, 30).tooltip("开关信息板全显示");
+                tt.button(Blocks.worldMessage.emoji(), textStyle, () -> Core.settings.put("displayallmessage", !Core.settings.getBool("displayallmessage", false))).checked(a -> Core.settings.getBool("displayallmessage")).size(30, 30).tooltip("开关信息板全显示");
                 tt.button(Blocks.worldProcessor.emoji(), NCtextStyle, () -> {
                     RFuncs.worldProcessor();
                     searchBlock = Blocks.worldProcessor;
                     rebuild();
                 }).size(30).tooltip("地图世处信息");
             }).fillX().row();
-            t.table(tt -> {
-                tt.button("\uE817", textStyle, () -> {
-                    shadowBuild = !shadowBuild;
-                }).checked(a -> shadowBuild).size(30, 30).tooltip("虚影建造模式\n[red]有些服限制发包数较低，建筑较多时会被踢出。请酌情使用");
-            }).fillX().row();
+            t.table(tt -> tt.button("\uE817", textStyle, () -> shadowBuild = !shadowBuild).checked(a -> shadowBuild).size(30, 30).tooltip("虚影建造模式\n[red]有些服限制发包数较低，建筑较多时会被踢出。请酌情使用")).fillX().row();
             if (!net.client()) {
                 t.table(tt -> {
                     tt.button("\uF8C9", textStyle, () -> {
                         buildPlansConstrain = !buildPlansConstrain;
-                        Core.settings.put("forcePlacement", !buildPlansConstrain);
+                        AdvanceToolTable.forcePlacement = !buildPlansConstrain;
                         if (mobile)
                             arcui.arcInfo("允许蓝图建造地形");
                     }).checked(a -> !buildPlansConstrain).size(30, 30).tooltip("允许蓝图建造地形");
@@ -281,12 +276,8 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
                         }
                     }
                 }
-                if (closest != null && closest.team != player.team()) {
-                    return false;
-                }
-            } else if (state.teams.anyEnemyCoresWithin(player.team(), tile.x * tilesize, tile.y * tilesize, state.rules.enemyCoreBuildRadius + tilesize)) {
-                return false;
-            }
+                return closest == null || closest.team == player.team();
+            } else return !state.teams.anyEnemyCoresWithin(player.team(), tile.x * tilesize, tile.y * tilesize, state.rules.enemyCoreBuildRadius + tilesize);
         }
         return true;
     }
@@ -351,10 +342,10 @@ public class AdvanceBuildTool extends ElementUtils.ToolTable {
     }
 
     enum BuildRange {
-        global, zone, team, player;
+        global, zone, team, player
     }
 
-    class BuildTiles {
+    public class BuildTiles {
         Seq<Tile> validTile = new Seq<>();
         Seq<Float> eff = new Seq<>();
 

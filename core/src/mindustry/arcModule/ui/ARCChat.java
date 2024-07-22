@@ -65,20 +65,22 @@ public class ARCChat {
                 byte[] bytes = new byte[s.readShort()];
                 int read = s.read(bytes);
                 if (read != bytes.length) return;
-                try {
-                    addMessage(p, isPrivate ? new String(decrypt(bytes, arcClient.myPrivate), StandardCharsets.UTF_8) : new String(bytes, StandardCharsets.UTF_8), isPrivate, null);
-                } catch (Exception e) {
-                    Log.err(e);
-                }
+                Core.app.post(() -> {
+                    try {
+                        addMessage(p, isPrivate ? new String(decrypt(bytes, arcClient.myPrivate), StandardCharsets.UTF_8) : new String(bytes, StandardCharsets.UTF_8), isPrivate, null);
+                    } catch (Exception e) {
+                        Log.err(e);
+                    }
+                });
             } catch (Exception ignored) {
             }
         });
-        arcClient.addHandlerStream("ARCChatAvatar", (p, d) -> {
+        arcClient.addHandlerStream("ARCChatAvatar", (p, d) -> Core.app.post(() -> {
             try {
                 setAvatar(p, d.readLong());
             } catch (Exception ignored) {
             }
-        });
+        }));
         Events.on(ARCEvents.PlayerKeySend.class, e -> arcClient.send("ARCChatAvatar", s -> {
             try {
                 s.writeLong(Core.settings.getLong("avatar", -1));
@@ -86,7 +88,7 @@ public class ARCChat {
             }
         }));
         Events.on(ARCEvents.PlayerKeyReceived.class, e -> {
-            if (!messages.containsKey(e.player.id)) buildButton(e.player);
+            if (!messages.containsKey(e.player.id)) Core.app.post(() -> buildButton(e.player));
         });
         Events.on(ARCEvents.PlayerLeave.class, e -> {
             ChatTable ct = messages.get(e.player.id);

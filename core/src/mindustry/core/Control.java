@@ -6,12 +6,12 @@ import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.scene.actions.Actions;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.arcModule.DrawUtilities;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
@@ -59,6 +59,11 @@ public class Control implements ApplicationListener, Loadable{
     private boolean hiscore = false;
     private boolean wasPaused = false, backgroundPaused = false;
     private Seq<Building> toBePlaced = new Seq<>(false);
+
+    public static boolean bossKeyPressing, bossKeyValid;
+    private BaseDialog calcDialog;
+    private final StringBuilder formula = new StringBuilder();
+    private String resultString = "";
 
     public Control(){
         saves = new Saves();
@@ -608,13 +613,9 @@ public class Control implements ApplicationListener, Loadable{
             }));
         }
 
-        settings.put("bossKeyPressing", false);
-        Events.on(EventType.ClientLoadEvent.class, e -> initCalc());
+        bossKeyPressing = false;
+        if (!app.isMobile()) Events.on(EventType.ClientLoadEvent.class, e -> initCalc());
     }
-
-    BaseDialog calcDialog;
-    StringBuilder formula = new StringBuilder();
-    String resultString = "";
 
     private void initCalc() {
         calcDialog = new BaseDialog("");
@@ -721,15 +722,15 @@ public class Control implements ApplicationListener, Loadable{
         if(Float.isNaN(camera.position.x)) camera.position.x = world.unitWidth()/2f;
         if(Float.isNaN(camera.position.y)) camera.position.y = world.unitHeight()/2f;
 
-        if (Core.settings.getBool("bossKeyValid") && Vars.clientLoaded && Core.input.keyTap(Binding.bossKey)) {
+        if (calcDialog != null && bossKeyValid && Vars.clientLoaded && Core.input.keyTap(Binding.bossKey)) {
             if (Core.input.keyDown(KeyCode.controlLeft)) {
-                if (!settings.getBool("bossKeyPressing", false)) return;
+                if (!bossKeyPressing) return;
                 calcDialog.hide();
-                loadIcon("icons/icon_64.png");
-                settings.put("bossKeyPressing", false);
+                loadIcon("icons/arc.png");
+                bossKeyPressing = false;
             } else {
-                if (settings.getBool("bossKeyPressing", false)) return;
-                settings.put("bossKeyPressing", true);
+                if (bossKeyPressing) return;
+                bossKeyPressing = true;
                 loadIcon("icons/calc.png");
                 settings.put("musicvol", 0);
                 settings.put("sfxvol", 0);
@@ -737,14 +738,14 @@ public class Control implements ApplicationListener, Loadable{
                 arcui.MusicDialog.vol = 0;
                 arcui.MusicDialog.player.setVolume(0);
                 arcui.MusicDialog.sounds.setVolume(0);
-                calcDialog.show();
+                calcDialog.show(scene, Actions.alpha(1));
                 mods.getScripts().runConsole(
                         """
                             Packages.arc.backend.sdl.jni.SDL.SDL_SetWindowFullscreen(Core.app.window,0);
                             Packages.arc.backend.sdl.jni.SDL.SDL_SetWindowSize(Core.app.window,220,430);
-                            Timer.schedule(()=>Packages.arc.backend.sdl.jni.SDL.SDL_MinimizeWindow(Core.app.window),0.1)
+                            Timer.schedule(()=>Packages.arc.backend.sdl.jni.SDL.SDL_MinimizeWindow(Core.app.window),0.15)
                             """
-                );//几把java
+                );
             }
         }
 

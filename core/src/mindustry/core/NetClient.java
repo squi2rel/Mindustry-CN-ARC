@@ -8,12 +8,10 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
-import arc.util.Timer;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.arcModule.ARCClient;
 import mindustry.arcModule.ARCEvents;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ui.XiBao;
@@ -126,16 +124,6 @@ public class NetClient implements ApplicationListener{
 
             ARCVars.replayController.createReplay(packet.addressTCP);
             net.send(c, true);
-
-            if(!Core.settings.getBool("arcAnonymity")){
-                // 原则上都应该发送，仅用于测试
-                // 这段谁写的 太几把了
-                Timer.schedule(() -> {
-                    Call.serverPacketReliable("ARC", ARCVars.arcVersion);
-                    Call.serverPacketReliable("ARC-build",Version.arcBuild + "");
-                    Call.serverPacketReliable("CheatOverride", ARCVars.arcCheatServer + "");
-                }, 5000);
-            }
         });
 
         net.handleClient(Disconnect.class, packet -> {
@@ -171,11 +159,17 @@ public class NetClient implements ApplicationListener{
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
+
+            if (!Core.settings.getBool("arcAnonymity")) {
+                Call.serverPacketReliable("ARC", ARCVars.arcVersion);
+                Call.serverPacketReliable("ARC-build",Version.arcBuild + "");
+                Call.serverPacketReliable("CheatOverride", ARCVars.arcCheatServer + "");
+            }
         });
 
         ARCVars.arcClient.addHandlerString("ARCCHAT", (p, s) -> {
             if (s.length() > maxTextLength) return;
-            NetClient.sendMessage("[violet]<ARC>[] " + netServer.chatFormatter.format(p, s), s, p);
+            Core.app.post(() -> NetClient.sendMessage("[violet]<ARC>[] " + netServer.chatFormatter.format(p, s), s, p));
         });
     }
 

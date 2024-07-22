@@ -169,11 +169,13 @@ public class HudSettingsTable extends ElementUtils.ToolTable {
                 t.button("[cyan]扫", textStyle, () -> {
                     control.input.arcScanMode = !control.input.arcScanMode;
                 }).checked(a -> control.input.arcScanMode).size(30, 30).tooltip("扫描模式");
+                t.button("[cyan]名", textStyle, () -> {
+                    settings.put("arcHideName", !settings.getBool("arcHideName"));
+                }).checked(a -> !ARCVars.arcHideName).size(30, 30).tooltip("显示玩家名");
 
             }).left();
             sp.row();
             sp.add(sets);
-            return;
         }).maxSize(800f, 300f).get();
 
         pane.update(() -> {

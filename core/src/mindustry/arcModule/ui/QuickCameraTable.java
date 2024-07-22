@@ -19,7 +19,7 @@ import static mindustry.arcModule.ui.RStyles.*;
 
 public class QuickCameraTable extends Table {
     private static int quickHudSize = Core.settings.getInt("quickHudSize", 0);
-    private static SingleHud[] hudList = new SingleHud[quickHudSize];
+    private static SingleHud[] hudList = new SingleHud[10];
 
     boolean hoverMode = Core.settings.getBool("arcCameraHoverMode", false);
     boolean saveScale = Core.settings.getBool("arcCameraSaveScale", true);
@@ -71,6 +71,7 @@ public class QuickCameraTable extends Table {
     }
 
     private void rebuild() {
+        quickHudSize = Core.settings.getInt("quickHudSize", 0);
         clear();
         table(t -> {
             //t.setBackground(Styles.black3);
@@ -96,9 +97,7 @@ public class QuickCameraTable extends Table {
 
     private void hudButton(Table table, int index) {
         table.table(t -> {
-            Label field = t.add("").get();
-            Events.run(EventType.Trigger.update,
-                    () -> field.setText((Core.keybinds.get(cameraSelect[index]).key == KeyCode.unknown ? "" : "[cyan]" + Core.keybinds.get(cameraSelect[index]).key.toString()) + hudList[index].getName()));
+            Label field = t.label(() -> (Core.keybinds.get(cameraSelect[index]).key == KeyCode.unknown ? "" : "[cyan]" + Core.keybinds.get(cameraSelect[index]).key.toString()) + hudList[index].getName()).get();
             if (hoverMode) field.hovered(() -> hudList[index].getHud());
             else field.clicked(() -> hudList[index].getHud());
             if (hudList[index].isValid()) {

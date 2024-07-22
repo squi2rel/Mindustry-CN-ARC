@@ -16,6 +16,7 @@ import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.arcModule.NumberFormat;
 import mindustry.arcModule.draw.ARCBuilds;
+import mindustry.arcModule.ui.AdvanceToolTable;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -957,7 +958,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isPlaceable(){
-        return Core.settings.getBool("allBlocksReveal") || isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
+        return AdvanceToolTable.allBlocksReveal || isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
 
     /** @return whether this block supports a specific environment. */

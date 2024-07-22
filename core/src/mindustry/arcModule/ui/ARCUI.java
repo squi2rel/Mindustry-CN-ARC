@@ -11,7 +11,6 @@ import arc.util.Align;
 import arc.util.Log;
 import mindustry.ClientLauncher;
 import mindustry.arcModule.RFuncs;
-import mindustry.arcModule.claj.Claj;
 import mindustry.arcModule.ui.dialogs.AboutCN_ARCDialog;
 import mindustry.arcModule.ui.dialogs.AchievementsDialog;
 import mindustry.arcModule.ui.dialogs.MessageDialog;
@@ -89,6 +88,5 @@ public class ARCUI {
         } catch (Exception e) {
             Log.err(e);
         }
-        Claj.init();
     }
 }

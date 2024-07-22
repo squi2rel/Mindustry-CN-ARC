@@ -60,7 +60,7 @@ public class DesktopLauncher extends ClientLauncher{
                         }
                     }
                 }
-                setWindowIcon(FileType.internal, "icons/icon_64.png");
+                setWindowIcon(FileType.internal, "icons/arc.png");
             }});
         }catch(Throwable e){
             handleCrash(e);
@@ -380,7 +380,7 @@ public class DesktopLauncher extends ClientLauncher{
             //Steam mostly just expects us to give it a nice string, but it apparently expects "steam_display" to always be a loc token, so I've uploaded this one which just passes through 'steam_status' raw.
             SVars.net.friends.setRichPresence("steam_display", "#steam_status_raw");
 
-            SVars.net.friends.setRichPresence("steam_status", ARCVars.arcVersionPrefix + " " + (inGame ? gameMapWithWave : uiState));
+            SVars.net.friends.setRichPresence("steam_status", Strings.stripColors(ARCVars.arcVersionPrefix) + " " + (inGame ? gameMapWithWave : uiState));
         }
     }
 

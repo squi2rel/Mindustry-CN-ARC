@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.arcModule.ui.AdvanceToolTable;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -69,7 +70,7 @@ public class Build{
     @Remote(called = Loc.server)
     public static void beginPlace(@Nullable Unit unit, Block result, Team team, int x, int y, int rotation){
 
-        if(Core.settings.getBool("worldCreator")){
+        if(AdvanceToolTable.worldCreator){
             Tile tile = world.tile(x, y);
             if(tile == null) return;
             if(result == Blocks.cliff) {
@@ -100,7 +101,7 @@ public class Build{
         }
 
 
-        if(!Core.settings.getBool("worldCreator") && !validPlace(result, team, x, y, rotation)){
+        if(!AdvanceToolTable.worldCreator && !validPlace(result, team, x, y, rotation)){
             return;
         }
 
@@ -164,13 +165,12 @@ public class Build{
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
         //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
 
-        if(Core.settings.getBool("forcePlacement")){
+        if(AdvanceToolTable.forcePlacement){
             Tile tile = world.tile(x, y);
-            if (tile == null) return false;
-            return true;
+            return tile != null;
         }
 
-        if (Core.settings.getBool("worldCreator")) {
+        if (AdvanceToolTable.worldCreator) {
             Tile tile = world.tile(x, y);
             if (tile == null) return false;
             if (type instanceof OverlayFloor of) {
@@ -308,7 +308,7 @@ public class Build{
     /** Returns whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
-        return (Core.settings.getBool("worldCreator") && tile.block() != Blocks.air)
+        return (AdvanceToolTable.worldCreator && tile.block() != Blocks.air)
                 || (tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team));
     }
 }

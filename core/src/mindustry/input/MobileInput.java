@@ -25,6 +25,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.Conveyor;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -529,6 +530,15 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //shoot on touch down when in keyboard mode
                 player.shooting = true;
             }
+        }
+
+        if (block instanceof Conveyor) {
+            lineStartX = cursor.x;
+            lineStartY = cursor.y;
+            lastLineX = cursor.x;
+            lastLineY = cursor.y;
+            lineMode = true;
+            updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
         }
 
         return false;

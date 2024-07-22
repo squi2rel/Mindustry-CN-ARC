@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.arcModule.ARCVars;
+import mindustry.arcModule.ui.AdvanceToolTable;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -56,7 +57,7 @@ public class DatabaseDialog extends BaseDialog{
 
             Seq<UnlockableContent> array = allContent[j]
                 .select(c -> c instanceof UnlockableContent u &&
-                    (Core.settings.getBool("allBlocksReveal") || !u.isHidden()) &&
+                    (AdvanceToolTable.allBlocksReveal || !u.isHidden()) &&
                     (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase()))
                 ).as();
 
