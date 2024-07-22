@@ -315,12 +315,14 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
                 Lines.square(res.x, res.y, res.type.hitSize, 20);
             } else {
                 Tile tileOn = tileOn();
-                if (tileOn.block() != Blocks.air) {
-                    Draw.color(Tmp.c1.set(Color.green).a(0.5f));
-                    Lines.square(tileOn.build.x, tileOn.build.y, tileOn.block().size * tilesize * 0.9f, 20);
-                } else {
-                    Draw.color(Tmp.c1.set(Color.lime).a(0.5f));
-                    Lines.square(tileOn.worldx(), tileOn.worldy(), 5, 20);
+                if (tileOn != null) {
+                    if (tileOn.block() != Blocks.air) {
+                        Draw.color(Tmp.c1.set(Color.green).a(0.5f));
+                        Lines.square(tileOn.build.x, tileOn.build.y, tileOn.block().size * tilesize * 0.9f, 20);
+                    } else {
+                        Draw.color(Tmp.c1.set(Color.lime).a(0.5f));
+                        Lines.square(tileOn.worldx(), tileOn.worldy(), 5, 20);
+                    }
                 }
             }
         }
