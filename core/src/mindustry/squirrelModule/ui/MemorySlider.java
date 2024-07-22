@@ -19,9 +19,7 @@ public class MemorySlider extends Slider {
         addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Element actor) {
-                if (actor == MemorySlider.this) {
-                    Core.settings.put(name, getValue());
-                }
+                if (actor == MemorySlider.this) Core.settings.put(name, getValue());
             }
         });
     }

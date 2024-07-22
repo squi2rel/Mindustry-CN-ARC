@@ -1,10 +1,8 @@
 package mindustry.squirrelModule.ui;
 
 import arc.Core;
-import arc.func.Boolf;
 import arc.scene.Element;
 import arc.scene.event.ChangeListener;
-import arc.scene.ui.CheckBox;
 import arc.scene.ui.TextField;
 import mindustry.squirrelModule.modules.hack.Config;
 
@@ -21,9 +19,7 @@ public class MemoryField extends TextField {
         addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Element actor) {
-                if (actor == MemoryField.this) {
-                    Core.settings.put(name, getText());
-                }
+                if (actor == MemoryField.this) Core.settings.put(name, getText());
             }
         });
     }

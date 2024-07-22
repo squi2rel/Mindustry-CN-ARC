@@ -19,9 +19,7 @@ public class MemoryCheckBox extends CheckBox {
         addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Element actor) {
-                if (actor == MemoryCheckBox.this) {
-                    Core.settings.put(name, isChecked());
-                }
+                if (actor == MemoryCheckBox.this) Core.settings.put(name, isChecked());
             }
         });
     }

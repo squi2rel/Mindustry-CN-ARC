@@ -14,13 +14,13 @@ import arc.scene.Element;
 import arc.scene.event.ChangeListener;
 import arc.scene.style.Drawable;
 import arc.scene.ui.Button;
+import arc.scene.ui.CheckBox;
 import arc.scene.ui.Label;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
 import arc.scene.utils.Elem;
 import arc.struct.ObjectMap;
 import arc.util.*;
-import mindustry.Vars;
 import mindustry.arcModule.ARCVars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
@@ -126,8 +126,8 @@ public class Hack {
         initFill();
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
-        manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), field("customPoke", "戳了{name}[white]一下，并提醒你留意对话框", s -> customPokeText = s)}, changed(e -> customPoke = e)));
-        manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), field("customPrefix", "S~{ver}", s -> arcVersionPrefix = "<ARC" + s.replace("{ver}", Version.arcBuild <= 0 ? "Dev" : String.valueOf(Version.arcBuild)) + ">")}, changed(e -> arcVersionPrefix = e ? arcVersionPrefix : "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">")));
+        manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), jsField("customPoke", "戳了{name}[white]一下，并提醒你留意对话框", s -> customPokeText = s)}, changed(e -> customPoke = e)));
+        manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), jsField("customPrefix", "S~{ver}", s -> arcVersionPrefix = "<ARC" + s.replace("{ver}", Version.arcBuild <= 0 ? "Dev" : String.valueOf(Version.arcBuild)) + ">")}, changed(e -> arcVersionPrefix = e ? arcVersionPrefix : "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">")));
 
         initKeys();
         initHandler();
@@ -210,9 +210,7 @@ public class Hack {
         c.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Element actor) {
-                if (actor == c) {
-                    func.get(c.isChecked());
-                }
+                if (actor == c) func.get(c.isChecked());
             }
         });
         Core.app.post(() -> func.get(c.isChecked()));
@@ -224,13 +222,21 @@ public class Hack {
         f.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Element actor) {
-                if (actor == f) {
-                    func.get(f.getText());
-                }
+                if (actor == f) func.get(f.getText());
             }
         });
         Core.app.post(() -> func.get(f.getText()));
         return f;
+    }
+
+    public static Table jsField(String name, String def, Cons<String> func) {
+        Table t = new Table();
+        CheckBox c = new CheckBox("js");
+        MemoryField f = field(name, def, s -> func.get(c.isChecked() ? mods.getScripts().runConsole(s) : s));
+        c.changed(f::change);
+        t.add(c).left();
+        t.add(f).growX();
+        return t;
     }
 
     public static MemoryField field(String name, String def, TextField.TextFieldValidator valid, Cons<String> func) {
@@ -387,7 +393,7 @@ public class Hack {
             get[0] = true;
         });
         Runnable co = () -> {
-            if (!(dst instanceof CoreBlock.CoreBuild) && !(dst instanceof StorageBlock.StorageBuild sb && sb.linkedCore != null) && !get[0] && core != null && len <= itemTransferRange) {
+            if (!get[0] && !(dst instanceof CoreBlock.CoreBuild) && !(dst instanceof StorageBlock.StorageBuild sb && sb.linkedCore != null) && core != null && len <= itemTransferRange) {
                 if (holdFillMinItem == 0 ? core.items.has(item) : core.items.has(item, holdFillMinItem)) {
                     if (unit.stack.amount != 0) dropItem(core, len);
                     Call.requestItem(player, core, item, amount == -1 ? unit.type.itemCapacity : amount);
@@ -456,7 +462,7 @@ public class Hack {
 
     private static void initKeys() {
         sui.infoControl.manager.flatList.each((s, c) -> {
-            String kn = settings.getString("key-" + c.internalName, null);
+            String kn = settings.getString("hkey-" + c.internalName, null);
             if (kn == null) return;
             KeyCode k = KeyCode.valueOf(kn);
             keyMap.put(c, k);
@@ -467,7 +473,7 @@ public class Hack {
         ARCVars.arcClient.addHandlerString("VAPEMSG", (p, s) -> NetClient.sendMessage("[acid]<VAPE>[] " + netServer.chatFormatter.format(p, s), s, p));
     }
 
-    interface StrInt<T> {
+    public interface StrInt<T> {
         String get(T p);
     }
 }

@@ -5,7 +5,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.input.KeyCode;
-import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.scene.Element;
 import arc.scene.Group;
@@ -25,7 +24,6 @@ import arc.util.Tmp;
 import mindustry.squirrelModule.modules.hack.Config;
 import mindustry.squirrelModule.modules.tools.SMisc;
 
-import static mindustry.Vars.ui;
 import static mindustry.squirrelModule.modules.tools.SMisc.PI20;
 
 public class ControlTable extends Table {
@@ -132,7 +130,7 @@ public class ControlTable extends Table {
                                 float offset = 40 * Scl.scl();
                                 for (float i = 0; i <= height; i++) {
                                     Draw.color(SMisc.color((((Time.globalTime / rotateDiv) % PI20) + id * lineAdd * offset + (offset - i) * lineAdd) % PI20));
-                                    Lines.line(x, y + i, x + width, y + i);
+                                    Lines.line(x + 1, y + i, x + width, y + i);
                                 }
                             }
                         }).grow();
