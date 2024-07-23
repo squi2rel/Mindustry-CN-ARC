@@ -94,7 +94,7 @@ public class Hack {
         manager.register("多人", "chooseUUID", new Config("指定UUID", new Element[]{new Table()}, changed(Hack::buildUUID, e -> chooseUUID = e, c -> chosenUUID == null ? "off" : chosenUUID.substring(0, 3))));
         manager.register("多人", "randomUSID", new Config("随机USID", null, changed(e -> randomUSID = e)));
         manager.register("多人", "simDevice", new Config(mobile ? "伪装电脑" : "伪装手机", null, changed(e -> simDevice = e)));
-        manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label("自定义消息"), jsField("autoGG", "gg", s -> ggText = s), new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 1, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
+        manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label("自定义消息"), jsField("autoGG", "gg", s -> ggText = s), new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 2, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
         manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
         manager.register("多人", "rejoin", new Config("重进", null, changed(Hack::reconnect)));
         manager.register("多人", "privateMsg", new Config("VAPE聊天", null, changed(e -> privateMsg = e)));
