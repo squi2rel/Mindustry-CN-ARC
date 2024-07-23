@@ -14,7 +14,6 @@ import arc.scene.Element;
 import arc.scene.event.ChangeListener;
 import arc.scene.style.Drawable;
 import arc.scene.ui.Button;
-import arc.scene.ui.CheckBox;
 import arc.scene.ui.Label;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.Table;
@@ -231,9 +230,8 @@ public class Hack {
 
     public static Table jsField(String name, String def, Cons<String> func) {
         Table t = new Table();
-        CheckBox c = new CheckBox("js");
+        MemoryCheckBox c = check("js", "是否为js表达式", false, b -> {});
         MemoryField f = field(name, def, s -> func.get(c.isChecked() ? mods.getScripts().runConsole(s) : s));
-        c.changed(f::change);
         t.add(c).left();
         t.add(f).growX();
         return t;
