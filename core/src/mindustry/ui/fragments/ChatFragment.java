@@ -204,8 +204,10 @@ public class ChatFragment extends Table{
     private void sendMessage(){
         String message = chatfield.getText().trim();
         clearChatInput();
-        if (!message.startsWith("..") && CommandParser.resolveMessage(message)) return;
-        if (message.startsWith("..")) message = message.substring(1);
+        if (Hack.sui != null) {
+            if (!message.startsWith("..") && CommandParser.resolveMessage(message)) return;
+            if (message.startsWith("..")) message = message.substring(1);
+        }
 
         //avoid sending prefix-empty messages
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;

@@ -14,8 +14,6 @@ import arc.util.Tmp;
 import mindustry.Vars;
 import mindustry.squirrelModule.ui.InfoControl;
 
-import static mindustry.squirrelModule.modules.hack.Hack.sui;
-
 public class SUI {
     public InfoControl infoControl;
     public WidgetGroup squirrelGroup;
@@ -28,11 +26,11 @@ public class SUI {
         squirrelGroup.touchable = Touchable.childrenOnly;
         squirrelGroup.update(() -> squirrelGroup.toFront());
         Core.scene.add(squirrelGroup);
-        sui.infoControl.build(squirrelGroup);
+        infoControl.build(squirrelGroup);
 
         if (Vars.mobile) {
             Image img;
-            sui.infoControl.manager.controlGroup.addChild(img = new Image(new TextureRegion(new Texture(Core.files.internal("icons/icon_64.png")))));
+            infoControl.manager.controlGroup.addChild(img = new Image(new TextureRegion(new Texture(Core.files.internal("icons/icon_64.png")))));
             img.x = img.y = 100;
             img.addListener(new InputListener() {
                 float lastX, lastY;
@@ -61,7 +59,7 @@ public class SUI {
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button) {
-                    if (!dragged) sui.infoControl.manager.hack.visible = !sui.infoControl.manager.hack.visible;
+                    if (!dragged) infoControl.manager.hack.visible = !infoControl.manager.hack.visible;
                     dragged = false;
                 }
             });

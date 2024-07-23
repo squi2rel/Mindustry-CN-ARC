@@ -372,7 +372,7 @@ public class Logic implements ApplicationListener{
         state.gameOver = true;
         if(!headless){
             state.won = player.team() == winner;
-            if (Hack.autoGG) Timer.schedule(() -> Call.sendChatMessage("gg"), (float) Hack.autoGGDelay / 1000);
+            if (Hack.autoGG) Timer.schedule(() -> Call.sendChatMessage(Hack.ggText), (float) Hack.autoGGDelay / 1000);
         }
     }
 

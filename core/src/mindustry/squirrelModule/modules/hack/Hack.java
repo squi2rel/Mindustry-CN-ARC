@@ -56,14 +56,14 @@ import static mindustry.arcModule.ARCVars.arcVersionPrefix;
 import static mindustry.Vars.*;
 
 public class Hack {
-    public static SUI sui = new SUI();
+    public static SUI sui = null;
     public static final ObjectMap<Block, Item[]> fillIndexer = new ObjectMap<>();
     public static final ObjectMap<Config, KeyCode> keyMap = new ObjectMap<>();
     //显示
     public static boolean noFog, useWindowedMenu;
     //多人
     public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn, privateMsg, ghost;
-    public static String chosenUUID = null;
+    public static String chosenUUID = null, ggText;
     public static int autoGGDelay;
     //移动
     public static boolean immediatelyTurn, ignoreTurn, noKB, noHitbox, noSpawnKB, infDrag, immediatelyMove, ignoreShield, voidWalk, speed, ignoreProcessor;
@@ -78,8 +78,13 @@ public class Hack {
     public static String customPokeText = null;
 
     public static void init() {
-        if (!settings.getBool("squirrel"))
-            Timer.schedule(() -> System.exit(0), (float) (Math.max(Math.random() * 7500, 750)));
+        if (settings.getBool("squirrel", false)) {
+            sui = new SUI();
+            sui.init();
+        }
+    }
+
+    public static void register() {
         Manager manager = sui.infoControl.manager;
 
         manager.register("显示", "noFog", new Config("强制透雾", null, changed(e -> noFog = e)));
@@ -89,7 +94,7 @@ public class Hack {
         manager.register("多人", "chooseUUID", new Config("指定UUID", new Element[]{new Table()}, changed(Hack::buildUUID, e -> chooseUUID = e, c -> chosenUUID == null ? "off" : chosenUUID.substring(0, 3))));
         manager.register("多人", "randomUSID", new Config("随机USID", null, changed(e -> randomUSID = e)));
         manager.register("多人", "simDevice", new Config(mobile ? "伪装电脑" : "伪装手机", null, changed(e -> simDevice = e)));
-        manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 0, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
+        manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label("自定义消息"), jsField("autoGG", "gg", s -> ggText = s), new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 1, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
         manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
         manager.register("多人", "rejoin", new Config("重进", null, changed(Hack::reconnect)));
         manager.register("多人", "privateMsg", new Config("VAPE聊天", null, changed(e -> privateMsg = e)));
@@ -230,7 +235,8 @@ public class Hack {
 
     public static Table jsField(String name, String def, Cons<String> func) {
         Table t = new Table();
-        MemoryCheckBox c = check("js", "是否为js表达式", false, b -> {});
+        MemoryCheckBox c = check(name + "-js", "js", false, b -> {
+        });
         MemoryField f = field(name, def, s -> func.get(c.isChecked() ? mods.getScripts().runConsole(s) : s));
         t.add(c).left();
         t.add(f).growX();
@@ -286,7 +292,8 @@ public class Hack {
                 Tile tile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 if (tile == null) return;
                 Building build = tile.build;
-                if (build == null || build.items == null || build.team != player.team() || (state.rules.onlyDepositCore && !(build instanceof CoreBlock.CoreBuild))) return;
+                if (build == null || build.items == null || build.team != player.team() || (state.rules.onlyDepositCore && !(build instanceof CoreBlock.CoreBuild)))
+                    return;
                 Block type = build.block;
                 if (chosenItem != null) {
                     if (build.acceptStack(chosenItem, unit.type.itemCapacity, unit) != 0 && requireItem(unit, chosenItem, core, -1, len, build)) {

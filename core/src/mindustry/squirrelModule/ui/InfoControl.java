@@ -1,14 +1,11 @@
 package mindustry.squirrelModule.ui;
 
 import arc.Core;
-import arc.graphics.Color;
-import arc.math.Mathf;
 import arc.scene.Group;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import arc.util.Time;
 import mindustry.input.Binding;
-import mindustry.squirrelModule.modules.hack.Config;
 import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.squirrelModule.modules.hack.Manager;
 import mindustry.squirrelModule.modules.tools.SMisc;
@@ -31,7 +28,7 @@ public class InfoControl {
         table.setFillParent(true);
         table.align(Align.topLeft);
         manager = new Manager(root);
-        Hack.init();
+        Hack.register();
         manager.buildClickHUD();
     }
 
@@ -54,9 +51,5 @@ public class InfoControl {
         }
         manager.controlGroup.toFront();
         color = (color + step * Time.delta) % PI20;
-    }
-
-    public Config getConfig(String name) {
-        return manager.getConfig(name);
     }
 }

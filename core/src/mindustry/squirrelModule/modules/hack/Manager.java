@@ -12,7 +12,7 @@ import mindustry.ui.Styles;
 
 public class Manager {
     public WidgetGroup controlGroup = new WidgetGroup(), hack = new WidgetGroup();
-    ControlTable control;
+    public ControlTable control;
     public ObjectMap<String, Seq<Config>> list = new ObjectMap<>();
     public ObjectMap<String, Config> flatList = new ObjectMap<>();
 
@@ -30,10 +30,6 @@ public class Manager {
             t.setBackground(Styles.black3);
             t.update(t::toBack);
         }));
-    }
-
-    public Config getConfig(String name) {
-        return flatList.get(name);
     }
 
     public void register(String type, String name, Config conf) {

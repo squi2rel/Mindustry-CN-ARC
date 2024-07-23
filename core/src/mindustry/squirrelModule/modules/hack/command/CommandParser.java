@@ -42,7 +42,7 @@ public class CommandParser {
         cmd.put(c.name, c);
     }
 
-    private abstract static class Command {
+    public abstract static class Command {
         public String name, desc, args;
         public Command(String name, String desc, String... args) {
             this.name = name;

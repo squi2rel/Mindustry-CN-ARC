@@ -39,7 +39,6 @@ import mindustry.ui.fragments.*;
 
 import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
-import static mindustry.squirrelModule.modules.hack.Hack.sui;
 
 public class UI implements ApplicationListener, Loadable{
     public static String billions, millions, thousands;
@@ -234,7 +233,7 @@ public class UI implements ApplicationListener, Loadable{
         Group group = Core.scene.root;
 
         ARCVars.arcui.init(group);
-        sui.init();
+        Hack.init();
 
         menuGroup.setFillParent(true);
         menuGroup.touchable = Touchable.childrenOnly;
