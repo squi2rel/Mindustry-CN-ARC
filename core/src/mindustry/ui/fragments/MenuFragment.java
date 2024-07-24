@@ -136,7 +136,7 @@ public class MenuFragment{
                 s.fontColor = b.color;
                 b.setStyle(s);
             }).update(b -> b.color.fromHsv(Time.time % 360,1,1)).row();
-            c.bottom().right().button("检查更新", Icon.refresh, () -> {
+            /*c.bottom().right().button("检查更新", Icon.refresh, () -> {
                 ui.loadfrag.show();
                 becontrol.checkUpdate(result -> {
                     ui.loadfrag.hide();
@@ -144,7 +144,7 @@ public class MenuFragment{
                 });
             }).size(200, 60).name("检查更新").update(t -> {
                 t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
-            });
+            });*/
         });
 
         parent.fill(c -> c.bottom().left().table(t -> {

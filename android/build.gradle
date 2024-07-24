@@ -29,7 +29,7 @@ task deploy(type: Copy){
 }
 
 android{
-    namespace = "io.anuke.mindustry"
+    namespace = "io.anuke.mindustry.arcsbe"
     buildToolsVersion = '34.0.0'
     compileSdk = 34
     sourceSets{
@@ -55,7 +55,7 @@ android{
         Integer vcode = props['androidBuildCode']?.toInteger() ?: 1
         def versionNameResult = "$versionNumber-$versionType-${getBuildVersion().replace(" ", "-")}"
 
-        applicationId "io.anuke.mindustry.arcs"
+        applicationId "io.anuke.mindustry.arcsbe"
         minSdkVersion 14
         targetSdkVersion 34
         
@@ -147,7 +147,7 @@ task copyAndroidNatives(){
 }
 
 task run(type: Exec){
-    commandLine "${findSdkDir()}/platform-tools/adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
+    commandLine "${findSdkDir()}/platform-tools/adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry.arcsbe/mindustry.android.AndroidLauncher'
 }
 
 if(!project.ext.hasSprites()){
