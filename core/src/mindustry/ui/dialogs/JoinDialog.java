@@ -168,6 +168,11 @@ public class JoinDialog extends BaseDialog{
                     ARCVars.arcClient.disable = pattern.matcher(ip).find();
 
                     if(server.lastHost != null){
+                        if (server.lastHost.version < 10000) {
+                            Vars.ui.showErrorMessage("BE版学术不能加入正式版服务器\n请使用正式版");
+                            return;
+                        }
+                        Version.build = server.lastHost.version;
                         Events.fire(new ClientPreConnectEvent(server.lastHost));
                         safeConnect(server.lastHost.address, server.lastHost.port, server.lastHost.version);
                     }else{
@@ -647,11 +652,12 @@ public class JoinDialog extends BaseDialog{
     }
 
     void safeConnect(String ip, int port, int version){
-        if(version != Version.build && Version.build != -1 && version != -1){
-
-            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
-                Core.bundle.format("server.versions", Version.build, version));
-        }else if (version < 136 && version!=-1) ui.showInfo("当前学术端为v7测试版，无法进入正式版服务器\n[orange]请寻找BE测试服");
+        if(version != Version.arcBuild && Version.arcBuild != -1 && version != -1){
+            ui.showInfo("[red]版本不匹配\n[orange]此服务器BE版本与学术BE版本不匹配\n如报错请尝试更换版本");
+            connect(ip, port);
+            //ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
+            //    Core.bundle.format("server.versions", Version.build, version));
+        }
         else {
             connect(ip, port);
         }
@@ -706,7 +712,7 @@ public class JoinDialog extends BaseDialog{
     }
 
     private String getVersionString(Host host){
-        if(host.version == -1){
+        /*if(host.version == -1){
             return Core.bundle.format("server.version", Core.bundle.get("server.custombuild"), "");
         }else if(host.version == 0){
             return Core.bundle.get("server.outdated");
@@ -719,7 +725,7 @@ public class JoinDialog extends BaseDialog{
         }else if(host.version == Version.build && Version.type.equals(host.versionType)){
             //not important
             return "";
-        }else{
+        }else*/{
             return Core.bundle.format("server.version", host.version, host.versionType);
         }
     }
