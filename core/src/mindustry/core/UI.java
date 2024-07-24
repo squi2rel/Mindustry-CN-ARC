@@ -87,7 +87,7 @@ public class UI implements ApplicationListener, Loadable{
     public IntMap<Dialog> followUpMenus;
     public IntMap<Window> followUpWindowedMenus = new IntMap<>();
 
-    public Cursor drillCursor, unloadCursor, targetCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
     private @Nullable Element lastAnnouncement;
 
     public UI(){
