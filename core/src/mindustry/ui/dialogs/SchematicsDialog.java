@@ -614,6 +614,7 @@ public class SchematicsDialog extends BaseDialog{
             closeOnBack();
             setFillParent(true);
 
+            //TODO: use IconSelectDialog
             cont.pane(t -> {
                 resized(true, () -> {
                     t.clearChildren();
@@ -623,7 +624,7 @@ public class SchematicsDialog extends BaseDialog{
                     int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                     int i = 0;
-                    for(String icon : PlanetDialog.defaultIcons){
+                    for(String icon : accessibleIcons){
                         String out = (char)Iconc.codes.get(icon) + "";
                         if(tags.contains(out)) continue;
 
@@ -679,6 +680,7 @@ public class SchematicsDialog extends BaseDialog{
                 Table current = new Table().left();
 
                 for(var tag : tags){
+                    float si = 40f;
 
                     var next = new Table(Tex.whiteui, n -> {
                         n.setColor(Pal.gray);
@@ -694,7 +696,7 @@ public class SchematicsDialog extends BaseDialog{
                                     tagsChanged();
                                     rebuild[0].run();
                                 }
-                            }).tooltip("@editor.moveup").row();
+                            }).size(si).tooltip("@editor.moveup").row();
                             //move down
                             move.button(Icon.downOpen, Styles.emptyi, () -> {
                                 int idx = tags.indexOf(tag);
@@ -703,7 +705,7 @@ public class SchematicsDialog extends BaseDialog{
                                     tagsChanged();
                                     rebuild[0].run();
                                 }
-                            }).tooltip("@editor.movedown");
+                            }).size(si).tooltip("@editor.movedown");
                         }).fillY();
 
                         n.table(t -> {
@@ -741,7 +743,7 @@ public class SchematicsDialog extends BaseDialog{
                                         rebuild[0].run();
                                     }
                                 });
-                            }).tooltip("@schematic.renametag").row();
+                            }).size(si).tooltip("@schematic.renametag").row();
                             //delete tag
                             b.button(Icon.trash, Styles.emptyi, () -> {
                                 ui.showConfirm("@schematic.tagdelconfirm", () -> {
@@ -757,7 +759,7 @@ public class SchematicsDialog extends BaseDialog{
                                     rebuildPane.run();
                                     rebuild[0].run();
                                 });
-                            }).tooltip("@save.delete");
+                            }).size(si).tooltip("@save.delete");
                         }).fillY();
                     });
 
@@ -768,11 +770,10 @@ public class SchematicsDialog extends BaseDialog{
                         p.add(current).row();
                         current = new Table();
                         current.left();
-                        current.add(next).minWidth(240).pad(4);
                         sum = 0;
-                    }else{
-                        current.add(next).minWidth(240).pad(4);
                     }
+
+                    current.add(next).minWidth(210).pad(4);
 
                     sum += w;
                 }

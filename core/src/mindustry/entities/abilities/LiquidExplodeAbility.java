@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -27,6 +28,12 @@ public class LiquidExplodeAbility extends Ability{
                 rad
         );
     }
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add((liquid.hasEmoji() ? liquid.emoji() : "") + "[stat]" + liquid.localizedName);
+    }
+
     @Override
     public void death(Unit unit){
         //TODO what if noise is radial, so it looks like a splat?

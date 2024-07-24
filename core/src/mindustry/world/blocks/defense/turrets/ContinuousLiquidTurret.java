@@ -10,6 +10,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -145,6 +146,14 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case currentAmmoType -> liquids.current();
+                default -> super.senseObject(sensor);
+            };
+        }
+
+        @Override
         public boolean canConsume(){
             return hasCorrectAmmo() && super.canConsume();
         }
@@ -162,7 +171,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public boolean hasAmmo(){
-            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() > 0f;
         }
 
         public boolean hasCorrectAmmo(){

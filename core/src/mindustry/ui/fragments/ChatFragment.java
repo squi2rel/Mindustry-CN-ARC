@@ -328,7 +328,7 @@ public class ChatFragment extends Table{
         try {
             if (message != null) arcui.MessageDialog.resolveMsg(message, playersender);
             if (playersender != null && playersender.unit() != null)
-                message = (playersender.unit().isNull() ? Iconc.alphaaaa : playersender.unit().type.emoji()) + " " + message;
+                message = (playersender.unit() == null ? Iconc.alphaaaa : playersender.unit().type.emoji()) + " " + message;
             addMessage(message);
         } catch (Exception e) {
             Log.err(e);

@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -28,6 +29,14 @@ public class LiquidRegenAbility extends Ability{
                 Math.PI * Math.pow(Math.max(unit.hitSize / tilesize * 0.6f, 1), 2) * slurpSpeed * regenPerSlurp
         );
     }
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add((liquid.hasEmoji() ? liquid.emoji() : "") + "[stat]" + liquid.localizedName);
+        t.row();
+        t.add(abilityStat("slurpheal", Strings.autoFixed(regenPerSlurp, 2)));
+    }
+
     @Override
     public void update(Unit unit){
         //TODO timer?

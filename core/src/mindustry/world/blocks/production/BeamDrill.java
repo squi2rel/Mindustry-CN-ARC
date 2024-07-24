@@ -266,7 +266,7 @@ public class BeamDrill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity && lastItem != null && enabled;
+            return items.total() < itemCapacity && facingAmount > 0 && enabled;
         }
 
         @Override

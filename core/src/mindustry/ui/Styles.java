@@ -49,6 +49,8 @@ public class Styles{
     togglet,
     /** Partially transparent square button. */
     cleart,
+    /** Clear, square, orange border, toggleable. */
+    clearTogglet,
     /** Similar to flatToggle, but without a darker border. */
     fullTogglet,
     /** Toggle-able version of flatBorder. */
@@ -76,6 +78,8 @@ public class Styles{
     geni,
     /** Gray, toggleable, no background. */
     grayi,
+    /** Gray square background, standard behavior. Equivalent to grayt. */
+    graySquarei,
     /** Flat, square, black background. */
     flati,
     /** Square border. */
@@ -230,6 +234,16 @@ public class Styles{
             disabled = buttonDisabled;
             disabledFontColor = Color.gray;
         }};
+        clearTogglet = new TextButtonStyle(){{
+            font = Fonts.def;
+            fontColor = Color.white;
+            down = flatDown;
+            checked = flatDown;
+            up = black6;
+            over = flatOver;
+            disabled = black;
+            disabledFontColor = Color.gray;
+        }};
         fullTogglet = new TextButtonStyle(){{
             font = Fonts.def;
             fontColor = Color.white;
@@ -286,6 +300,14 @@ public class Styles{
         grayi = new ImageButtonStyle(){{
             imageUpColor = Color.lightGray;
             imageDownColor = Color.white;
+        }};
+        graySquarei = new ImageButtonStyle(){{
+            imageUpColor = Color.white;
+            imageDownColor = Color.lightGray;
+
+            over = flatOver;
+            down = flatOver;
+            up = grayPanel;
         }};
         flati = new ImageButtonStyle(){{
             down = flatOver;

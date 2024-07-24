@@ -49,21 +49,17 @@ public class Logic implements ApplicationListener{
 
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
-                TeamData data = event.team.data();
-                Iterator<BlockPlan> it = data.plans.iterator();
-                var bounds = event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1);
-                while(it.hasNext()){
-                    BlockPlan b = it.next();
-                    Block block = content.block(b.block);
-                    if(bounds.overlaps(block.bounds(b.x, b.y, Tmp.r2))){
-                        b.removed = true;
-                        it.remove();
-                    }
-                }
+                checkOverlappingPlans(event.team, event.tile);
 
                 if(event.team == state.rules.defaultTeam){
                     state.stats.placedBlockCount.increment(event.tile.block());
                 }
+            }
+        });
+
+        Events.on(PayloadDropEvent.class, e -> {
+            if(e.build != null){
+                checkOverlappingPlans(e.build.team, e.build.tile);
             }
         });
 
@@ -213,6 +209,20 @@ public class Logic implements ApplicationListener{
         });
     }
 
+    private void checkOverlappingPlans(Team team, Tile tile){
+        TeamData data = team.data();
+        Iterator<BlockPlan> it = data.plans.iterator();
+        var bounds = tile.block().bounds(tile.x, tile.y, Tmp.r1);
+        while(it.hasNext()){
+            BlockPlan b = it.next();
+            Block block = content.block(b.block);
+            if(bounds.overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+                b.removed = true;
+                it.remove();
+            }
+        }
+    }
+
     /** Adds starting items, resets wave time, and sets state to playing. */
     public void play(){
         state.set(State.playing);
@@ -359,7 +369,8 @@ public class Logic implements ApplicationListener{
 
         //map is over, no more world processor objective stuff
         state.rules.disableWorldProcessors = true;
-        state.rules.objectives.clear();
+
+        Call.clearObjectives();
 
         //save, just in case
         if(!headless && !net.client()){
@@ -463,9 +474,6 @@ public class Logic implements ApplicationListener{
 
                 if(!state.isEditor()){
                     state.rules.objectives.update();
-                    if(state.rules.objectives.checkChanged() && net.server()){
-                        Call.setObjectives(state.rules.objectives);
-                    }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){

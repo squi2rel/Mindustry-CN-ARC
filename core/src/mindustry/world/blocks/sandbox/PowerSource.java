@@ -11,6 +11,7 @@ public class PowerSource extends PowerNode{
         maxNodes = 100;
         outputsPower = true;
         consumesPower = false;
+        drawDisabled = true;
         //TODO maybe don't?
         envEnabled = Env.any;
     }
@@ -22,6 +23,14 @@ public class PowerSource extends PowerNode{
     }
 
     public class PowerSourceBuild extends PowerNodeBuild{
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+            if(!allowUpdate()){
+                enabled = false;
+            }
+        }
+
         @Override
         public float getPowerProduction(){
             return enabled ? powerProduction : 0f;

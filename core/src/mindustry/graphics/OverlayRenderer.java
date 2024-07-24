@@ -119,7 +119,7 @@ public class OverlayRenderer{
 
         //draw objective markers
         state.rules.objectives.eachRunning(obj -> {
-            for(var marker : obj.markers) marker.draw();
+            for(var marker : obj.markers) marker.draw(1);
         });
 
         //if(player.dead()) return; //dead players don't draw
@@ -138,9 +138,11 @@ public class OverlayRenderer{
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(unitFade);
             Building build = (select instanceof BlockUnitc b ? b.tile() : select instanceof Building b ? b : null);
-            TextureRegion region = build != null ? build.block.fullIcon : select instanceof Unit u ? u.icon() : Core.atlas.white();
+            TextureRegion region = build != null ? build.block.fullIcon : Core.atlas.white();
 
-            Draw.rect(region, select.getX(), select.getY(), select instanceof Unit u && !(select instanceof BlockUnitc) ? u.rotation - 90f : 0f);
+            if(!(select instanceof Unitc)){
+                Draw.rect(region, select.getX(), select.getY());
+            }
 
             for(int i = 0; i < 4; i++){
                 float rot = i * 90f + 45f + (-Time.time) % 360f;
@@ -302,7 +304,9 @@ public class OverlayRenderer{
             Draw.reset();
 
             Building build = world.buildWorld(v.x, v.y);
-            if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange)){
+            if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
+                input.itemDepositCooldown <= 0f){
+
                 boolean invalid = (state.rules.onlyDepositCore && !(build instanceof CoreBuild));
 
                 Lines.stroke(3f, Pal.gray);
@@ -321,6 +325,13 @@ public class OverlayRenderer{
         drawScanner();
         drawMarker();
         arcScan();
+    }
+
+    public void checkApplySelection(Unit u){
+        if(unitFade > 0.001f && lastSelect == u){
+            Color prev = Draw.getMixColor();
+            Draw.mixcol(prev.a > 0.001f ? prev.lerp(Pal.accent, unitFade) : Pal.accent, Math.max(unitFade, prev.a));
+        }
     }
 
     private static class CoreEdge{

@@ -19,6 +19,8 @@ import mindustry.world.blocks.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
+    /** Allows editing the rules in-game. Essentially a cheat mode toggle. */
+    public boolean allowEditRules = false;
     /** Sandbox mode: Enables infinite resources, build range and build speed. */
     public boolean infiniteResources;
     /** Team-specific rules. */
@@ -29,6 +31,8 @@ public class Rules{
     public boolean waveSending = true;
     /** Whether waves are spawnable at all. */
     public boolean waves;
+    /** Whether air units spawn at spawns instead of the edge of the map */
+    public boolean airUseSpawns = false;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */
@@ -39,6 +43,8 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
+    /** Whether blocks can be repaired by clicking them. */
+    public boolean derelictRepair = true;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
     /** Whether cores change teams when they are destroyed. */
@@ -57,6 +63,8 @@ public class Rules{
     public boolean unitAmmo = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
+    /** If true, units' payloads are destroy()ed when the unit is destroyed. */
+    public boolean unitPayloadsExplode = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
     /** If true, unit spawn points are shown. */
@@ -99,10 +107,16 @@ public class Rules{
     public boolean cleanupDeadTeams = true;
     /** If true, items can only be deposited in the core. */
     public boolean onlyDepositCore = false;
+    /** Cooldown, in seconds, of item depositing for players. */
+    public float itemDepositCooldown = 0.5f;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
     public boolean coreDestroyClear = false;
     /** If true, banned blocks are hidden from the build menu. */
     public boolean hideBannedBlocks = false;
+    /** If true, most blocks (including environmental walls) can be deconstructed. This is only meant to be used internally in sandbox/test maps. */
+    public boolean allowEnvironmentDeconstruct = false;
+    /** If true, buildings will be constructed instantly, with no limit on blocks placed per second. This is highly experimental and may cause lag! */
+    public boolean instantBuild = false;
     /** If true, bannedBlocks becomes a whitelist. */
     public boolean blockWhitelist = false;
     /** If true, bannedUnits becomes a whitelist. */
@@ -193,6 +207,8 @@ public class Rules{
     public @Nullable PlanetParams planetBackground;
     /** Rules from this planet are applied. If it's {@code sun}, mixed tech is enabled. */
     public Planet planet = Planets.serpulo;
+    /** If the `data` instruction is allowed for world processors */
+    public boolean allowLogicData = false;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){

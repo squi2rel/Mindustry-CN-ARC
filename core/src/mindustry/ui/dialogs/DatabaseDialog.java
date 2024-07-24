@@ -48,7 +48,7 @@ public class DatabaseDialog extends BaseDialog{
 
     void rebuild(){
         all.clear();
-        var text = search.getText();
+        var text = search.getText().toLowerCase();
 
         Seq<Content>[] allContent = Vars.content.getContentMap();
 

@@ -19,9 +19,14 @@ import mindustry.core.GameState.State;
 import mindustry.ctype.Content;
 import mindustry.game.Team;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.logic.LExecutor.*;
+import mindustry.logic.LStatements.*;
+import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.logic.*;
 import mindustry.graphics.Pal;
 import mindustry.logic.LExecutor.PrintI;
-import mindustry.logic.LExecutor.Var;
 import mindustry.logic.LStatements.InvalidStatement;
 import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
@@ -44,6 +49,7 @@ public class LogicDialog extends BaseDialog{
     public static String transText = "";
 
     @Nullable LExecutor executor;
+    GlobalVarsDialog globalsDialog = new GlobalVarsDialog();
 
     private boolean dispose = false;
 
@@ -204,17 +210,17 @@ public class LogicDialog extends BaseDialog{
             }).width(400f).padLeft(20f);
     }
 
-    public static String arcVarsText(Var s){
+    public static String arcVarsText(LVar s){
         return s.isobj ? PrintI.toString(s.objval) : Math.abs(s.numval - (long)s.numval) < 0.00001 ? (long)s.numval + "" : s.numval + "";
     }
 
-    public static Color arcVarsColor(Var s){
+    public static Color arcVarsColor(LVar s){
         if(s.constant && s.name.startsWith("@")) return Color.goldenrod;
         else if (s.constant) return Color.valueOf("00cc7e");
         else return typeColor(s,new Color());
     }
 
-    private static Color typeColor(Var s, Color color){
+    public static Color typeColor(LVar s, Color color){
         return color.set(
             !s.isobj ? Pal.place :
             s.objval == null ? Color.darkGray :
@@ -228,7 +234,7 @@ public class LogicDialog extends BaseDialog{
         );
     }
 
-    private String typeName(Var s){
+    public static String typeName(LVar s){
         return
             !s.isobj ? "number" :
             s.objval == null ? "null" :
@@ -254,11 +260,29 @@ public class LogicDialog extends BaseDialog{
                     TextButtonStyle style = Styles.flatt;
                     t.defaults().size(280f, 60f).left();
 
+                    if(privileged && executor != null && executor.build != null && !ui.editor.isShown()){
+                        t.button("@editor.worldprocessors.editname", Icon.edit, style, () -> {
+                            ui.showTextInput("", "@editor.name", LogicBlock.maxNameLength, executor.build.tag == null ? "" : executor.build.tag, tag -> {
+                                if(privileged && executor != null && executor.build != null){
+                                    executor.build.configure(tag);
+                                    //just in case of privilege shenanigans...
+                                    executor.build.tag = tag;
+                                }
+                            });
+                            dialog.hide();
+                        }).marginLeft(12f).row();
+                    }
+
+                    t.button("@clear", Icon.cancel, style, () -> {
+                        ui.showConfirm("@logic.clear.confirm", () -> canvas.clearStatements());
+                        dialog.hide();
+                    }).marginLeft(12f).row();
+
                     t.button("@schematic.copy", Icon.copy, style, () -> {
                         dialog.hide();
                         Core.app.setClipboardText(canvas.save());
-                    }).marginLeft(12f);
-                    t.row();
+                    }).marginLeft(12f).row();
+
                     t.button("@schematic.copy.import", Icon.download, style, () -> {
                         dialog.hide();
                         try{
@@ -353,6 +377,8 @@ public class LogicDialog extends BaseDialog{
             });
 
             dialog.addCloseButton();
+            dialog.buttons.button("@logic.globals", Icon.list, () -> globalsDialog.show()).size(210f, 64f);
+
             dialog.show();
         }).name("variables").disabled(b -> executor == null || executor.vars.length == 0);
 

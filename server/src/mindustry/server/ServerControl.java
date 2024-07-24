@@ -150,6 +150,7 @@ public class ServerControl implements ApplicationListener{
         };
 
         Time.setDeltaProvider(TimeControl.deltaProvider);
+        Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f, maxDeltaServer));
 
         registerCommands();
 
@@ -296,6 +297,15 @@ public class ServerControl implements ApplicationListener{
             info("Server loaded. Type @ for help.", "'help'");
         });
 
+        Events.on(SaveLoadEvent.class, e -> {
+            Core.app.post(() -> {
+                if(Config.autoPause.bool() && Groups.player.size() == 0){
+                    state.set(State.paused);
+                    autoPaused = true;
+                }
+            });
+        });
+
         Events.on(PlayerJoin.class, e -> {
             if(state.isPaused() && autoPaused && Config.autoPause.bool()){
                 state.set(State.playing);
@@ -344,18 +354,18 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();
-            if(lastTask != null) lastTask.cancel();
+            cancelPlayTask();
             state.set(State.menu);
             info("Stopped server.");
         });
 
         handler.register("host", "[mapname] [mode]", "Open the server. Will default to survival and a random map if not specified.", arg -> {
-            if(state.is(State.playing)){
+            if(state.isGame()){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
 
-            if(lastTask != null) lastTask.cancel();
+            cancelPlayTask();
 
             Gamemode preset = Gamemode.survival;
 
@@ -502,7 +512,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting. Host a game first.");
                 return;
             }
@@ -519,7 +529,7 @@ public class ServerControl implements ApplicationListener{
             }
             boolean pause = arg[0].equals("on");
             autoPaused = false;
-            state.set(state.isPaused() ? State.playing : State.paused);
+            state.set(pause ? State.paused : State.playing);
             info(pause ? "Game paused." : "Game unpaused.");
         });
 
@@ -576,7 +586,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("fillitems", "[team]", "Fill the core with items.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not playing. Host first.");
                 return;
             }
@@ -751,7 +761,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting a game yet. Calm down.");
                 return;
             }
@@ -844,7 +854,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("admin", "<add/remove> <username/ID...>", "Make an online user admin", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Open the server first.");
                 return;
             }
@@ -903,7 +913,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("runwave", "Trigger the next wave.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting. Host a game first.");
             }else{
                 logic.runWave();
@@ -911,8 +921,39 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("loadautosave", "Loads the last auto-save.", arg -> {
+            if(state.isGame()){
+                err("Already hosting. Type 'stop' to stop hosting first.");
+                return;
+            }
+
+            Fi newestSave = saveDirectory.findAll(f -> f.name().startsWith("auto_")).min(Fi::lastModified);
+
+            if(newestSave == null){
+                err("No auto-saves found! Type `config autosave true` to enable auto-saves.");
+                return;
+            }
+
+            if(!SaveIO.isSaveValid(newestSave)){
+                err("No (valid) save data found for slot.");
+                return;
+            }
+
+            Core.app.post(() -> {
+                try{
+                    SaveIO.load(newestSave);
+                    state.rules.sector = null;
+                    info("Save loaded.");
+                    state.set(State.playing);
+                    netServer.openServer();
+                }catch(Throwable t){
+                    err("Failed to load save. Outdated or corrupt file.");
+                }
+            });
+        });
+
         handler.register("load", "<slot>", "Load a save from a slot.", arg -> {
-            if(state.is(State.playing)){
+            if(state.isGame()){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
@@ -938,7 +979,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting. Host a game first.");
                 return;
             }
@@ -1065,6 +1106,13 @@ public class ServerControl implements ApplicationListener{
     }
 
     /**
+     * Cancels the world load timer task, if it is scheduled. Can be useful for stopping a server or hosting a new game.
+     */
+    public void cancelPlayTask(){
+        if(lastTask != null) lastTask.cancel();
+    }
+
+    /**
      * Resets the world state, starts a new game.
      * @param run What task to run to load a new world.
      */
@@ -1079,38 +1127,30 @@ public class ServerControl implements ApplicationListener{
      */
     public void play(boolean wait, Runnable run){
         inGameOverWait = true;
-        if(lastTask != null) lastTask.cancel();
+        cancelPlayTask();
         
-        Runnable r = () -> {
-            WorldReloader reloader = new WorldReloader();
+        Runnable reload = () -> {
+            try{
+                WorldReloader reloader = new WorldReloader();
+                reloader.begin();
 
-            reloader.begin();
+                run.run();
 
-            run.run();
+                state.rules = state.map.applyRules(lastMode);
+                logic.play();
 
-            state.rules = state.map.applyRules(lastMode);
-            logic.play();
-
-            reloader.end();
-            inGameOverWait = false;
+                reloader.end();
+                inGameOverWait = false;
+            }catch(MapException e){
+                err("@: @", e.map.plainName(), e.getMessage());
+                net.closeServer();
+            }
         };
 
         if(wait){
-            lastTask = new Task(){
-                @Override
-                public void run(){
-                    try{
-                        r.run();
-                    }catch(MapException e){
-                        err("@: @", e.map.plainName(), e.getMessage());
-                        net.closeServer();
-                    }
-                }
-            };
-
-            Timer.schedule(lastTask, Config.roundExtraTime.num());
+            lastTask = Timer.schedule(reload, Config.roundExtraTime.num());
         }else{
-            r.run();
+            reload.run();
         }
     }
 

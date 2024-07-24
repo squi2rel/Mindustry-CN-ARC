@@ -348,6 +348,7 @@ public class SettingsMenuDialog extends BaseDialog{
             arc.sliderPref("changelogreaded", 0, 0, 150, 1, i -> i + "");
             arc.checkPref("changelogexplain", false);
         }else {
+            sound.checkPref("alwaysmusic", false);
             sound.sliderPref("musicvol", 100, 0, 100, 1, i -> i + "%");
             sound.sliderPref("sfxvol", 100, 0, 100, 1, i -> i + "%");
             sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
@@ -398,6 +399,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
+            game.checkPref("distinctcontrolgroups", true);
 
             game.checkPref("doubletapmine", false);
             game.checkPref("commandmodehold", true);

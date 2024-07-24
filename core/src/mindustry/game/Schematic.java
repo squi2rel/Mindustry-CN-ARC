@@ -51,7 +51,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     public float powerProduction(){
-        return tiles.sumf(s -> s.block instanceof PowerGenerator p ? p.powerProduction : 0f);
+        return tiles.sumf(s -> s.block instanceof PowerGenerator p ? p.getDisplayedPowerProduction() : 0f);
     }
 
     public float powerConsumption(){

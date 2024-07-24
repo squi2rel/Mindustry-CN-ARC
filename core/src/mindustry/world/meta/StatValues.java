@@ -484,17 +484,23 @@ public class StatValues{
     public static StatValue abilities(Seq<Ability> abilities){
         return table -> {
             table.row();
-            table.table(t -> abilities.each(ability -> {
-                if(ability.display){
-                    t.row();
-                    t.table(Styles.grayPanel, a -> {
-                        a.add("[accent]" + ability.localized()).padBottom(4);
-                        a.row();
-                        a.left().top().defaults().left();
-                        ability.addStats(a);
-                    }).pad(5).margin(10).growX();
-                }
-            }));
+            table.table(t -> {
+                int count = 0;
+                for(Ability ability : abilities){
+                    if(ability.display){
+                        t.table(Styles.grayPanel, a -> {
+                            a.add("[accent]" + ability.localized()).padBottom(4).center().top().expandX();
+                            a.row();
+                            a.left().top().defaults().left();
+                            ability.addStats(a);
+                        }).pad(5).margin(10).growX().top().uniformX();
+                        if((++count) == 2){
+                            count = 0;
+                            t.row();
+                        }
+                    }
+                };
+            });
         };
     }
 
@@ -664,6 +670,10 @@ public class StatValues{
                         sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive? "":"[lightgray]~[]" + Strings.autoFixed(type.statusDuration/60f,2)+"[lightgray]s"));
                     }
 
+                    if(type.maxDamageFraction > 0){
+                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100)));
+                    }
+
                     if(type.suppressionRange > 0){
                         sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
                     }
@@ -681,6 +691,26 @@ public class StatValues{
                             sep(ec,Strings.format("[stat]对敌方单位造成@%子弹伤害", Strings.autoFixed(eb.unitDamageScl * 100, 0)));
                             sep(ec,Strings.format("[stat]对我方耗电建筑超速至@%", Strings.autoFixed(eb.timeIncrease * 100, 0)));
                             sep(ec,Strings.format("[stat]对敌方电网建筑减速至@%", Strings.autoFixed(eb.powerSclDecrease * 100, 0)));
+                        });
+                    }
+
+                    if(type.status != StatusEffects.none){
+                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
+                    }
+
+                    if(type.intervalBullet != null){
+                        bt.row();
+
+                        Table ic = new Table();
+                        ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
+                        Collapser coll = new Collapser(ic, true);
+                        coll.setDuration(0.1f);
+
+                        bt.table(it -> {
+                            it.left().defaults().left();
+
+                            it.add(Core.bundle.format("bullet.interval", Strings.autoFixed(type.intervalBullets / type.bulletInterval * 60, 2)));
+                            it.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
                         });
                     }
 

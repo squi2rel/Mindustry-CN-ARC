@@ -37,6 +37,8 @@ public class Turret extends ReloadTurret{
     public final int timerTarget = timers++;
     /** Ticks between attempt at finding a target. */
     public float targetInterval = 20;
+    /** Target interval for when this turret already has a valid target. -1 = targetInterval */
+    public float newTargetInterval = -1f;
 
     /** Maximum ammo units stored. */
     public int maxAmmo = 30;
@@ -140,6 +142,8 @@ public class Turret extends ReloadTurret{
         liquidCapacity = 20f;
         quickRotate = false;
         outlinedIcon = 1;
+        drawLiquidLight = false;
+        sync = true;
     }
 
     @Override
@@ -178,6 +182,7 @@ public class Turret extends ReloadTurret{
         if(elevation < 0) elevation = size / 2f;
         if(recoilTime < 0f) recoilTime = reload;
         if(cooldownTime < 0f) cooldownTime = reload;
+        if(newTargetInterval <= 0f) newTargetInterval = targetInterval;
 
         super.init();
     }
@@ -426,7 +431,7 @@ public class Turret extends ReloadTurret{
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
-                if(timer(timerTarget, targetInterval)){
+                if(timer(timerTarget, target != null ? newTargetInterval : targetInterval)){
                     findTarget();
                 }
 
@@ -459,6 +464,8 @@ public class Turret extends ReloadTurret{
                         wasShooting = true;
                         updateShooting();
                     }
+                }else{
+                    target = null;
                 }
 
                 if(alwaysShooting){
@@ -583,8 +590,16 @@ public class Turret extends ReloadTurret{
 
             shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
+                int barrel = barrelCounter;
+
                 if(delay > 0f){
-                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
+                    Time.run(delay, () -> {
+                        //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                        int prev = barrelCounter;
+                        barrelCounter = barrel;
+                        bullet(type, xOffset, yOffset, angle, mover);
+                        barrelCounter = prev;
+                    });
                 }else{
                     bullet(type, xOffset, yOffset, angle, mover);
                 }
@@ -679,6 +694,17 @@ public class Turret extends ReloadTurret{
             if (minWarmup > 0f) {
                 bars.add(new Bar(() -> Core.bundle.format("stat.warmupDetail", (int)(shootWarmup * 100 / minWarmup)), () -> Pal.ammo, () -> shootWarmup / minWarmup)).row();
             }
+        }
+
+        @Override
+        public void readSync(Reads read, byte revision){
+            //maintain rotation and reload when syncing so clients don't see turrets snapping around
+            float oldRot = rotation, oldReload = reloadCounter;
+
+            readAll(read, revision);
+
+            rotation = oldRot;
+            reloadCounter = oldReload;
         }
     }
 

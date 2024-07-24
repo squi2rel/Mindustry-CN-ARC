@@ -22,6 +22,7 @@ import static mindustry.Vars.*;
 import static mindustry.arcModule.NumberFormat.buildPercent;
 
 public class OverdriveProjector extends Block{
+    @Deprecated
     public final int timerUse = timers++;
 
     public @Load("@-top") TextureRegion topRegion;
@@ -92,7 +93,7 @@ public class OverdriveProjector extends Block{
     }
 
     public class OverdriveBuild extends Building implements Ranged{
-        public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
+        public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency, useProgress;
 
         @Override
         public float range(){
@@ -121,8 +122,13 @@ public class OverdriveProjector extends Block{
                 indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 1f));
             }
 
-            if(timer(timerUse, useTime) && efficiency > 0){
+            if(efficiency > 0){
+                useProgress += delta();
+            }
+
+            if(useProgress >= useTime){
                 consume();
+                useProgress %= useTime;
             }
         }
 

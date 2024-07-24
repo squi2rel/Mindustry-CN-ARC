@@ -61,6 +61,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
+    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    public boolean acceptsPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
@@ -156,6 +158,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean updateInUnits = true;
     /** if true, this block updates in payloads in units regardless of the experimental game rule */
     public boolean alwaysUpdateInUnits = false;
+    /** if false, only incinerable liquids are dropped when deconstructing; otherwise, all liquids are dropped. */
+    public boolean deconstructDropAllLiquid = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
@@ -219,6 +223,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** If true, this block does not have pointConfig with a transform called on map resize. */
+    public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
@@ -245,6 +251,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean allowDiagonal = true;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
+    /** Whether to allow rectangular placement, as opposed to a line. */
+    public boolean allowRectanglePlacement = false;
     /** Build queue priority in schematics. */
     public int schematicPriority = 0;
     /**
@@ -322,6 +330,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float deconstructThreshold = 0f;
     /** If true, this block deconstructs immediately. Instant deconstruction implies no resource refund. */
     public boolean instantDeconstruct = false;
+    /** If true, this block constructs immediately. This implies no resource requirement, and ignores configs - do not use, this is for performance only! */
+    public boolean instantBuild = false;
     /** Effect for placing the block. Passes size as rotation. */
     public Effect placeEffect = Fx.placeBlock;
     /** Effect for breaking the block. Passes size as rotation. */
@@ -338,6 +348,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
+    /** If true, this derelict block can be repair by clicking it. */
+    public boolean allowDerelictRepair = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
     /** Scroll position for certain blocks. */
@@ -376,7 +388,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
-    protected final int dumpTime = 5;
+    public int dumpTime = 5;
 
     public Block(String name){
         super(name);
@@ -439,7 +451,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return 0;
+        if(renderer.pixelate) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
         Font font = Fonts.outline;
@@ -571,6 +583,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean rotatedOutput(int x, int y){
         return rotate;
+    }
+
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        return rotatedOutput(fromX, fromY);
     }
 
     public boolean synthetic(){
@@ -1024,6 +1040,14 @@ public class Block extends UnlockableContent implements Senseable{
         consumeBuilder.remove(cons);
     }
 
+    public void removeConsumers(Boolf<Consume> b){
+        consumeBuilder.removeAll(b);
+        //the power was removed, unassign it
+        if(!consumeBuilder.contains(c -> c instanceof ConsumePower)){
+            consPower = null;
+        }
+    }
+
     public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){
         return consume(new ConsumeLiquid(liquid, amount));
     }
@@ -1049,6 +1073,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** Creates a consumer that consumes a dynamic amount of power. */
     public <T extends Building> ConsumePower consumePowerDynamic(Floatf<T> usage){
         return consume(new ConsumePowerDynamic((Floatf<Building>)usage));
+    }
+
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower consumePowerDynamic(float displayed, Floatf<T> usage){
+        return consume(new ConsumePowerDynamic(displayed, (Floatf<Building>)usage));
     }
 
     /**
@@ -1352,6 +1381,8 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
+        Seq<Pixmap> toDispose = new Seq<>();
+
         //generate paletted team regions
         if(teamRegion != null && teamRegion.found()){
             for(Team team : Team.all){
@@ -1376,6 +1407,7 @@ public class Block extends UnlockableContent implements Senseable{
                     Drawf.checkBleed(out);
 
                     packer.add(PageType.main, name + "-team-" + team.name, out);
+                    toDispose.add(out);
                 }
             }
 
@@ -1395,6 +1427,7 @@ public class Block extends UnlockableContent implements Senseable{
             Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
             Drawf.checkBleed(out);
             packer.add(PageType.main, atlasRegion.name, out);
+            toDispose.add(out);
         }
 
         var toOutline = new Seq<TextureRegion>();
@@ -1408,6 +1441,7 @@ public class Block extends UnlockableContent implements Senseable{
                 Drawf.checkBleed(outlined);
 
                 packer.add(PageType.main, regionName + "-outline", outlined);
+                toDispose.add(outlined);
             }
         }
 
@@ -1425,12 +1459,15 @@ public class Block extends UnlockableContent implements Senseable{
             packer.add(PageType.main, "block-" + name + "-full", base);
 
             editorBase = new PixmapRegion(base);
+            toDispose.add(base);
         }else{
             if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
             editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
 
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
+
+        toDispose.each(Pixmap::dispose);
     }
 
     public int planRotation(int rot){
@@ -1448,6 +1485,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;

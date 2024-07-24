@@ -11,6 +11,7 @@ import mindustry.Vars;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -37,7 +38,7 @@ import static mindustry.logic.GlobalVars.*;
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
 
     @Import boolean hovering, dead, disarmed;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -95,7 +96,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         moveAt(Tmp.v2.trns(rotation, vec.len()));
 
         if(!vec.isZero()){
-            rotation = Angles.moveToward(rotation, vec.angle(), Hack.immediatelyTurn ? 360f : type.rotateSpeed * Time.delta);
+            rotation = Angles.moveToward(rotation, vec.angle(), Hack.immediatelyTurn ? 360f : type.rotateSpeed * Time.delta * speedMultiplier);
         }
     }
 
@@ -112,7 +113,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public boolean isPathImpassable(int tileX, int tileY){
         return !type.flying && world.tiles.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
     }
-
 
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){
@@ -218,6 +218,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
+            case velocityX -> vel.x * 60f / tilesize;
+            case velocityY -> vel.y * 60f / tilesize;
             case dead -> dead || !isAdded() ? 1 : 0;
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;
@@ -225,11 +227,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case range -> range() / tilesize;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
+            case cameraX -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.position.x : player.con.viewX) : 0;
+            case cameraY -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.position.y : player.con.viewY) : 0;
+            case cameraWidth -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.width : player.con.viewWidth) : 0;
+            case cameraHeight -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.height : player.con.viewHeight) : 0;
             case mining -> mining() ? 1 : 0;
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
+            case armor -> armorOverride >= 0f ? armorOverride : armor;
             case flag -> flag;
-            case speed -> type.speed * 60f / tilesize;
+            case speed -> type.speed * 60f / tilesize * speedMultiplier;
             case controlled -> !isValid() ? 0 :
                     controller instanceof LogicAI ? ctrlProcessor :
                     controller instanceof Player ? ctrlPlayer :
@@ -272,15 +279,20 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     kill();
                 }
             }
+            case shield -> shield = Math.max((float)value, 0f);
             case x -> {
-                if (!(controller instanceof Player pl && pl == player) || !Hack.ignoreProcessor) x = World.unconv((float)value);
+                if (controller instanceof Player pl && pl == player && Hack.ignoreProcessor) return;
+                x = World.unconv((float)value);
+                if(!isLocal()) snapInterpolation();
             }
             case y -> {
-                if (!(controller instanceof Player pl && pl == player) || !Hack.ignoreProcessor) y = World.unconv((float)value);
+                if (controller instanceof Player pl && pl == player && Hack.ignoreProcessor) return;
+                y = World.unconv((float)value);
+                if(!isLocal()) snapInterpolation();
             }
-            case rotation -> {
-                if (!(controller instanceof Player pl && pl == player) || !Hack.ignoreProcessor) rotation = (float)value;
-            }
+            case velocityX -> vel.x = (float)(value * tilesize / 60d);
+            case velocityY -> vel.y = (float)(value * tilesize / 60d);
+            case rotation -> rotation = (float)value;
             case team -> {
                 if(!net.client()){
                     Team team = Team.get((int)value);
@@ -291,6 +303,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 }
             }
             case flag -> flag = value;
+            case speed -> statusSpeed(Math.max((float)value, 0f));
+            case armor -> statusArmor(Math.max((float)value, 0f));
         }
     }
 
@@ -393,7 +407,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         controller(controller);
     }
 
-    /** @return pathfinder path type for calculating costs */
+    /** @return the collision layer to use for unit physics. Returning anything outside of PhysicsProcess contents will crash the game. */
+    public int collisionLayer(){
+        return type.allowLegStep && type.legPhysicsLayer ? PhysicsProcess.layerLegs : isGrounded() ? PhysicsProcess.layerGround : PhysicsProcess.layerFlying;
+    }
+
+    /** @return pathfinder path type for calculating costs. This is used for wave AI only. (TODO: remove) */
     public int pathType(){
         return Pathfinder.costGround;
     }
@@ -420,6 +439,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public boolean isCommandable(){
         return controller instanceof CommandAI;
+    }
+
+    public boolean canTarget(Unit other){
+        return other != null && other.checkTarget(type.targetAir, type.targetGround);
     }
 
     public CommandAI command(){
@@ -478,6 +501,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(!(controller instanceof AIController ai && ai.keepState())){
             controller(type.createController(self()));
         }
+    }
+
+    @Override
+    public void afterAllRead(){
+        controller.afterRead(self());
     }
 
     @Override
@@ -656,9 +684,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
     }
 
-    /** @return a preview icon for this unit. */
+    /** @return a preview UI icon for this unit. */
     public TextureRegion icon(){
-        return type.fullIcon;
+        return type.uiIcon;
     }
 
     /** Actually destroys the unit, removing it and creating explosions. **/
@@ -724,7 +752,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     /** @return name of direct or indirect player controller. */
     @Override
     public @Nullable String getControllerName(){
-        if(isPlayer()) return getPlayer().name;
+        if(isPlayer()) return getPlayer().coloredName();
         if(controller instanceof LogicAI ai && ai.controller != null) return ai.controller.lastAccessed;
         return null;
     }

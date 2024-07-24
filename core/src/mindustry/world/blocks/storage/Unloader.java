@@ -25,6 +25,9 @@ public class Unloader extends Block{
 
     public float speed = 1f;
 
+    /** Cached result of content.items() */
+    static Item[] allItems;
+
     public Unloader(String name){
         super(name);
         update = true;
@@ -40,6 +43,13 @@ public class Unloader extends Block{
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        allItems = content.items().toArray(Item.class);
     }
 
     @Override
@@ -64,27 +74,17 @@ public class Unloader extends Block{
         float loadFactor;
         boolean canLoad;
         boolean canUnload;
+        /** Cached !(building instanceof StorageBuild) */
+        boolean notStorage;
         int lastUsed;
-
-        @Override
-        public String toString(){
-            return "ContainerStat{" +
-            "building=" + building.block + "#" + building.id +
-            ", loadFactor=" + loadFactor +
-            ", canLoad=" + canLoad +
-            ", canUnload=" + canUnload +
-            ", lastUsed=" + lastUsed +
-            '}';
-        }
     }
 
     public class UnloaderBuild extends Building{
         public float unloadTimer = 0f;
         public int rotations = 0;
-        private final int itemsLength = content.items().size;
         public Item sortItem = null;
         public ContainerStat dumpingFrom, dumpingTo;
-        public final Seq<ContainerStat> possibleBlocks = new Seq<>();
+        public final Seq<ContainerStat> possibleBlocks = new Seq<>(ContainerStat.class);
 
         protected final Comparator<ContainerStat> comparator = (x, y) -> {
             //sort so it gives priority for blocks that can only either receive or give (not both), and then by load, and then by last use
@@ -100,19 +100,20 @@ public class Unloader extends Block{
 
         private boolean isPossibleItem(Item item){
             boolean hasProvider = false,
-                    hasReceiver = false,
-                    isDistinct = false;
+            hasReceiver = false,
+            isDistinct = false;
 
-            for(int i = 0; i < possibleBlocks.size; i++){
-                var pb = possibleBlocks.get(i);
+            var pbi = possibleBlocks.items;
+            for(int i = 0, l = possibleBlocks.size; i < l; i++){
+                var pb = pbi[i];
                 var other = pb.building;
 
                 //set the stats of buildings in possibleBlocks while we are at it
-                pb.canLoad = !(other.block instanceof StorageBlock) && other.acceptItem(this, item);
+                pb.canLoad = pb.notStorage && other.acceptItem(this, item);
                 pb.canUnload = other.canUnload() && other.items != null && other.items.has(item);
 
                 //thats also handling framerate issues and slow conveyor belts, to avoid skipping items if nulloader
-                if((hasProvider && pb.canLoad) || (hasReceiver && pb.canUnload)) isDistinct = true;
+                isDistinct |= (hasProvider && pb.canLoad) || (hasReceiver && pb.canUnload);
                 hasProvider |= pb.canUnload;
                 hasReceiver |= pb.canLoad;
             }
@@ -130,14 +131,15 @@ public class Unloader extends Block{
             for(int i = 0; i < proximity.size; i++){
                 var other = proximity.get(i);
                 if(!other.interactable(team)) continue; //avoid blocks of the wrong team
-                ContainerStat pb = Pools.obtain(ContainerStat.class, ContainerStat::new);
 
                 //partial check
                 boolean canLoad = !(other.block instanceof StorageBlock);
                 boolean canUnload = other.canUnload() && other.items != null;
 
                 if(canLoad || canUnload){ //avoid blocks that can neither give nor receive items
+                    var pb = Pools.obtain(ContainerStat.class, ContainerStat::new);
                     pb.building = other;
+                    pb.notStorage = canLoad;
                     //TODO store the partial canLoad/canUnload?
                     possibleBlocks.add(pb);
                 }
@@ -155,9 +157,9 @@ public class Unloader extends Block{
             }else{
                 //selects the next item for nulloaders
                 //inspired of nextIndex() but for all "proximity" (possibleBlocks) at once, and also way more powerful
-                for(int i = 0; i < itemsLength; i++){
-                    int total = (rotations + i + 1) % itemsLength;
-                    Item possibleItem = content.item(total);
+                for(int i = 0, l = allItems.length; i < l; i++){
+                    int id = (rotations + i + 1) % l;
+                    var possibleItem = allItems[id];
 
                     if(isPossibleItem(possibleItem)){
                         item = possibleItem;
@@ -168,11 +170,14 @@ public class Unloader extends Block{
 
             if(item != null){
                 rotations = item.id; //next rotation for nulloaders //TODO maybe if(sortItem == null)
+                var pbi = possibleBlocks.items;
+                int pbs = possibleBlocks.size;
 
-                for(int i = 0; i < possibleBlocks.size; i++){
-                    var pb = possibleBlocks.get(i);
+                for(int i = 0; i < pbs; i++){
+                    var pb = pbi[i];
                     var other = pb.building;
-                    pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
+                    int maxAccepted = other.getMaximumAccepted(item);
+                    pb.loadFactor = maxAccepted == 0 || other.items == null ? 0 : other.items.get(item) / (float)maxAccepted;
                     pb.lastUsed = (pb.lastUsed + 1) % Integer.MAX_VALUE; //increment the priority if not used
                 }
 
@@ -182,17 +187,17 @@ public class Unloader extends Block{
                 dumpingFrom = null;
 
                 //choose the building to accept the item
-                for(int i = 0; i < possibleBlocks.size; i++){
-                    if(possibleBlocks.get(i).canLoad){
-                        dumpingTo = possibleBlocks.get(i);
+                for(int i = 0; i < pbs; i++){
+                    if(pbi[i].canLoad){
+                        dumpingTo = pbi[i];
                         break;
                     }
                 }
 
                 //choose the building to take the item from
-                for(int i = possibleBlocks.size - 1; i >= 0; i--){
-                    if(possibleBlocks.get(i).canUnload){
-                        dumpingFrom = possibleBlocks.get(i);
+                for(int i = pbs - 1; i >= 0; i--){
+                    if(pbi[i].canUnload){
+                        dumpingFrom = pbi[i];
                         break;
                     }
                 }
