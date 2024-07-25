@@ -30,22 +30,25 @@ public class AboutCN_ARCDialog extends BaseDialog {
         cont.clear();
         buttons.clear();
 
+        Table header = new Table();
+        ScrollPane p = new ScrollPane(header);
         Table about = new Table();
         ScrollPane pane = new ScrollPane(about);
 
-        cont.add("[cyan]CN-ARC Client by PVP学术交流群");
-        cont.row();
-        cont.row();
-        cont.add("共同制作:");
-        cont.row();
-        cont.add("v3制作团队：[violet]Lucky_Clover[white]、blac8、[orange]squirrel[]、[blue]xkldklp[white]、[yellow]miner");
-        cont.row();
-        cont.add("主负责人：[violet]Lucky_Clover").row();
-        cont.add("公开发行版本：" + ARCVars.arcVersion).row();
-        cont.add("提议更新或反馈bug，请加入[yellow]猫猫的数据库[white]").row();
-        cont.add("讨论学术端更新|提议源码|共同编辑，请加入[yellow]mindustry PVP交流群[white]:931790051[orange]不欢迎萌新，仅限大佬加入").row();
-        cont.row();
-        cont.table(t -> {
+
+        header.add("[cyan]CN-ARC Client by PVP学术交流群");
+        header.row();
+        header.row();
+        header.add("共同制作:");
+        header.row();
+        header.add("v3制作团队：[violet]Lucky_Clover[white]、blac8、[orange]squirrel[]、[blue]xkldklp[white]、[yellow]miner");
+        header.row();
+        header.add("主负责人：[violet]Lucky_Clover").row();
+        header.add("公开发行版本：" + ARCVars.arcVersion).row();
+        header.add("提议更新或反馈bug，请加入[yellow]猫猫的数据库[white]").row();
+        header.add("讨论学术端更新|提议源码|共同编辑，请加入[yellow]mindustry PVP交流群[white]:931790051[orange]不欢迎萌新，仅限大佬加入").row();
+        header.row();
+        header.table(t -> {
             t.add("相关链接").height(30f);
             t.button("[cyan]更新日志", cleart, () -> {
                 if (!Core.app.openURI("https://github.com/CN-ARC/Mindustry-CN-ARC")) {
@@ -66,8 +69,8 @@ public class AboutCN_ARCDialog extends BaseDialog {
                 }
             }).width(100f).height(30f);
         });
-        cont.row();
-        cont.table(t -> {
+        header.row();
+        header.table(t -> {
             t.add("共同编辑").height(30f);
             t.button("[cyan]成就翻译", cleart, () -> {
                 String link = "https://docs.qq.com/doc/DVHBUd3d4eWdNQWpo";
@@ -84,6 +87,7 @@ public class AboutCN_ARCDialog extends BaseDialog {
                 }
             }).width(100f).height(30f);
         });
+        cont.add(p).height(300).growX().pad(3);
 
         cont.row();
         for (String log : changelogs) {
@@ -94,7 +98,7 @@ public class AboutCN_ARCDialog extends BaseDialog {
             }
             about.row();
         }
-        cont.add(pane).growX();
+        cont.add(pane).grow().pad(3);
         cont.row();
 
 
