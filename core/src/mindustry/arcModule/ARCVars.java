@@ -4,7 +4,6 @@ import arc.Core;
 import arc.Events;
 import arc.assets.Loadable;
 import arc.graphics.Color;
-import arc.math.Mathf;
 import arc.struct.Seq;
 import mindustry.Vars;
 import mindustry.arcModule.toolpack.ARCTeam;
@@ -15,7 +14,6 @@ import mindustry.game.Gamemode;
 import mindustry.game.Team;
 
 import static arc.Core.settings;
-import static mindustry.Vars.world;
 
 public class ARCVars implements Loadable {
     public static ARCUI arcui = new ARCUI();
@@ -37,6 +35,9 @@ public class ARCVars implements Loadable {
 
     public static boolean arcInfoControl = false;
 
+    /** Control */
+    public static boolean quickBelt;
+
     /** UI */
     public static boolean arcSelfName;
     public static boolean arcHideName;
@@ -54,6 +55,8 @@ public class ARCVars implements Loadable {
             arcSelfName = settings.getBool("arcSelfName");
             arcHideName = settings.getBool("arcHideName");
             payloadPreview = settings.getBool("payloadpreview");
+
+            quickBelt = settings.getBool("quickBelt");
         });
     }
 

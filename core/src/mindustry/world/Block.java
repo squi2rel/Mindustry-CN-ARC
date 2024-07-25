@@ -781,7 +781,6 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void drawPlan(BuildPlan plan, Eachable<BuildPlan> list, boolean valid, float alpha){
-        if (player.unit() == null) return;
         Draw.reset();
         if (!valid)  Draw.mixcol(Pal.breakInvalid, 0.4f + Mathf.absin(Time.globalTime, 6f, 0.28f));
         else {

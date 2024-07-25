@@ -167,7 +167,7 @@ public class HudFragment{
 
             //position
             t.table(tt-> {
-                tt.label(() -> player.unit() == null ? "" : player.unit().type.emoji() +
+                tt.label(() -> player.unit().type.emoji() +
                                 (Core.settings.getBool("position") ? player.tileX() + "," + player.tileY() + "\n" : "") +
                                 (Core.settings.getBool("mouseposition") ? "[lightgray]" + "♐" + World.toTile(Core.input.mouseWorldX()) + "," + World.toTile(Core.input.mouseWorldY()) : ""))
                         .visible(() -> Core.settings.getBool("position") || Core.settings.getBool("mouseposition"))
@@ -940,7 +940,7 @@ public class HudFragment{
                 }
             });
 
-            t.add(new SideBar(() -> player.dead() ? 0f : player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : Pal.health);
@@ -1094,7 +1094,6 @@ public class HudFragment{
             t.row();
             t.add(new Bar(
                     () -> {
-                        if (player.unit() == null) return "";
                         if (player.unit().shield > 0) {
                             return UI.formatAmount((long) player.unit().health) + "[gray]+[white]" + UI.formatAmount((long) player.unit().shield);
                         } else {
@@ -1102,17 +1101,16 @@ public class HudFragment{
                         }
                     },
                     () -> Pal.health,
-                    () -> player.unit() == null ? 0 : Math.min(player.unit().health / player.unit().maxHealth, 1))).height(18).growX();
+                    () -> Math.min(player.unit().health / player.unit().maxHealth, 1))).height(18).growX();
             t.row();
             t.add(new Bar(
                     () -> {
-                        if (player.unit() == null) return Items.copper.emoji();
                         if (player.unit() instanceof BlockUnitUnit u && u.tile().buildOn() instanceof ItemTurret.ItemTurretBuild it) return ((float) it.totalAmmo > 0 ? ((ItemTurret.ItemEntry) it.ammo.peek()).item.emoji() + it.totalAmmo + "/" + ((ItemTurret) it.block).maxAmmo : "");
                         if (state.rules.unitAmmo)
                             return player.unit().type.ammoType.icon() + (int) player.unit().ammo + "/" + player.unit().type.ammoCapacity;
                         else return player.unit().type.ammoType.icon();
                     },
-                    () -> player.unit() == null ? Pal.ammo : player.unit().type.ammoType.barColor(),
+                    () -> player.unit().type.ammoType.barColor(),
                     () -> {
                         if (state.rules.unitAmmo || player.unit() instanceof BlockUnitUnit) return player.unit().ammof();
                         else return 1;

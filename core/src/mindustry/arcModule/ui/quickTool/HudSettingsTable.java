@@ -9,7 +9,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.scene.event.*;
 
-import mindustry.Vars;
 import mindustry.arcModule.ARCVars;
 import mindustry.arcModule.ElementUtils;
 import mindustry.content.StatusEffects;
@@ -140,6 +139,9 @@ public class HudSettingsTable extends ElementUtils.ToolTable {
                     Core.settings.put("blockDrop", !block);
                     arcui.arcInfo("已" + (block ? "开启" : "关闭") + "丢弃物品");
                 }).checked(a -> !Core.settings.getBool("blockDrop")).size(30, 30).tooltip("允许丢弃物品");
+                t.button("[cyan]名", textStyle, () -> {
+                    settings.put("arcHideName", !ARCVars.arcHideName);
+                }).checked(a -> !ARCVars.arcHideName).size(30, 30).tooltip("显示玩家名");
                 t.button("[cyan]雾", textStyle, () -> {
                     if (!state.rules.pvp || player.team().id == 255) renderer.fogEnabled = !renderer.fogEnabled;
                 }).checked(a -> renderer.fogEnabled).size(30, 30).tooltip("战争迷雾").visible(() -> !state.rules.pvp || player.team().id == 255);
@@ -169,10 +171,9 @@ public class HudSettingsTable extends ElementUtils.ToolTable {
                 t.button("[cyan]扫", textStyle, () -> {
                     control.input.arcScanMode = !control.input.arcScanMode;
                 }).checked(a -> control.input.arcScanMode).size(30, 30).tooltip("扫描模式");
-                t.button("[cyan]名", textStyle, () -> {
-                    settings.put("arcHideName", !settings.getBool("arcHideName"));
-                }).checked(a -> !ARCVars.arcHideName).size(30, 30).tooltip("显示玩家名");
-
+                if (Core.app.isMobile()) t.button("[cyan]带", textStyle, () -> {
+                    settings.put("quickBelt", !ARCVars.quickBelt);
+                }).checked(a -> !ARCVars.quickBelt).size(30, 30).tooltip("快速拉传送带（不需要长按）");
             }).left();
             sp.row();
             sp.add(sets);

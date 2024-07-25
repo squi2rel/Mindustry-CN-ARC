@@ -160,7 +160,7 @@ public class ARCUnits {
         if (unitWeaponRange == 30) {
             drawWeaponRange(unit, unitWeaponRangeAlpha);
         } else if (unit.team != player.team()) {
-            canHitPlayer = player.unit() != null && player.unit().hittable() && (player.unit().isFlying() ? unit.type.targetAir : unit.type.targetGround)
+            canHitPlayer = !player.unit().isNull() && player.unit().hittable() && (player.unit().isFlying() ? unit.type.targetAir : unit.type.targetGround)
                     && unit.within(player.unit().x, player.unit().y, unit.type.maxRange + unitWeaponRange);
             canHitCommand = control.input.commandMode && ((selectedUnitsFlyer && unit.type.targetAir) || (selectedUnitsLand && unit.type.targetGround));
             canHitPlans = (control.input.block != null || control.input.selectPlans.size > 0) && unit.type.targetGround;
