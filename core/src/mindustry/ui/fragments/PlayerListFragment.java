@@ -385,6 +385,6 @@ public class PlayerListFragment{
     }
 
     private String arcAtPlayer(String name){
-        return getPrefix("coral", "AT") + (Hack.customPoke ? Hack.customPokeText.replace("{name}", name) : "戳了" + name + "[white]一下，并提醒你留意对话框");
+        return getPrefix("coral", "AT") + (Hack.customPoke ? Hack.customPokeText.get(name).replace("{name}", name) : "戳了" + name + "[white]一下，并提醒你留意对话框");
     }
 }

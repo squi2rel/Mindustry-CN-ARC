@@ -23,6 +23,7 @@ import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.type.*;
 
 import java.io.*;
@@ -380,7 +381,7 @@ public class DesktopLauncher extends ClientLauncher{
             //Steam mostly just expects us to give it a nice string, but it apparently expects "steam_display" to always be a loc token, so I've uploaded this one which just passes through 'steam_status' raw.
             SVars.net.friends.setRichPresence("steam_display", "#steam_status_raw");
 
-            SVars.net.friends.setRichPresence("steam_status", Strings.stripColors(ARCVars.arcVersionPrefix) + " " + (inGame ? gameMapWithWave : uiState));
+            SVars.net.friends.setRichPresence("steam_status", Strings.stripColors(Hack.customPrefix ? "<ARC" + Hack.customPrefixText.get() + ">" : ARCVars.arcVersionPrefix) + " " + (inGame ? gameMapWithWave : uiState));
         }
     }
 

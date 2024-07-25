@@ -25,7 +25,6 @@ import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.core.GameState;
 import mindustry.core.NetClient;
-import mindustry.core.Version;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Building;
@@ -33,6 +32,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.input.Binding;
+import mindustry.mod.Scripts;
 import mindustry.squirrelModule.SUI;
 import mindustry.squirrelModule.modules.hack.command.CommandParser;
 import mindustry.squirrelModule.modules.tools.SMisc;
@@ -52,7 +52,6 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeItems;
 
 import static arc.Core.settings;
-import static mindustry.arcModule.ARCVars.arcVersionPrefix;
 import static mindustry.Vars.*;
 
 public class Hack {
@@ -63,8 +62,9 @@ public class Hack {
     public static boolean noFog, useWindowedMenu;
     //多人
     public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn, privateMsg, ghost;
-    public static String chosenUUID = null, ggText;
+    public static String chosenUUID = null;
     public static int autoGGDelay;
+    public static JSTable autoGGText;
     //移动
     public static boolean immediatelyTurn, ignoreTurn, noKB, noHitbox, noSpawnKB, infDrag, immediatelyMove, ignoreShield, voidWalk, speed, ignoreProcessor;
     public static float KBMulti, boundX, boundY, boundW, boundH, speedMulti;
@@ -74,8 +74,8 @@ public class Hack {
     public static long lastFillTime, lastAutoFillTime;
     public static Item chosenItem = null;
     //杂项
-    public static boolean customPoke;
-    public static String customPokeText = null;
+    public static boolean customPoke, customPrefix;
+    public static JSTable customPokeText, customPrefixText;
 
     public static void init() {
         if (settings.getBool("squirrel", false)) {
@@ -94,7 +94,7 @@ public class Hack {
         manager.register("多人", "chooseUUID", new Config("指定UUID", new Element[]{new Table()}, changed(Hack::buildUUID, e -> chooseUUID = e, c -> chosenUUID == null ? "off" : chosenUUID.substring(0, 3))));
         manager.register("多人", "randomUSID", new Config("随机USID", null, changed(e -> randomUSID = e)));
         manager.register("多人", "simDevice", new Config(mobile ? "伪装电脑" : "伪装手机", null, changed(e -> simDevice = e)));
-        manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label("自定义消息"), jsField("autoGG", "gg", s -> ggText = s), new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 2, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
+        manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label("自定义消息"), autoGGText = jsField("autoGG", "gg"), new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 2, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
         manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
         manager.register("多人", "rejoin", new Config("重进", null, changed(Hack::reconnect)));
         manager.register("多人", "privateMsg", new Config("VAPE聊天", null, changed(e -> privateMsg = e)));
@@ -130,8 +130,8 @@ public class Hack {
         initFill();
 
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
-        manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), jsField("customPoke", "戳了{name}[white]一下，并提醒你留意对话框", s -> customPokeText = s)}, changed(e -> customPoke = e)));
-        manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), jsField("customPrefix", "S~{ver}", s -> arcVersionPrefix = "<ARC" + s.replace("{ver}", Version.arcBuild <= 0 ? "Dev" : String.valueOf(Version.arcBuild)) + ">")}, changed(e -> arcVersionPrefix = e ? arcVersionPrefix : "<ARCS~" + (Version.arcBuild <= 0 ? "Dev" : Version.arcBuild) + ">")));
+        manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), customPokeText = jsField("customPoke", "戳了{name}[white]一下，并提醒你留意对话框")}, changed(e -> customPoke = e)));
+        manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), customPrefixText = jsField("customPrefix", "S~{ver}")}, changed(e -> customPrefix = e)));
 
         initKeys();
         initHandler();
@@ -231,6 +231,21 @@ public class Hack {
         });
         Core.app.post(() -> func.get(f.getText()));
         return f;
+    }
+
+    public static JSTable jsField(String name, String def) {
+        JSTable t = new JSTable();
+        MemoryCheckBox c = check(name + "-js", "js", false, b -> {});
+        MemoryField f = field(name, def, s -> t.setGetter(a -> {
+            Scripts sc = mods.getScripts();
+            sc.scope.put("args", sc.scope, a);
+            String r = c.isChecked() ? mods.getScripts().runConsole(s) : s;
+            sc.scope.delete("args");
+            return r;
+        }));
+        t.add(c).left();
+        t.add(f).growX();
+        return t;
     }
 
     public static Table jsField(String name, String def, Cons<String> func) {
@@ -476,6 +491,18 @@ public class Hack {
 
     private static void initHandler() {
         ARCVars.arcClient.addHandlerString("VAPEMSG", (p, s) -> NetClient.sendMessage("[acid]<VAPE>[] " + netServer.chatFormatter.format(p, s), s, p));
+    }
+
+    public static class JSTable extends Table {
+        private StrInt<Object[]> getter;
+
+        public void setGetter(StrInt<Object[]> getter) {
+            this.getter = getter;
+        }
+
+        public String get(Object ...arg) {
+            return getter.get(arg);
+        }
     }
 
     public interface StrInt<T> {

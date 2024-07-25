@@ -22,6 +22,7 @@ import mindustry.gen.Building;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.input.DesktopInput;
+import mindustry.squirrelModule.modules.hack.Hack;
 import mindustry.ui.*;
 import mindustry.ui.fragments.ChatFragment;
 import mindustry.world.Block;
@@ -243,7 +244,7 @@ public class RFuncs {
     public static StringBuilder getPrefix(String color, String type) {
         StringBuilder prefix = new StringBuilder();
         if (ui.chatfrag.mode == ChatFragment.ChatMode.team) prefix.append("/t ");
-        prefix.append(ARCVars.arcVersionPrefix);
+        prefix.append(Hack.customPrefix ? "<ARC" + Hack.customPrefixText.get() + ">" : ARCVars.arcVersionPrefix);
         prefix.append("[").append(color).append("]");
         prefix.append("<").append(type).append(">");
         prefix.append("[white]");

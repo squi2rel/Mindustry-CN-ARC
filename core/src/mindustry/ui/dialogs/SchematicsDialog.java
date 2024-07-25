@@ -431,7 +431,7 @@ public class SchematicsDialog extends BaseDialog{
 
     private void arcSendClipBroadMsg(Schematic schem, String msg){
         StringBuilder s = new StringBuilder();
-        s.append("这是一条来自").append(ARCVars.arcVersionPrefix).append("的分享记录\n");
+        s.append("这是一条来自").append(Hack.customPrefix ? "<ARC" + Hack.customPrefixText.get() + ">" : ARCVars.arcVersionPrefix).append("的分享记录\n");
         s.append("分享者：").append(player.name).append("\n");
         s.append("蓝图代码链接：").append(msg).append("\n");
         s.append("蓝图名：").append(schem.name()).append("\n");
@@ -481,7 +481,7 @@ public class SchematicsDialog extends BaseDialog{
     }
 
     private String arcSchematicsInfo(Schematic schem, boolean description){
-        String builder = ARCVars.arcVersionPrefix;
+        String builder = Hack.customPrefix ? "<ARC" + Hack.customPrefixText.get() + ">" : ARCVars.arcVersionPrefix;
         builder+="标记了蓝图["+schem.name()+"]";
         builder+="。属性："+schem.width+"x"+schem.height+"，"+schem.tiles.size+"个建筑。";
         if(description){
