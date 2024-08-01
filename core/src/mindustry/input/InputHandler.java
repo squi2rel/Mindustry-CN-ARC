@@ -879,7 +879,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     attack = selectedEnemyUnit(target.x, target.y);
                 }
 
-                if (input.keyDown(KeyCode.altLeft)) attack = null;
+                if (input.keyDown(Binding.force_move)) attack = null;
 
                 int[] ids = new int[selectedUnits.size];
                 for(int i = 0; i < ids.length; i++){

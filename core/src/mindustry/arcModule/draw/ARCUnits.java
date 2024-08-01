@@ -283,6 +283,7 @@ public class ARCUnits {
 
     private static void drawBuildPlan(Unit unit) {
         if (unitBuildPlan && !unit.plans().isEmpty()) {
+            Draw.z(Layer.flyingUnit + 0.2f);
             int counter = 0;
             if (unit != player.unit()) {
                 for (BuildPlan b : unit.plans()) {

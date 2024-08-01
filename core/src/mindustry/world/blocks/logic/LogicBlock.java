@@ -13,6 +13,7 @@ import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.Vars;
 import mindustry.ai.types.*;
 import mindustry.arcModule.ARCVars;
 import mindustry.core.*;
@@ -98,8 +99,8 @@ public class LogicBlock extends Block{
     }
 
     public boolean accessible(){
-        //return !privileged || state.rules.editor|| state.playtestingMap != null;
-        return !privileged || state.rules.editor|| state.playtestingMap != null || ARCVars.arcInfoControl;
+        return !privileged || state.rules.editor|| state.playtestingMap != null;
+        //return !privileged || state.rules.editor|| state.playtestingMap != null || ARCVars.arcInfoControl;
     }
 
     @Override
@@ -643,7 +644,7 @@ public class LogicBlock extends Block{
 
         @Override
         public boolean shouldShowConfigure(Player player){
-            return accessible();
+            return player == Vars.player;
         }
 
         @Override
@@ -669,7 +670,7 @@ public class LogicBlock extends Block{
 
         @Override
         public boolean onConfigureBuildTapped(Building other){
-            if(this == other || !accessible()){
+            if(this == other){
                 deselect();
                 return false;
             }
