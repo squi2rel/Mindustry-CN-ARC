@@ -435,6 +435,7 @@ public class MusicDialog extends BaseDialog {
                 String id = msg.substring(split + 1);
                 if (src < 0 || src > apis.size || apis.get(src) == null && src != 0) {
                     Core.app.post(() -> arcui.arcInfo("[red]无法找到api!\n可能是学术版本太旧"));
+                    return false;
                 }
                 MusicApi current = apis.get(src);
                 current.getMusicInfo(id, info -> Core.app.post(() -> ui.showConfirm("松鼠音乐", (sender == null ? "" : sender.name) + "分享了一首来自" + current.name + "的音乐" + (info.name == null ? "" : ":\n" + info.author + " - " + info.name) + "\n播放?", () -> current.getInfoOrCall(info, this::play))));
@@ -501,7 +502,7 @@ public class MusicDialog extends BaseDialog {
                 cb.get(info);
                 return;
             }
-            getMusicInfo(info.id, cb, noTip, info);
+            getMusicInfo(info.id, c -> Core.app.post(() -> cb.get(c)), noTip, info);
         }
 
         public void share(MusicInfo info) {
@@ -884,7 +885,7 @@ public class MusicDialog extends BaseDialog {
                 req.submit(res -> {
                     JsonValue j = new JsonReader().parse(res.getResultAsString());
                     if (j.getByte("status") == 0) {
-                        Core.app.post(() -> Vars.ui.showErrorMessage("此歌曲无法播放:\nKuGou Error: (" + j.getLong("error_code") + ") " + j.getString("msg")));
+                        Core.app.post(() -> Vars.ui.showErrorMessage("此歌曲无法播放:\nKuGou Error: (" + j.getLong("error_code", -1) + ") " + j.getString("msg")));
                         return;
                     }
                     JsonValue data = j.get("data");
