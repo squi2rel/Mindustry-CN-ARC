@@ -976,7 +976,6 @@ public class MusicDialog extends BaseDialog {
     }
 
     private class NetEaseMusic extends NetApi {
-        NetEastEncryptor encryptor = new NetEastEncryptor();
 
         {
             name = "网易云网页版";
@@ -986,126 +985,100 @@ public class MusicDialog extends BaseDialog {
 
         @Override
         public void getMusicInfo(String id, Cons<MusicInfo> callback, boolean noTip, MusicInfo raw) {
-            Http.HttpRequest req = Http.post("https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token=");
-            try {
-                encryptor.encryptRequest(req, "{\"ids\":\"[" + id + "]\",\"level\":\"standard\",\"encodeType\":\"mp3\",\"csrf_token\":\"\"}");
-            } catch (Exception e) {
-                ui.showException("获取歌曲信息错误", e);
-            }
+            Http.HttpRequest req = Http.get("https://zm.armoe.cn/song/url?id=" + id);
+
             req.submit(r -> {
                 JsonValue j = new JsonReader().parse(r.getResultAsString());
                 if (j.getInt("code") != 200) {
                     Core.app.post(() -> ui.showErrorMessage("网易云状态码错误:\n" + j.getInt("code")));
-                }
-                JsonValue data = j.get("data").get(0);
-                if (data.getInt("code") != 200) {
-                    Core.app.post(() -> ui.showInfo("此歌曲为vip专属 无法播放"));
                     return;
                 }
-                Http.HttpRequest lr = Http.post("https://music.163.com/weapi/song/lyric?csrf_token=");
-                encryptor.encryptRequest(lr, "{\"id\":" + data.getString("id") + ",\"lv\":-1,\"tv\":-1,\"csrf_token\":\"\"}");
+
+                JsonValue data = j.get("data").get(0);
+                if (data.get("url") == null) {
+                    Core.app.post(() -> ui.showInfo("此歌曲为vip专属或无法播放"));
+                    return;
+                }
+
+                Http.HttpRequest lr = Http.get("https://zm.armoe.cn/lyric?id=" + id);
                 lr.submit(rr -> {
                     JsonValue lrcData = new JsonReader().parse(rr.getResultAsString());
-                    if (lrcData.getInt("code") != 200 || !lrcData.get("lrc").has("lyric")) {
-                        if (raw == null) callback.get(new MusicInfo() {{
+
+                    if (raw == null) {
+                        callback.get(new MusicInfo() {{
                             name = data.getString("name");
                             url = data.getString("url");
                             id = data.getString("id");
                             src = thisId;
+                            lrc = LRCParser.parse(lrcData.get("lrc").getString("lyric"));
                             length = data.getInt("time") / 1000;
                         }});
-                        else callback.get(new MusicInfo() {{
+                    } else {
+                        callback.get(new MusicInfo() {{
                             name = raw.name;
                             author = raw.author;
                             url = data.getString("url");
                             id = data.getString("id");
                             src = thisId;
+                            lrc = LRCParser.parse(lrcData.get("lrc").getString("lyric"));
                             length = data.getInt("time") / 1000;
                         }});
                     }
-                    if (raw == null) callback.get(new MusicInfo() {{
-                        name = data.getString("name");
-                        url = data.getString("url");
-                        id = data.getString("id");
-                        src = thisId;
-                        lrc = LRCParser.parse(lrcData.get("lrc").getString("lyric"));
-                        length = data.getInt("time") / 1000;
-                    }});
-                    else callback.get(new MusicInfo() {{
-                        name = raw.name;
-                        author = raw.author;
-                        url = data.getString("url");
-                        id = data.getString("id");
-                        src = thisId;
-                        lrc = LRCParser.parse(lrcData.get("lrc").getString("lyric"));
-                        length = data.getInt("time") / 1000;
-                    }});
                 });
             });
         }
 
         @Override
         public void search(String name, int page, Cons<MusicSet> callback) {
+            String encodeName;
             try {
-                Http.HttpRequest req = Http.post("https://music.163.com/weapi/cloudsearch/get/web?csrf_token=");
-                encryptor.encryptRequest(req, "{\"s\":\"" + name.replace("\\", "\\\\").replace("\"", "\\\"") + "\",\"type\":\"1\",\"offset\":\"0\",\"total\":\"true\",\"limit\":\"30\",\"csrf_token\":\"\"}");
-                req.submit(res -> {
-                    try {
-                        JsonValue j = new JsonReader().parse(res.getResultAsString());
-                        if (j.getInt("code") != 200) {
-                            Core.app.post(() -> Vars.ui.showErrorMessage("搜索出错:\n网易云 Error: (" + j.getInt("code") + ") "));
-                            return;
-                        }
-                        JsonValue lists = j.get("result").get("songs");
-                        allPage = 1;
-                        MusicSet set = new MusicSet((byte) 30);
-                        for (byte i = 0; i < 30; i++) {
-                            JsonValue thisMusic = lists.get(i);
-                            if (thisMusic == null) {
-                                break;
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            int l = thisMusic.get("ar").size;
-                            JsonValue ar = thisMusic.get("ar");
-                            for (int k = 0; k < l; k++) {
-                                sb.append(ar.get(k).getString("name")).append("/");
-                            }
-                            if (sb.length() != 0) sb.deleteCharAt(sb.length() - 1);
-                            set.add(new MusicInfo() {{
-                                name = thisMusic.getString("name");
-                                author = sb.toString();
-                                id = thisMusic.getString("id");
-                                src = thisId;
-                            }});
-                        }
-                        callback.get(set);
-                    } catch (Exception e) {
-                        Core.app.post(() -> ui.showException("搜索出错!", e));
-                    }
-                });
+                encodeName = URLEncoder.encode(name, "UTF-8");
             } catch (Exception e) {
-                ui.showException("搜索出错!", e);
+                e.printStackTrace();
+                Core.app.post(() -> ui.showErrorMessage("歌曲名称编码错误"));
+                return;
             }
+            Http.HttpRequest req = Http.get("https://zm.armoe.cn/search?keywords=" + encodeName + "&limit=30&offset=" + (page - 1) * 30);
+
+            req.submit(res -> {
+                JsonValue j = new JsonReader().parse(res.getResultAsString());
+                if (j.getInt("code") != 200) {
+                    Core.app.post(() -> ui.showErrorMessage("搜索出错:\n网易云 Error: (" + j.getInt("code") + ") "));
+                    return;
+                }
+
+                JsonValue lists = j.get("result").get("songs");
+                MusicSet set = new MusicSet((byte) 30);
+
+                for (byte i = 0; i < lists.size; i++) {
+                    JsonValue thisMusic = lists.get(i);
+                    if (thisMusic == null) {
+                        break;
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    JsonValue artists = thisMusic.get("artists");
+                    for (int k = 0; k < artists.size; k++) {
+                        sb.append(artists.get(k).getString("name")).append("/");
+                    }
+                    if (sb.length() != 0) sb.deleteCharAt(sb.length() - 1);
+
+                    set.add(new MusicInfo() {{
+                        name = thisMusic.getString("name");
+                        author = sb.toString();
+                        id = thisMusic.getString("id");
+                        src = thisId;
+                    }});
+                }
+
+                callback.get(set);
+            });
         }
 
+
         @Override
-        public void getTips(String str, Cons<String[]> cb) {
-            try {
-                Http.HttpRequest req = Http.post("https://music.163.com/weapi/search/suggest/web?csrf_token=");
-                encryptor.encryptRequest(req, "{\"s\":\"" + str.replace("\\", "\\\\").replace("\"", "\\\"") + "\",\"limit\":\"10\",\"csrf_token\":\"\"}");
-                req.submit(r -> {
-                    JsonValue j = new JsonReader().parse(r.getResultAsString());
-                    if (j.getInt("code") != 200) return;
-                    JsonValue all = j.get("result").get("songs");
-                    int count = all.size;
-                    String[] list = new String[count];
-                    for (int i = 0; i < count; i++) {
-                        list[i] = all.get(i).getString("name");
-                    }
-                    cb.get(list);
-                });
-            } catch (Exception ignored) {
-            }
+        public void getTips(String query, Cons<String[]> callback) {
+            callback.get(new String[0]);
         }
 
         @Override
