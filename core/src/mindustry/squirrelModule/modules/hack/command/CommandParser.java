@@ -7,7 +7,10 @@ import arc.scene.event.InputEvent;
 import arc.scene.event.InputListener;
 import arc.struct.ObjectMap;
 import arc.util.Log;
+import arc.util.Strings;
 import arc.util.Time;
+import mindustry.Vars;
+import mindustry.gen.Call;
 import mindustry.squirrelModule.modules.tools.SMisc;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -157,6 +160,23 @@ public class CommandParser {
                 })).grow()).grow();
                 b.addCloseButton();
                 b.show();
+            }
+        });
+        registerCmd(new Command("colorful", "发送炫彩消息", "<msg>") {
+            @Override
+            public void get(String[] args) {
+                if (args.length == 0) {
+                    ui.chatfrag.addMessage("[red]不能发送空消息");
+                    return;
+                }
+                String raw = Strings.join(" ", args);
+                String msg = SMisc.color(args[0], 3, sui.infoControl.getColor(), false);
+                if (msg.length() > Vars.maxTextLength) {
+                    int max = Vars.maxTextLength / 10;
+                    ui.chatfrag.addMessage("[red]文字过长! 限制为 " + max + " 个字符(" + Vars.maxTextLength +  "), 实际为 " + raw.length() + " 个字符(" + msg.length() + ")");
+                    return;
+                }
+                Call.sendChatMessage(msg);
             }
         });
     }

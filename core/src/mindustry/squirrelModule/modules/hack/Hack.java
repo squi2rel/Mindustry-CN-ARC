@@ -74,8 +74,8 @@ public class Hack {
     public static long lastFillTime, lastAutoFillTime;
     public static Item chosenItem = null;
     //杂项
-    public static boolean customPoke, customPrefix;
-    public static JSTable customPokeText, customPrefixText;
+    public static boolean customPoke, customPrefix, customChat;
+    public static JSTable customPokeText, customPrefixText, customChatText;
 
     public static void init() {
         if (settings.getBool("squirrel", false)) {
@@ -132,6 +132,7 @@ public class Hack {
         manager.register("杂项", "noArcPacket", new Config("停发版本", null, changed(e -> settings.put("arcAnonymity", e))));
         manager.register("杂项", "customPoke", new Config("自定义戳戳", new Element[]{new Label("使用{name}代替玩家名"), customPokeText = jsField("customPoke", "戳了{name}[white]一下，并提醒你留意对话框")}, changed(e -> customPoke = e)));
         manager.register("杂项", "customPrefix", new Config("自定义前缀", new Element[]{new Label("使用{ver}代替版本"), customPrefixText = jsField("customPrefix", "S~{ver}")}, changed(e -> customPrefix = e)));
+        manager.register("杂项", "customChat", new Config("聊天格式化", new Element[]{new Label("使用{text}代表原始聊天"), customChatText = jsField("customChat", "{text}喵~")}, changed(e -> customChat = e)));
 
         initKeys();
         initHandler();

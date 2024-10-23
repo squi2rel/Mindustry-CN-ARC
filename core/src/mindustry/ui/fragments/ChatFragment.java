@@ -209,6 +209,10 @@ public class ChatFragment extends Table{
             if (message.startsWith("..")) message = message.substring(1);
         }
 
+        if (Hack.customChat && !message.startsWith("/")) {
+            message = Hack.customChatText.get(message).replace("{text}", message);
+        }
+
         //avoid sending prefix-empty messages
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 

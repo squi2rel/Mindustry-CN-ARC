@@ -19,6 +19,10 @@ public class SMisc {
     }
 
     public static String color(String str, float step, float rot) {
+        return color(str, step, rot, true);
+    }
+
+    public static String color(String str, float step, float rot, boolean pad) {
         StringBuilder sb = new StringBuilder();
         str = Strings.stripColors(str);
         for (int i = 0, l = str.length(); i < l; i++) {
@@ -26,7 +30,7 @@ public class SMisc {
             sb.append("[#").append(color(rot).toString(), 0, 6).append("]").append(str.charAt(i));
             if (str.charAt(i) == '[') sb.append('[');
         }
-        return sb + "[white]";
+        return pad ? sb + "[white]" : sb.toString();
     }
 
     public static String randomBase64(int length) {
