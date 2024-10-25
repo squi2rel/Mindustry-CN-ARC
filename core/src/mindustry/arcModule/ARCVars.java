@@ -31,7 +31,6 @@ public class ARCVars implements Loadable {
     public static boolean arcCheatServer = false;
     public static boolean replaying = false;
     public static ReplayController replayController;
-    public static ARCClient arcClient = new ARCClient();
 
     public static boolean arcInfoControl = false;
 

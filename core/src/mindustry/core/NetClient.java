@@ -75,7 +75,7 @@ public class NetClient implements ApplicationListener{
             if (ip.contains("/")) {
                 ip = ip.substring(ip.indexOf("/") + 1);
             }
-            if (USIDDialog.chooseUSID && Core.settings.getString("usid-" + ip, null) == null && !ARCVars.replaying) {
+            if (!ip.startsWith("steam:") && USIDDialog.chooseUSID && Core.settings.getString("usid-" + ip, null) == null && !ARCVars.replaying) {
                 disconnectQuietly();
                 USIDDialog.showSet(ip);
                 return;
@@ -165,11 +165,6 @@ public class NetClient implements ApplicationListener{
                 Call.serverPacketReliable("ARC-build",Version.arcBuild + "");
                 Call.serverPacketReliable("CheatOverride", ARCVars.arcCheatServer + "");
             }
-        });
-
-        ARCVars.arcClient.addHandlerString("ARCCHAT", (p, s) -> {
-            if (s.length() > maxTextLength) return;
-            Core.app.post(() -> NetClient.sendMessage("[violet]<ARC>[] " + netServer.chatFormatter.format(p, s), s, p));
         });
     }
 
@@ -322,11 +317,6 @@ public class NetClient implements ApplicationListener{
                 }
             }
         }
-    }
-
-    public static void sendARCMessage(String msg) {
-        if (msg.length() > maxTextLength) return;
-        ARCVars.arcClient.send("ARCCHAT", msg);
     }
 
     @Remote(called = Loc.client, variants = Variant.one)
