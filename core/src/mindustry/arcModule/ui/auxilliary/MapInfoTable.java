@@ -4,14 +4,9 @@ package mindustry.arcModule.ui.auxilliary;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.Colors;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.scene.Element;
-import arc.scene.ui.ImageButton;
 import arc.scene.ui.TextField;
 import arc.scene.ui.layout.*;
 import mindustry.arcModule.ARCVars;
-import mindustry.arcModule.ui.ARCChat;
 import mindustry.content.*;
 import mindustry.editor.*;
 import mindustry.gen.*;
@@ -56,21 +51,6 @@ public class MapInfoTable extends BaseToolsTable{
         }).tooltip("切换跟踪玩家");
         button(Icon.starSmall, clearAccentNonei, arcui.achievements::show).tooltip("统计与成就");
         if(!mobile) button(Icon.editSmall,clearAccentNonei,this::uiTable).tooltip("ui大全");
-        {
-            ImageButton button = new ImageButton(Icon.chatSmall, clearAccentNonei) {
-                @Override
-                public void draw() {
-                    super.draw();
-                    if (ARCChat.msgUnread != 0) {
-                        Draw.color(Color.red);
-                        Fill.circle(x + 30, y + 30, 5);
-                    }
-                }
-            };
-            button.clicked(ARCChat::show);
-            button.resizeImage(Icon.chatSmall.imageSize());
-            add(button).tooltip("学术聊天");
-        }
     }
 
     private void floorStatisticDialog(){

@@ -1,6 +1,6 @@
 sourceSets.main.java.srcDirs = ["src/"]
 
-project.ext.mainClassName = "mindustry.desktop.DesktopLauncher0"
+project.ext.mainClassName = "mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 def enableTemplates = true

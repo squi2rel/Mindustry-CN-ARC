@@ -83,10 +83,5 @@ public class ARCUI {
         Core.settings.put("yuanshen", ClientLauncher.YuanShenLoader);
 
         initArcWave();
-        try {
-            ARCChat.init();
-        } catch (Exception e) {
-            Log.err(e);
-        }
     }
 }
