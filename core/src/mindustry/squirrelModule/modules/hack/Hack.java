@@ -20,11 +20,9 @@ import arc.scene.ui.layout.Table;
 import arc.scene.utils.Elem;
 import arc.struct.ObjectMap;
 import arc.util.*;
-import mindustry.arcModule.ARCVars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.core.GameState;
-import mindustry.core.NetClient;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Building;
@@ -61,7 +59,7 @@ public class Hack {
     //显示
     public static boolean noFog, useWindowedMenu;
     //多人
-    public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn, privateMsg, ghost;
+    public static boolean chooseUUID, randomUSID, simDevice, autoGG, fastIn, ghost;
     public static String chosenUUID = null;
     public static int autoGGDelay;
     public static JSTable autoGGText;
@@ -97,7 +95,6 @@ public class Hack {
         manager.register("多人", "autoGG", new Config("自动gg", new Element[]{new Label("自定义消息"), autoGGText = jsField("autoGG", "gg"), new Label(""), slider("autoGG", 0f, 5000f, 1f, 0f, f -> autoGGDelay = Mathf.ceil(f), 2, f -> "自动gg延时 " + autoGGDelay + "ms")}, changed(e -> autoGG = e)));
         manager.register("多人", "fastIn", new Config("快速附身", new Element[]{new Label("按住单位生成的位置")}, changed(e -> fastIn = e)));
         manager.register("多人", "rejoin", new Config("重进", null, changed(Hack::reconnect)));
-        manager.register("多人", "privateMsg", new Config("VAPE聊天", null, changed(e -> privateMsg = e)));
         manager.register("多人", "ghost", new Config("幽灵玩家", new Element[]{new Label("能看建筑看不到单位"), new Label("无法交互和聊天"), new Label("不会显示玩家加入")}, changed(e -> ghost = e)));
 
         manager.register("移动", "immediatelyTurn", new Config("瞬间转向", null, changed(e -> immediatelyTurn = e)));
@@ -135,7 +132,6 @@ public class Hack {
         manager.register("杂项", "customChat", new Config("聊天格式化", new Element[]{new Label("使用{text}代表原始聊天"), customChatText = jsField("customChat", "{text}喵~")}, changed(e -> customChat = e)));
 
         initKeys();
-        initHandler();
         CommandParser.initCommands();
     }
 
@@ -488,10 +484,6 @@ public class Hack {
             KeyCode k = KeyCode.valueOf(kn);
             keyMap.put(c, k);
         });
-    }
-
-    private static void initHandler() {
-        ARCVars.arcClient.addHandlerString("VAPEMSG", (p, s) -> NetClient.sendMessage("[acid]<VAPE>[] " + netServer.chatFormatter.format(p, s), s, p));
     }
 
     public static class JSTable extends Table {

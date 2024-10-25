@@ -223,11 +223,6 @@ public class ChatFragment extends Table{
 
         Events.fire(new ClientChatEvent(message));
 
-        if (Hack.privateMsg) {
-            ARCVars.arcClient.send("VAPEMSG", message);
-            return;
-        }
-
         if (settings.getBool("arcChatEnabled", false) && message.startsWith(ChatMode.arc.prefix + " ")) {
             NetClient.sendARCMessage(message.substring(ChatMode.arc.prefix.length() + 1));
             return;
