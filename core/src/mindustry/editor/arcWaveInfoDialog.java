@@ -12,6 +12,7 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.ai.types.BuilderAI;
 import mindustry.ai.types.MinerAI;
 import mindustry.ai.types.RepairAI;
@@ -134,7 +135,7 @@ public class arcWaveInfoDialog extends BaseDialog {
             waveInfo = !waveInfo;
             waveMulti = 1;
             setup();
-        }).size(250f, 64f);
+        }).size(250f, 64f).disabled(b -> state.rules.winWave > 50000);
 
         if (true) {
             buttons.button("随机", Icon.refresh, () -> arcSpawner()).width(200f);
@@ -162,6 +163,7 @@ public class arcWaveInfoDialog extends BaseDialog {
     }
 
     void setup() {
+        if (state.rules.winWave > 50000) waveInfo = true;
         groups = JsonIO.copy(state.rules.spawns.isEmpty() ? waves.get() : state.rules.spawns);
 
         cont.clear();
@@ -351,7 +353,7 @@ public class arcWaveInfoDialog extends BaseDialog {
                     }
                 }).scrollX(false).growX().row();
                 tb.table(tbb -> {
-                    tbb.button("刷新波次显示", () -> setup()).width(200f);
+                    tbb.button("刷新波次显示", this::setup).width(200f);
                     TextField sField = tbb.field(calWinWave() * (int) waveMulti + "", text -> {
                         waveMulti = (Float.parseFloat(text) / calWinWave());
                     }).valid(Strings::canParsePositiveFloat).width(200f).get();

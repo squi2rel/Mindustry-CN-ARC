@@ -97,7 +97,8 @@ public class arcWaveSpawner {
 
     public static void initArcWave(int wave) {
         arcWave = new Seq<>();
-        for (int waveN = 0; waveN < wave; waveN++) {
+        int end = Math.min(wave, 50000);
+        for (int waveN = 0; waveN < end; waveN++) {
             arcWave.add(new waveInfo(waveN));
         }
     }
