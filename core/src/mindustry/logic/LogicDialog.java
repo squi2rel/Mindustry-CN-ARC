@@ -46,6 +46,7 @@ public class LogicDialog extends BaseDialog{
     @Nullable LExecutor executor;
 
     private boolean dispose = false;
+    public boolean editing = false;
 
     public LogicDialog(){
         super("logic");
@@ -416,7 +417,9 @@ public class LogicDialog extends BaseDialog{
         }
         this.consumer = result -> {
             if(!result.equals(code)){
+                editing = true;
                 modified.get(result);
+                editing = false;
             }
         };
         varsTable();
